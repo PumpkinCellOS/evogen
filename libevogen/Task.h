@@ -53,7 +53,7 @@ public:
 
 private:
     BlockPosition m_position;
-    Turtle m_turtle;
+    Turtle& m_turtle;
 };
 
 }
