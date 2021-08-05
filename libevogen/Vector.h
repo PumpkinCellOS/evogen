@@ -29,3 +29,17 @@ public:
 };
 
 }
+
+namespace std
+{
+
+template<class T>
+struct hash<evo::Vector<T>>
+{
+    size_t operator()(evo::Vector<T> const& vector) const
+    {
+        return hash<T>()(vector.x) ^ (hash<T>()(vector.y) << 1) ^ (hash<T>()(vector.z) << 2);
+    }
+};
+
+}
