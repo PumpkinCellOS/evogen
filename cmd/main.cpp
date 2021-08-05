@@ -1,14 +1,15 @@
 #include <libevogen/Block.h>
 #include <libevogen/Generator.h>
 #include <libevogen/Task.h>
+#include <libevogen/VanillaBlock.h>
 #include <libevogen/World.h>
 
 int main()
 {
     evo::World world;
     
-    world.set_block_at({10, 10, 10}, evo::Block("stone"));
-    world.fill_blocks_at({11, 11, 11}, {-11, 50, -11}, evo::Block("stone"));
+    world.set_block_at({10, 10, 10}, evo::VanillaBlock::Stone);
+    world.fill_blocks_at({11, 11, 11}, {-11, 50, -11}, evo::VanillaBlock::Stone);
 
     evo::Generator generator;
     generator.load_from_world(world);

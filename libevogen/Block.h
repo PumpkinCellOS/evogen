@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libevogen/VanillaBlock.h>
 #include <libevogen/Vector.h>
 
 #include <string>
@@ -15,6 +16,8 @@ public:
 
     Block(std::string const& id, std::string const& states = "", std::string const& nbt = "")
     : m_id(id), m_states(states), m_nbt(nbt) {}
+
+    Block(VanillaBlock type, std::string const& states = "", std::string const& nbt = "");
 
     std::string id() const { return m_id; }
     std::string states() const { return m_states; }
