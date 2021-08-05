@@ -20,6 +20,11 @@ public:
         return {x+other.x, y+other.y, z+other.z};
     }
 
+    Vector operator*(double value) const
+    {
+        return {static_cast<T>(x*value), static_cast<T>(y*value), static_cast<T>(z*value)};
+    }
+
     std::string to_string() const
     {
         return std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(z);
