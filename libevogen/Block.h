@@ -22,6 +22,11 @@ public:
 
     std::string to_command_format() const { return m_id + "[" + m_states + "]" + m_nbt; }
 
+    bool operator==(Block const& other) const
+    {
+        return id() == other.id() && states() == other.states() && nbt() == other.nbt();
+    }
+
 private:
     std::string m_id;
     std::string m_states;
@@ -41,9 +46,14 @@ public:
                 coord_to_string(m_position.z);
     }
 
-    Vector<int> resolve_relative_position(Vector<int> const& other) const
+    Vector<int> resolve_relative_position(Vector<int> const& relative) const
     { 
-        return other + m_position;
+        return relative + m_position;
+    }
+
+    Vector<int> resolve_absolute_position(Vector<int> const& absolute) const
+    { 
+        return absolute - m_position;
     }
 
 private:
@@ -53,6 +63,20 @@ private:
     }
 
     Vector<int> m_position;
+};
+
+}
+
+namespace std
+{
+
+template<>
+struct hash<evo::Block>
+{
+    size_t operator()(evo::Block const& block) const
+    {
+        return std::hash<std::string>()(block.to_command_format());
+    }
 };
 
 }

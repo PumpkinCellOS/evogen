@@ -20,9 +20,19 @@ public:
         return {x+other.x, y+other.y, z+other.z};
     }
 
+    Vector operator-(Vector const& other) const
+    {
+        return {x-other.x, y-other.y, z-other.z};
+    }
+
     Vector operator*(double value) const
     {
         return {static_cast<T>(x*value), static_cast<T>(y*value), static_cast<T>(z*value)};
+    }
+
+    bool operator==(Vector const& other) const
+    {
+        return x == other.x && y == other.y && z == other.z;
     }
 
     std::string to_string() const
@@ -43,7 +53,7 @@ struct hash<evo::Vector<T>>
 {
     size_t operator()(evo::Vector<T> const& vector) const
     {
-        return hash<T>()(vector.x) ^ (hash<T>()(vector.y) << 1) ^ (hash<T>()(vector.z) << 2);
+        return hash<T>()(vector.x) ^ (hash<T>()(vector.y) << 24) ^ (hash<T>()(vector.z) << 48);
     }
 };
 

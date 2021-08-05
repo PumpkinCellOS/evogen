@@ -24,6 +24,8 @@ void MoveTurtleTask::generate_code(Generator const& generator) const
 {
     *generator.stream() << m_turtle.to_execute_as() << " at @s run tp @s "
                         << m_position.to_command_format() << std::endl;
+    // DEBUG
+    *generator.stream() << m_turtle.to_execute_as() << " at @s run setblock ~ ~ ~ redstone_block" << std::endl;
 }
 
 }

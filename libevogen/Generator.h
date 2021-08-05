@@ -11,12 +11,16 @@
 namespace evo
 {
 
+class World;
+
 class Generator
 {
 public:
     Generator(Vector<int> position = {})
     : m_turtle(position) {}
-    
+
+    void load_from_world(World const& world);
+
     template<class T, class... Args>
     void add_task(Args&&... args)
     {

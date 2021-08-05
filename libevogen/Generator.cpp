@@ -1,9 +1,16 @@
 #include <libevogen/Generator.h>
 
+#include <libevogen/World.h>
+
 #include <fstream>
 
 namespace evo
 {
+
+void Generator::load_from_world(World const& world)
+{
+    world.generate_tasks(*this);
+}
 
 void Generator::generate(std::ostream& stream) const
 {
