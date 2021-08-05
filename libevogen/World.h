@@ -75,6 +75,9 @@ public:
     void set_block_at(Vector<int> const&, Block const&);
     void fill_blocks_at(Vector<int> const& start, Vector<int> const& end, Block const&);
 
+    void fill_blocks_hollow(Vector<int> const& start, Vector<int> const& end, Block const& outline, Block const& fill = Block("air"));
+    void fill_blocks_outline(Vector<int> const& start, Vector<int> const& end, Block const& outline);
+
     void set_block_descriptor_at(Vector<int> const&, BlockDescriptor);
     BlockDescriptor ensure_block_descriptor_at(Vector<int> const&);
 

@@ -10,6 +10,8 @@ int main()
     
     world.set_block_at({10, 10, 10}, evo::VanillaBlock::Stone);
     world.fill_blocks_at({11, 11, 11}, {-11, 50, -11}, evo::VanillaBlock::Stone);
+    world.fill_blocks_outline({-50, 50, -50}, {-40, 40, -40}, evo::VanillaBlock::OakPlanks);
+    world.fill_blocks_hollow({50, 50, 50}, {40, 40, 40}, {evo::VanillaBlock::OakLog, "axis=x"}, evo::VanillaBlock::Podzol);
 
     evo::Generator generator;
     generator.load_from_world(world);

@@ -113,6 +113,33 @@ void World::fill_blocks_at(Vector<int> const& start, Vector<int> const& end, Blo
     }
 }
 
+void World::fill_blocks_hollow(Vector<int> const& start, Vector<int> const& end, Block const& outline, Block const& fill)
+{
+    auto min_vector = Vector<int>{std::min(start.x, end.x), std::min(start.y, end.y), std::min(start.z, end.z)};
+    auto max_vector = Vector<int>{std::max(start.x, end.x), std::max(start.y, end.y), std::max(start.z, end.z)};
+
+    fill_blocks_at(min_vector + Vector<int>(1, 1, 1), max_vector - Vector<int>(1, 1, 1), fill);
+    fill_blocks_outline(min_vector, max_vector, outline);
+}
+
+void World::fill_blocks_outline(Vector<int> const& start, Vector<int> const& end, Block const& outline)
+{
+    auto min_vector = Vector<int>{std::min(start.x, end.x), std::min(start.y, end.y), std::min(start.z, end.z)};
+    auto max_vector = Vector<int>{std::max(start.x, end.x), std::max(start.y, end.y), std::max(start.z, end.z)};
+
+    // X Sides
+    fill_blocks_at(Vector<int>(min_vector.x, min_vector.y, min_vector.z), Vector<int>(min_vector.x, max_vector.y, max_vector.z), outline);
+    fill_blocks_at(Vector<int>(max_vector.x, min_vector.y, min_vector.z), Vector<int>(max_vector.x, max_vector.y, max_vector.z), outline);
+
+    // Y Sides
+    fill_blocks_at(Vector<int>(min_vector.x + 1, min_vector.y, min_vector.z + 1), Vector<int>(max_vector.x - 1, min_vector.y, max_vector.z - 1), outline);
+    fill_blocks_at(Vector<int>(min_vector.x + 1, max_vector.y, min_vector.z + 1), Vector<int>(max_vector.x - 1, max_vector.y, max_vector.z - 1), outline);
+
+    // Z Sides
+    fill_blocks_at(Vector<int>(min_vector.x + 1, min_vector.y, min_vector.z), Vector<int>(max_vector.x - 1, max_vector.y, min_vector.z), outline);
+    fill_blocks_at(Vector<int>(min_vector.x + 1, min_vector.y, max_vector.z), Vector<int>(max_vector.x - 1, max_vector.y, max_vector.z), outline);
+}
+
 void World::set_block_descriptor_at(Vector<int> const& position, BlockDescriptor block)
 {
     //std::cerr << "set_block_descriptor_at " << position.to_string() << " = " << block.arg << std::endl;
