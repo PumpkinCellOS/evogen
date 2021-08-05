@@ -37,7 +37,7 @@ void Chunk::generate_tasks(World const& world, Generator& generator) const
                             generator.add_task<FillBlocksTask>(
                                 block.value(),
                                 Vector<int>{static_cast<int>(x), static_cast<int>(y), saved_z},
-                                Vector<int>{static_cast<int>(x), static_cast<int>(y), static_cast<int>(z)});
+                                Vector<int>{static_cast<int>(x), static_cast<int>(y), static_cast<int>(z - 1)});
                     }
                     same_blocks = 0;
                     last_block_index = 0;
