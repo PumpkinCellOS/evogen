@@ -54,20 +54,20 @@ void Chunk::generate_tasks(World const& world, Generator& generator) const
                     {
                         if(z < SIZE - 1)
                         {
-                            if(last_block_index == 0)
-                            {
-                                last_block_index = block_descriptor.arg;
-                                saved_z = z;
-                                same_blocks = 1;
-                            }
-                            else if(last_block_index == block_descriptor.arg)
+                            if(last_block_index == block_descriptor.arg)
                             {
                                 same_blocks++;
                             }
                             else
                             {
-                                std::cerr << "dupe end save " << x << ", " << y << ", " << z << std::endl;
-                                save();
+                                if(last_block_index != 0)
+                                {
+                                    std::cerr << "dupe end save " << x << ", " << y << ", " << z << std::endl;
+                                    save();
+                                }
+                                last_block_index = block_descriptor.arg;
+                                saved_z = z;
+                                same_blocks = 1;
                             }
                         }
                         else
