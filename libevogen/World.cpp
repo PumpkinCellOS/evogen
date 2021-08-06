@@ -1,5 +1,6 @@
 #include <libevogen/World.h>
 
+#include <libevogen/Structure.h>
 #include <libevogen/Task.h>
 
 namespace evo
@@ -61,6 +62,29 @@ void World::fill_blocks_outline(Vector<int> const& start, Vector<int> const& end
     // Z Sides
     fill_blocks_at(Vector<int>(min_vector.x + 1, min_vector.y, min_vector.z), Vector<int>(max_vector.x - 1, max_vector.y, min_vector.z), outline);
     fill_blocks_at(Vector<int>(min_vector.x + 1, min_vector.y, max_vector.z), Vector<int>(max_vector.x - 1, max_vector.y, max_vector.z), outline);
+}
+
+void World::place_structure(Structure const& structure, Vector<int> const& offset)
+{
+    auto [sx, sy, sz] = structure.size();
+    for(int x = 0; x < sx; x++)
+    {
+        for(int y = 0; y < sy; y++)
+        {
+            for(int z = 0; z < sz; z++)
+            {
+                auto descriptor = structure.get_block_descriptor_at({x, y, z});
+                assert(descriptor);
+                if(descriptor->kind == BlockDescriptor::Block)
+                {
+                    auto block = structure.block_from_index(descriptor->arg);
+                    assert(block.has_value());
+                    // TODO: Handle states+nbt
+                    set_block_at(Vector<int>(x, y, z) + offset, block.value());
+                }
+            }
+        }
+    }
 }
 
 void World::set_block_descriptor_at(Vector<int> const& position, BlockDescriptor block)

@@ -13,6 +13,8 @@
 namespace evo
 {
 
+class Structure;
+
 class World
 {
 public:
@@ -21,6 +23,9 @@ public:
 
     void fill_blocks_hollow(Vector<int> const& start, Vector<int> const& end, Block const& outline, Block const& fill = Block("air"));
     void fill_blocks_outline(Vector<int> const& start, Vector<int> const& end, Block const& outline);
+
+    // Position specifies position of all-negative corner of structure.
+    void place_structure(Structure const&, Vector<int> const& position);
 
     void set_block_descriptor_at(Vector<int> const&, BlockDescriptor);
     BlockDescriptor ensure_block_descriptor_at(Vector<int> const&);
@@ -41,10 +46,11 @@ public:
     std::optional<Block> block_from_index(uint16_t) const;
     std::optional<uint16_t> index_of(Block const&) const;
 
-private:
+protected:
     void initialize_chunk(Chunk&) const;
     uint16_t generate_index(Block const&);
 
+private:
     std::unordered_map<Vector<int>, Chunk> m_chunks;
     std::unordered_map<uint16_t, Block> m_index_to_block;
     std::unordered_map<Block, uint16_t> m_block_to_index;
