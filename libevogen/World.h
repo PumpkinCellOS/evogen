@@ -24,8 +24,12 @@ public:
 
     void set_block_descriptor_at(Vector<int> const&, BlockDescriptor);
     BlockDescriptor ensure_block_descriptor_at(Vector<int> const&);
+    BlockDescriptor* get_block_descriptor_at(Vector<int> const&);
+    BlockDescriptor const* get_block_descriptor_at(Vector<int> const&) const;
 
     Chunk& ensure_chunk_at(Vector<int> const& chunk_position);
+    Chunk* get_chunk_at(Vector<int> const& chunk_position);
+    Chunk const* get_chunk_at(Vector<int> const& chunk_position) const;
 
     // TODO: Handle y chunks
     static Vector<int> chunk_position_from_block(Vector<int> const&);

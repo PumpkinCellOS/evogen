@@ -75,6 +75,22 @@ BlockDescriptor World::ensure_block_descriptor_at(Vector<int> const& position)
     return ensure_chunk_at(chunk_position_from_block(position)).block_at(chunk_offset_from_block(position));
 }
 
+BlockDescriptor* World::get_block_descriptor_at(Vector<int> const& position)
+{
+    auto chunk = get_chunk_at(chunk_position_from_block(position));
+    if(!chunk)
+        return nullptr;
+    return &chunk->block_at(chunk_offset_from_block(position));
+}
+
+BlockDescriptor const* World::get_block_descriptor_at(Vector<int> const& position) const
+{
+    auto chunk = get_chunk_at(chunk_position_from_block(position));
+    if(!chunk)
+        return nullptr;
+    return &chunk->block_at(chunk_offset_from_block(position));
+}
+
 Chunk& World::ensure_chunk_at(Vector<int> const& chunk_position)
 {
     auto it = m_chunks.find(chunk_position);
@@ -86,6 +102,22 @@ Chunk& World::ensure_chunk_at(Vector<int> const& chunk_position)
         it = result.first;
     }
     return it->second;
+}
+
+Chunk* World::get_chunk_at(Vector<int> const& chunk_position)
+{
+    auto it = m_chunks.find(chunk_position);
+    if(it == m_chunks.end())
+        return nullptr;
+    return &it->second;
+}
+
+Chunk const* World::get_chunk_at(Vector<int> const& chunk_position) const
+{
+    auto it = m_chunks.find(chunk_position);
+    if(it == m_chunks.end())
+        return nullptr;
+    return &it->second;
 }
 
 void World::initialize_chunk(Chunk&) const
