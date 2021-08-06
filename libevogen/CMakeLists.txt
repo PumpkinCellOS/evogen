@@ -1,5 +1,6 @@
 add_library(libevogen
     "Block.cpp"
+    "Chunk.cpp"
     "Generator.cpp"
     "Task.cpp"
     "Turtle.cpp"
