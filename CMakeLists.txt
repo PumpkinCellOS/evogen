@@ -7,3 +7,5 @@ add_compile_options(-Wall -Werror)
 
 add_subdirectory(cmd)
 add_subdirectory(libevogen)
+add_subdirectory(libevoscript)
+add_subdirectory(tests)

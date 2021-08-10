@@ -1,0 +1,13 @@
+file(GLOB_RECURSE sources CONFIGURE_DEPENDS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
+
+foreach(file ${sources})
+    get_filename_component(file_dir ${file} DIRECTORY)
+    get_filename_component(file_name ${file} NAME_WE)
+    string(REPLACE "/" "-" file_dir_for_target "${file_dir}")
+    set(target_name evotest-${file_dir_for_target}-${file_name})
+    add_executable(${target_name} ${file})
+    target_include_directories(${target_name} PUBLIC ${CMAKE_SOURCE_DIR})
+    if(${file_dir} MATCHES "script*")
+        target_link_libraries(${target_name} libevoscript)
+    endif()
+endforeach()
