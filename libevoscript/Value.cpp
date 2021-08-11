@@ -119,6 +119,8 @@ std::string Value::to_string(Runtime& rt) const
 {
     switch(m_type)
     {
+    case Type::Invalid:
+        return "<invalid>";
     case Type::Null:
         return "null";
     case Type::Undefined:
