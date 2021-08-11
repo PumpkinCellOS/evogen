@@ -175,10 +175,6 @@ std::shared_ptr<Statement> EVOParser::parse_expression_statement()
     auto expression = parse_expression();
     if(expression->is_error())
         return std::make_shared<ExpressionStatement>(ASTNode::Error, expression->error_message());
-
-    auto semicolon = consume_of_type(Token::Semicolon);
-    if(!semicolon)
-        return std::make_shared<ExpressionStatement>(ASTNode::Error, "Expected ';' in statement");
     
     return std::make_shared<ExpressionStatement>(expression);
 }
@@ -192,9 +188,17 @@ std::shared_ptr<Program> EVOParser::parse_program()
     while(!eof())
     {
         auto node = parse_statement();
+
         program->add_node(node);
         if(node->is_error())
             break;
+
+        if(node->requires_semicolon())
+        {
+            auto semicolon = consume_of_type(Token::Semicolon);
+            if(!semicolon && !eof())
+                return std::make_shared<Program>(ASTNode::Error, "Expected ';' in statement");
+        }
     }
     return program;
 }

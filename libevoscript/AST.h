@@ -258,6 +258,8 @@ public:
     : ASTNode(tag, message) {}
 
     Statement() = default;
+
+    virtual bool requires_semicolon() const { return true; }
 };
 
 class ExpressionStatement : public Statement
