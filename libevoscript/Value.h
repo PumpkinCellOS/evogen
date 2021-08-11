@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <map>
 #include <memory>
 #include <string>
@@ -88,10 +89,10 @@ private:
     : m_type(Type::Int), m_int_value(value) {}
 
     explicit Value(std::shared_ptr<Object> value)
-    : m_type(Type::Object), m_object_value(value) {}
+    : m_type(Type::Object), m_object_value(value) { assert(m_object_value); }
 
     explicit Value(std::shared_ptr<MemoryValue> value)
-    : m_type(Type::Reference), m_reference_value(value) {}
+    : m_type(Type::Reference), m_reference_value(value) { assert(m_reference_value); }
 
     struct _UndefinedTag {}; static constexpr _UndefinedTag Undefined {};
 
