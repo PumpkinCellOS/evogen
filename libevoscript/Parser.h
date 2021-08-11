@@ -58,6 +58,8 @@ public:
     Token const* consume()
     {
         auto token = peek();
+        if(!token)
+            return nullptr;
         m_offset++;
         return token;
     }
@@ -65,7 +67,7 @@ public:
     Token const* consume_of_type(Token::Type type)
     {
         auto token = peek();
-        if(token->type() != type)
+        if(!token || token->type() != type)
             return nullptr;
         m_offset++;
         return token;
