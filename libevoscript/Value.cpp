@@ -49,6 +49,11 @@ Value Function::get(std::string const&)
     return Value::undefined();
 }
 
+Value NativeFunction::create_value(std::function<Value(Runtime&)>&& function)
+{
+    return Value::new_object(std::make_shared<NativeFunction>(std::move(function)));
+}
+
 Value NativeFunction::call(Runtime& rt)
 {
     assert(m_function);

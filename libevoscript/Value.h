@@ -47,6 +47,8 @@ public:
     NativeFunction(std::function<Value(Runtime&)>&& function)
     : m_function(function) {}
 
+    static Value create_value(std::function<Value(Runtime&)>&& function);
+
     virtual std::string type_name() const override { return "NativeFunction"; }
     virtual Value call(Runtime& rt) override;
 
