@@ -1,6 +1,7 @@
 add_library(libevoscript
     "AST.cpp"
     "ExecutionContext.cpp"
+    "Lexer.cpp"
     "Parser.cpp"
     "Runtime.cpp"
     "Value.cpp"
