@@ -18,15 +18,8 @@ Runtime::Runtime(std::shared_ptr<MemoryValue> global_this)
     if(has_exception())
         return;
 
-    // some test
-    // TODO: This should be given by user with global_this argument
     auto _this = context.this_object();
     auto _local = context.local_scope_object();
-    _this->get("testInt").assign(Value::new_int(1234));
-    _this->get("testObject").assign(Value::new_object(std::make_shared<MapObject>()));
-    _local = MemoryValue::create_object<MapObject>();
-    _local->value().get_object()->get("testNull").assign(Value::null());
-    _local->value().get_object()->get("testReference").assign_direct(Value::new_reference(MemoryValue::create_existing_object(_this)));
 
     std::cout << "this = " << _this->dump_string() << std::endl;
     std::cout << "local scope = " << *_local << std::endl;
@@ -52,6 +45,11 @@ void Runtime::throw_exception(std::string const& message)
 
 ExecutionContext& Runtime::push_execution_context(std::shared_ptr<Object> this_object)
 {
+    if(!this_object)
+    {
+        assert(m_global_this->value().is_object());
+        this_object = m_global_this->value().get_object();
+    }
     return m_execution_context_stack.emplace(this_object);
 }
 
