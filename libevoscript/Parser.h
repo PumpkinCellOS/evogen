@@ -99,11 +99,16 @@ public:
     std::shared_ptr<Expression> parse_identifier();
     std::shared_ptr<Expression> parse_special_value();
     std::shared_ptr<Expression> parse_member_expression();
+    std::shared_ptr<Expression> parse_function_call();
     std::shared_ptr<Expression> parse_assignment_expression();
 
     std::shared_ptr<Statement>  parse_statement();
     std::shared_ptr<Statement>  parse_expression_statement();
     std::shared_ptr<Program>    parse_program();
+
+    // Postfix helpers
+    std::shared_ptr<Expression> parse_member_name(std::shared_ptr<Expression> container); // .name
+    std::shared_ptr<Expression> parse_argument_list(std::shared_ptr<Expression> callable); // (arg1, arg2, ...)
 };
 
 }

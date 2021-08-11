@@ -1,6 +1,8 @@
+#include "libevoscript/ExecutionContext.h"
 #include <libevoscript/AST.h>
 
 #include <cassert>
+#include <memory>
 
 namespace evo::script
 {
@@ -12,7 +14,7 @@ Value IntegerLiteral::evaluate(Runtime&) const
 
 Value Identifier::evaluate(Runtime& rt) const
 {
-    auto object = rt.local_scope_object()->value().to_object(rt);
+    auto object = rt.current_execution_context().local_scope_object()->value().to_object(rt);
     if(rt.has_exception())
         return {}; // Local scope is not an object (unlikely to happen)
 
@@ -28,7 +30,7 @@ Value SpecialValue::evaluate(Runtime& rt) const
     switch(m_type)
     {
     case This:
-        return Value::new_reference(rt.this_object());
+        return Value::new_reference(MemoryValue::create_existing_object(rt.current_execution_context().this_object()));
     case Null:
         return Value::null();
     case Undefined:
@@ -48,11 +50,25 @@ Value MemberExpression::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {}; // LHS of member expression is not an object
 
-    auto memory_object = object->get(m_name).to_reference(rt);
+    auto member = object->get(m_name);
     if(rt.has_exception())
-        return {}; // MemoryObject is not a reference
+        return {}; // get() failed (e.g nonexisting objects are not tolerated)
 
-    return Value::new_reference(memory_object);
+    member.set_container(object);
+    return member;
+}
+
+Value FunctionCall::evaluate(Runtime& rt) const
+{
+    auto callable = m_callable->evaluate(rt);
+    if(rt.has_exception())
+        return {}; // failed to evaluate callable
+
+    ScopedExecutionContext context(rt, callable.container());
+    if(rt.has_exception())
+        return {}; // 'this' is not an object
+
+    return callable.call(rt);
 }
 
 Value AssignmentExpression::evaluate(Runtime& rt) const

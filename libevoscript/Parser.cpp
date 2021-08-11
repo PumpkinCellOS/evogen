@@ -87,26 +87,71 @@ std::shared_ptr<Expression> EVOParser::parse_special_value()
     return std::make_shared<SpecialValue>(ASTNode::Error, "Invalid special value");
 }
 
+std::shared_ptr<Expression> EVOParser::parse_member_name(std::shared_ptr<Expression> container)
+{
+    auto dot = consume_of_type(Token::Dot);
+    if(!dot)
+        return std::make_shared<MemberExpression>(ASTNode::Error, "Invalid member expression");
+
+    auto member_name = consume_of_type(Token::Name);
+    if(!member_name)
+        return std::make_shared<MemberExpression>(ASTNode::Error, "Expected name in member expression");
+
+    auto member_expression = std::make_shared<MemberExpression>(container, member_name->value());
+
+    auto maybe_chained_reference = parse_member_name(member_expression);
+    if(!maybe_chained_reference->is_error())
+        return maybe_chained_reference;
+    return member_expression;
+}
+
 std::shared_ptr<Expression> EVOParser::parse_member_expression()
 {
     auto lhs = parse_primary_expression();
     if(lhs->is_error())
         return lhs;
 
-    auto dot = consume_of_type(Token::Dot);
-    if(!dot)
+    auto member_expression = parse_member_name(lhs);
+    if(member_expression->is_error())
+        return lhs;
+    return member_expression;
+}
+
+std::shared_ptr<Expression> EVOParser::parse_argument_list(std::shared_ptr<Expression> callable)
+{
+    auto paren_open = consume_of_type(Token::ParenOpen);
+    if(!paren_open)
+        return std::make_shared<FunctionCall>(ASTNode::Error, "Invalid argument list");
+
+    // TODO: Arguments
+    
+    auto paren_close = consume_of_type(Token::ParenClose);
+    if(!paren_close)
+        return std::make_shared<FunctionCall>(ASTNode::Error, "Unmatched '('");
+
+    auto function_call = std::make_shared<FunctionCall>(callable);
+
+    auto maybe_chained_call = parse_argument_list(function_call);
+    if(!maybe_chained_call->is_error())
+        return maybe_chained_call;
+    return function_call;
+}
+
+std::shared_ptr<Expression> EVOParser::parse_function_call()
+{
+    auto lhs = parse_member_expression();
+    if(lhs->is_error())
         return lhs;
 
-    auto member_name = consume_of_type(Token::Name);
-    if(!member_name)
-        return std::make_shared<MemberExpression>(ASTNode::Error, "Expected name in member expression");
-
-    return std::make_shared<MemberExpression>(lhs, member_name->value());
+    auto function_call = parse_argument_list(lhs);
+    if(function_call->is_error())
+        return lhs;
+    return function_call;
 }
 
 std::shared_ptr<Expression> EVOParser::parse_assignment_expression()
 {
-    auto lhs = parse_member_expression();
+    auto lhs = parse_function_call();
     if(lhs->is_error())
         return lhs;
 

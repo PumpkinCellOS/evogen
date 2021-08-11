@@ -8,8 +8,21 @@
 namespace evo::script
 {
 
+Value Object::call(Runtime& rt)
+{
+    rt.throw_exception("Cannot call non-callable object");
+    return {};
+}
+
 Value MapObject::get(std::string const& member)
 {
+    if(member == "length")
+    {
+        return Value::new_object(std::make_shared<NativeFunction>([](Runtime& rt)->Value {
+            return Value::new_int(rt.current_execution_context().this_object<MapObject>()->m_values.size());
+        }));
+    }
+
     auto it = m_values.find(member);
     if(it == m_values.end())
     {
@@ -29,6 +42,17 @@ std::string MapObject::dump_string() const
         oss << value.first << ": " << value.second->dump_string() << ", ";
     }
     return oss.str();
+}
+
+Value Function::get(std::string const&)
+{
+    return Value::undefined();
+}
+
+Value NativeFunction::call(Runtime& rt)
+{
+    assert(m_function);
+    return m_function(rt);
 }
 
 std::string Value::type_to_string(Type type)
@@ -81,12 +105,12 @@ std::shared_ptr<Object> Value::to_object(Runtime& rt) const
     case Type::Int:
         rt.throw_exception("Cannot convert " + type_to_string(m_type) + " to object");
         return nullptr;
-    case Type::Reference:
-        assert(m_reference_value);
-        return m_reference_value->value().to_object(rt);
     case Type::Object:
         assert(m_object_value);
         return m_object_value;
+    case Type::Reference:
+        assert(m_reference_value);
+        return m_reference_value->value().to_object(rt);
     default: assert(false);
     }
 }
@@ -220,6 +244,16 @@ void Value::assign_direct(Value const& other)
 Value Value::dereferenced() const
 {
     return is_reference() ? get_reference()->value().dereferenced() : *this;
+}
+
+Value Value::call(Runtime& rt)
+{
+    if(!is_object())
+    {
+        rt.throw_exception("Cannot call non-object");
+        return {};
+    }
+    return get_object()->call(rt);
 }
 
 std::ostream& operator<<(std::ostream& stream, Value const& value)

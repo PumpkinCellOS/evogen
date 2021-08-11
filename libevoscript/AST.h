@@ -29,7 +29,7 @@ public:
     virtual std::string to_string() const
     {
         if(is_error())
-            return "Syntax Error: " + error_message();
+            return "SyntaxError(" + error_message() + ")";
         return "";
     }
 
@@ -74,6 +74,19 @@ public:
         return messages;
     }
 
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        std::string out = "ASTGroupNode(";
+        for(auto& it: m_nodes)
+        {
+            out += it->to_string() + "; ";
+        }
+        return out + ")";
+    }
+
 protected:
     std::vector<std::shared_ptr<T>> m_nodes;
 };
@@ -100,6 +113,14 @@ public:
 
     virtual Value evaluate(Runtime&) const override;
 
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        return "IntegerLiteral(" + std::to_string(m_value) + ")";
+    }
+
 private:
     int m_value;
 };
@@ -114,6 +135,14 @@ public:
     : m_name(name) {}
 
     virtual Value evaluate(Runtime&) const override;
+
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        return "Identifier(" + m_name + ")";
+    }
 
 private:
     std::string m_name;
@@ -137,6 +166,14 @@ public:
 
     virtual Value evaluate(Runtime&) const override;
 
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        return "SpecialValue(" + std::to_string(int(m_type)) + ")";
+    }
+
 private:
     Type m_type;
 };
@@ -152,9 +189,42 @@ public:
 
     virtual Value evaluate(Runtime&) const override;
 
+    std::shared_ptr<Expression> this_expression() const { return m_expression; }
+
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        return "MemberExpression(" + m_expression->to_string() + "." + m_name + ")";
+    }
+
 private:
     std::shared_ptr<Expression> m_expression;
     std::string m_name;
+};
+
+class FunctionCall : public Expression
+{
+public:
+    FunctionCall(_ErrorTag tag, ErrorMessage message)
+    : Expression(tag, message) {}
+
+    FunctionCall(std::shared_ptr<Expression> callable)
+    : m_callable(callable) {}
+
+    virtual Value evaluate(Runtime&) const override;
+
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        return "FunctionCall(" + m_callable->to_string() + "())";
+    }
+
+private:
+    std::shared_ptr<Expression> m_callable;
 };
 
 class AssignmentExpression : public Expression
@@ -167,6 +237,14 @@ public:
     : m_lhs(lhs), m_rhs(rhs) {}
 
     virtual Value evaluate(Runtime&) const override;
+
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        return "AssignmentExpression(" + m_lhs->to_string() + " = " + m_rhs->to_string() + ")";
+    }
 
 private:
     std::shared_ptr<Expression> m_lhs;
@@ -192,6 +270,14 @@ public:
     : m_expression(expression) {}
 
     virtual Value evaluate(Runtime&) const override;
+
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        return "ExpressionStatement(" + m_expression->to_string() + ")";
+    }
 
 private:
     std::shared_ptr<Expression> m_expression;

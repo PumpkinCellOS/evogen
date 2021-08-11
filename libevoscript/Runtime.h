@@ -1,7 +1,9 @@
 #pragma once
 
+#include <libevoscript/ExecutionContext.h>
 #include <libevoscript/Value.h>
 
+#include <stack>
 #include <string>
 
 namespace evo::script
@@ -10,24 +12,23 @@ namespace evo::script
 class Runtime
 {
 public:
-    Runtime();
+    Runtime(std::shared_ptr<MemoryValue> global_this = nullptr);
     ~Runtime();
 
     void throw_exception(std::string const& message);
     void clear_exception() { m_exception_message = ""; }
 
-    // TODO: Move this to some Scope
-    std::shared_ptr<MemoryValue> this_object() const { return m_this; }
-    std::shared_ptr<MemoryValue> local_scope_object() const { return m_local_scope; }
-
     bool has_exception() const { return !m_exception_message.empty(); }
     std::string exception_message() const { return m_exception_message; }
 
+    ExecutionContext& push_execution_context(std::shared_ptr<Object> this_object);
+    ExecutionContext& current_execution_context();
+    void pop_execution_context();
+
 private:
-    // TODO: Move this to some Scope
-    std::shared_ptr<MemoryValue> m_this;
-    std::shared_ptr<MemoryValue> m_local_scope;
     std::string m_exception_message;
+    std::stack<ExecutionContext> m_execution_context_stack;
+    std::shared_ptr<MemoryValue> m_global_this;
 };
 
 }

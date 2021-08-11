@@ -29,6 +29,11 @@ int main()
     std::cout << assignment1->evaluate(runtime) << std::endl; // reference to 4321
     std::cout << assignment2->evaluate(runtime) << std::endl; // reference null
 
+    // this.length()
+    auto nativeFunctionCall = std::make_shared<FunctionCall>(std::make_shared<MemberExpression>(std::make_shared<SpecialValue>(SpecialValue::This), "length"));
+    std::cout << "this.length() == " << nativeFunctionCall->evaluate(runtime) << std::endl; 
+    std::cout << "exception: " << runtime.exception_message() << std::endl;
+
     // This should fail with exception because of getting member of null object.
     std::cout << ref1->evaluate(runtime) << std::endl; // reference to 4321
     std::cout << "exception: " << runtime.exception_message() << std::endl;
@@ -36,5 +41,6 @@ int main()
 
     std::cout << ref2->evaluate(runtime) << std::endl; // reference to null
     std::cout << "exception: " << runtime.exception_message() << std::endl;
+
     return 0;
 }
