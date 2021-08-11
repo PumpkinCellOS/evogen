@@ -250,12 +250,13 @@ Value Value::dereferenced() const
 
 Value Value::call(Runtime& rt)
 {
-    if(!is_object())
+    Value real_value = dereferenced();
+    if(!real_value.is_object())
     {
         rt.throw_exception("Cannot call non-object");
         return {};
     }
-    return get_object()->call(rt);
+    return real_value.get_object()->call(rt);
 }
 
 std::ostream& operator<<(std::ostream& stream, Value const& value)
