@@ -91,7 +91,7 @@ std::shared_ptr<Expression> EVOParser::parse_member_name(std::shared_ptr<Express
 {
     auto dot = consume_of_type(Token::Dot);
     if(!dot)
-        return std::make_shared<MemberExpression>(ASTNode::Error, "Invalid member expression");
+        return container;
 
     auto member_name = consume_of_type(Token::Name);
     if(!member_name)
@@ -111,10 +111,7 @@ std::shared_ptr<Expression> EVOParser::parse_member_expression()
     if(lhs->is_error())
         return lhs;
 
-    auto member_expression = parse_member_name(lhs);
-    if(member_expression->is_error())
-        return lhs;
-    return member_expression;
+    return parse_member_name(lhs);
 }
 
 std::shared_ptr<Expression> EVOParser::parse_argument_list(std::shared_ptr<Expression> callable)
