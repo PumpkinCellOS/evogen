@@ -25,6 +25,12 @@ public:
     ExecutionContext& current_execution_context();
     void pop_execution_context();
 
+    template<class T = Object>
+    std::shared_ptr<T> this_object() { return current_execution_context().this_object<T>(); }
+
+    template<class T = Object>
+    std::shared_ptr<T> local_scope_object() { return current_execution_context().local_scope_object(); }
+
 private:
     std::string m_exception_message;
     std::stack<ExecutionContext> m_execution_context_stack;
