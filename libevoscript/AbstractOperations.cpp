@@ -19,7 +19,7 @@ Value add(Runtime& rt, Value const& lhs, Value const& rhs)
 
         return Value::new_int(lhs_int + rhs_int);
     }
-    else if(lhs.is_string())
+    else if(real_lhs.is_string())
     {
         auto lhs_int = real_lhs.to_string(rt);
         if(rt.has_exception())
@@ -31,7 +31,7 @@ Value add(Runtime& rt, Value const& lhs, Value const& rhs)
 
         return Value::new_string(lhs_int + rhs_int);
     }
-    rt.throw_exception("Failed to evaluate " + real_lhs.type_to_string(lhs.type()) + " + " + real_rhs.type_to_string(rhs.type()));
+    rt.throw_exception("Failed to evaluate " + real_lhs.type_string() + " + " + real_rhs.type_string());
     return {};
 }
 
