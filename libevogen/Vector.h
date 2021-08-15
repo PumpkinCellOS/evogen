@@ -30,6 +30,11 @@ public:
         return {static_cast<T>(x*value), static_cast<T>(y*value), static_cast<T>(z*value)};
     }
 
+    Vector operator/(double value) const
+    {
+        return {static_cast<T>(x/value), static_cast<T>(y/value), static_cast<T>(z/value)};
+    }
+
     bool operator==(Vector const& other) const
     {
         return x == other.x && y == other.y && z == other.z;
