@@ -76,6 +76,9 @@ public:
 
     static std::string type_to_string(Type);
 
+    Type type() const { return m_type; }
+    std::string type_string() const { return type_to_string(type()); }
+
     static Value null() { return Value(Null); }
     static Value undefined() { return Value(Undefined); }
     static Value new_int(int value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
