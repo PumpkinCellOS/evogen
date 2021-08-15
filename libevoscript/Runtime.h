@@ -12,7 +12,7 @@ namespace evo::script
 class Runtime
 {
 public:
-    Runtime(std::shared_ptr<MemoryValue> global_this = nullptr);
+    Runtime(std::shared_ptr<MemoryValue> global_object = nullptr, std::shared_ptr<MemoryValue> global_this = nullptr);
     ~Runtime();
 
     void throw_exception(std::string const& message);
@@ -28,12 +28,13 @@ public:
     template<class T = Object>
     std::shared_ptr<T> this_object() { return current_execution_context().this_object<T>(); }
 
-    template<class T = Object>
-    std::shared_ptr<T> local_scope_object() { return current_execution_context().local_scope_object(); }
+    std::shared_ptr<MemoryValue> local_scope_object() { return current_execution_context().local_scope_object(); }
+    std::shared_ptr<MemoryValue> global_object() { return m_global_object; }
 
 private:
     std::string m_exception_message;
     std::stack<ExecutionContext> m_execution_context_stack;
+    std::shared_ptr<MemoryValue> m_global_object;
     std::shared_ptr<MemoryValue> m_global_this;
 };
 

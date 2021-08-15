@@ -4,6 +4,7 @@
 #include <libevoscript/ExecutionContext.h>
 
 #include <cassert>
+#include <iostream>
 #include <memory>
 
 namespace evo::script
@@ -28,6 +29,25 @@ Value Identifier::evaluate(Runtime& rt) const
     auto memory_object = object->get(m_name).to_reference(rt);
     if(rt.has_exception())
         return {}; // MemoryObject is not a reference
+
+    if(memory_object->value().type() == Value::Type::Undefined)
+    {
+        // Not in local scope; try searching global scope
+        // TODO: This means that not existing "local" variables will
+        // be created on global object!
+        auto global_object = rt.global_object()->value().to_object(rt);
+        if(rt.has_exception())
+            return {}; // Global scope is not an object (unlikely to happen)
+
+        auto value = global_object->get(m_name);
+        if(!value.is_reference()) 
+        {
+            return value;
+        }
+        
+        memory_object = value.to_reference(rt);
+        assert(!rt.has_exception());
+    }
 
     return Value::new_reference(memory_object);
 }

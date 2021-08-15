@@ -5,9 +5,14 @@
 namespace evo::script
 {
 
-Runtime::Runtime(std::shared_ptr<MemoryValue> global_this)
-: m_global_this(global_this)
+Runtime::Runtime(std::shared_ptr<MemoryValue> global_object, std::shared_ptr<MemoryValue> global_this)
+: m_global_object(global_object), m_global_this(global_this)
 {
+    if(!m_global_object)
+    {
+        std::cout << "Creating new global object as it was not specified" << std::endl;
+        m_global_object = MemoryValue::create_object<MapObject>();
+    }
     if(!m_global_this)
     {
         std::cout << "Creating new global this as it was not specified" << std::endl;
@@ -19,9 +24,11 @@ Runtime::Runtime(std::shared_ptr<MemoryValue> global_this)
         return;
 
     auto _this = context.this_object();
+    auto _global = global_object;
     auto _local = context.local_scope_object();
 
     std::cout << "this = " << _this->dump_string() << std::endl;
+    std::cout << "global object = " << *_global << std::endl;
     std::cout << "local scope = " << *_local << std::endl;
 }
 
@@ -29,9 +36,11 @@ Runtime::~Runtime()
 {
     auto& context = current_execution_context();
     auto _this = context.this_object();
+    auto _global = global_object();
     auto _local = context.local_scope_object();
 
     std::cout << "this = " << _this->dump_string() << std::endl;
+    std::cout << "global object = " << *_global << std::endl;
     std::cout << "local scope = " << *_local << std::endl;
 
     pop_execution_context();
