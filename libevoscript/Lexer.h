@@ -28,6 +28,8 @@ protected:
         std::string output;
         while(predicate(peek()))
         {
+            if(eof())
+                return output;
             output += consume();
         }
         return output;

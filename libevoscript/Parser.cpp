@@ -14,7 +14,7 @@ std::shared_ptr<Expression> EVOParser::parse_expression()
     return parse_assignment_expression();
 }
 
-// ( expression ) | integer_literal | identifier | special_value
+// ( expression ) | integer_literal | string_literal | identifier | special_value
 std::shared_ptr<Expression> EVOParser::parse_primary_expression()
 {
     auto paren_open = consume_of_type(Token::ParenOpen);
@@ -25,11 +25,18 @@ std::shared_ptr<Expression> EVOParser::parse_primary_expression()
         if(literal->is_error())
         {
             set_offset(off);
-            literal = parse_identifier();
+            literal = parse_string_literal();
             if(literal->is_error())
             {
                 set_offset(off);
-                return parse_special_value();
+                literal = parse_identifier();
+                if(literal->is_error())
+                {
+                    set_offset(off);
+                    literal = parse_special_value();
+                    if(literal->is_error())
+                        return std::make_shared<SpecialValue>(ASTNode::Error, "Expected primary expression");
+                }
             }
         }
         return literal;
@@ -50,7 +57,7 @@ std::shared_ptr<Expression> EVOParser::parse_integer_literal()
 {
     auto name = consume_of_type(Token::Number);
     if(!name)
-        return std::make_shared<SpecialValue>(ASTNode::Error, "Invalid identifier");
+        return std::make_shared<SpecialValue>(ASTNode::Error, "Invalid literal");
 
     try
     {
@@ -60,6 +67,15 @@ std::shared_ptr<Expression> EVOParser::parse_integer_literal()
     {
         return std::make_shared<SpecialValue>(ASTNode::Error, "Invalid integer literal");
     }
+}
+
+std::shared_ptr<Expression> EVOParser::parse_string_literal()
+{
+    auto name = consume_of_type(Token::String);
+    if(!name)
+        return std::make_shared<SpecialValue>(ASTNode::Error, "Invalid literal");
+
+    return std::make_shared<StringLiteral>(name->value());
 }
 
 std::shared_ptr<Expression> EVOParser::parse_identifier()

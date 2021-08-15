@@ -14,6 +14,11 @@ Value IntegerLiteral::evaluate(Runtime&) const
     return Value::new_int(m_value);
 }
 
+Value StringLiteral::evaluate(Runtime&) const
+{
+    return Value::new_string(m_value);
+}
+
 Value Identifier::evaluate(Runtime& rt) const
 {
     auto object = rt.current_execution_context().local_scope_object()->value().to_object(rt);

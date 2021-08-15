@@ -5,15 +5,32 @@ namespace evo::script::abstract
 
 Value add(Runtime& rt, Value const& lhs, Value const& rhs)
 {
-    auto lhs_int = lhs.to_int(rt);
-    if(rt.has_exception())
-        return {};
+    if(lhs.is_int())
+    {
+        auto lhs_int = lhs.to_int(rt);
+        if(rt.has_exception())
+            return {};
 
-    auto rhs_int = rhs.to_int(rt);
-    if(rt.has_exception())
-        return {};
+        auto rhs_int = rhs.to_int(rt);
+        if(rt.has_exception())
+            return {};
 
-    return Value::new_int(lhs_int + rhs_int);
+        return Value::new_int(lhs_int + rhs_int);
+    }
+    else if(lhs.is_string())
+    {
+        auto lhs_int = lhs.to_string(rt);
+        if(rt.has_exception())
+            return {};
+
+        auto rhs_int = rhs.to_string(rt);
+        if(rt.has_exception())
+            return {};
+
+        return Value::new_string(lhs_int + rhs_int);
+    }
+    rt.throw_exception("Failed to evaluate " + lhs.type_to_string(lhs.type()) + " + " + rhs.type_to_string(rhs.type()));
+    return {};
 }
 
 Value subtract(Runtime& rt, Value const& lhs, Value const& rhs)

@@ -23,16 +23,17 @@ class Token
 public:
     enum Type
     {
-        AssignmentOperator,     // =
+        AssignmentOperator,     // (all assignment operators)
         Comma,                  // ,
         Dot,                    // .
-        Name,                   // /_?[a-zA-Z_]/
-        NormalOperator,         // + | -
-        Number,                 // /[0-9]/
+        Name,                   // /([a-zA-Z_]?[a-zA-Z0-9_]*)/
+        NormalOperator,         // (all operators other than assignment)
+        Number,                 // /([0-9])/
         ParenOpen,              // (
         ParenClose,             // )
         ReservedKeyword,        // null | this | undefined
         Semicolon,              // ;
+        String,                 // /["']([^"']*)["']/
         Invalid                 // (others)
     };
 
@@ -98,8 +99,9 @@ class EVOParser : public Parser
 {
 public:
     std::shared_ptr<Expression> parse_expression();
-    std::shared_ptr<Expression> parse_primary_expression(); // ( expression ) | integer_literal | identifier | special_value
+    std::shared_ptr<Expression> parse_primary_expression(); // ( expression ) | integer_literal | string_literal | identifier | special_value
     std::shared_ptr<Expression> parse_integer_literal();
+    std::shared_ptr<Expression> parse_string_literal();
     std::shared_ptr<Expression> parse_identifier();
     std::shared_ptr<Expression> parse_special_value();
     std::shared_ptr<Expression> parse_member_expression();

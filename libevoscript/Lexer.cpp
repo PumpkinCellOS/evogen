@@ -101,6 +101,20 @@ bool EVOLexer::lex(std::vector<Token>& output)
             consume();
             output.emplace_back(Token::Comma, std::string(&next, 1), token_start, location());
         }
+        else if(next == '\"' || next == '\'')
+        {
+            consume();
+            // TODO: Escapes
+            std::string literal = consume_while([&](char ch) { return ch != next; });
+            if(eof())
+            {
+                was_error = true;
+                std::cout << "ERROR: Unclosed string literal" << std::endl;
+                return false;
+            }
+            consume(); // Last " or '
+            output.emplace_back(Token::String, literal, token_start, location());
+        }
         else
         {
             was_error = true;

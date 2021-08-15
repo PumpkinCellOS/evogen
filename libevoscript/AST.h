@@ -126,6 +126,29 @@ private:
     int m_value;
 };
 
+class StringLiteral : public Expression
+{
+public:
+    StringLiteral(_ErrorTag tag, ErrorMessage message)
+    : Expression(tag, message) {}
+
+    StringLiteral(std::string const& value)
+    : m_value(value) {}
+
+    virtual Value evaluate(Runtime&) const override;
+
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        return "StringLiteral(\"" + m_value + "\")";
+    }
+
+private:
+    std::string m_value;
+};
+
 class Identifier : public Expression
 {
 public:
