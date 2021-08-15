@@ -29,7 +29,7 @@ int main()
     {
         for(size_t z = 0; z < 10; z++)
         {
-            world.place_structure(structure, {static_cast<int>(x * structure.size().x), 100, static_cast<int>(z * structure.size().z)});
+            world.place_structure(structure, {static_cast<int>(x * (structure.size().x + 2)), 100, static_cast<int>(z * (structure.size().z + 2))});
         }
     }
 
