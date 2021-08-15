@@ -17,15 +17,13 @@ void Chunk::generate_tasks(World const& world, Generator& generator) const
             size_t same_blocks = 0;
             uint16_t last_block_index = 0;
             int saved_z = -1;
-            for(unsigned z = 0; z < SIZE; z++)
+            for(unsigned z = 0; z < SIZE + 1; z++)
             {
-                auto& block_descriptor = block_at({x, y, z});
+                auto& block_descriptor = z == SIZE ? BlockDescriptor{} : block_at({x, y, z});
                 if(block_descriptor.flags.handled)
                     continue;
                 block_descriptor.flags.handled = true;
                 static auto save = [&]() {
-                    if(z == SIZE - 1)
-                        same_blocks++;
                     auto block = world.block_from_index(last_block_index);
                     if(block.has_value())
                     {
@@ -53,23 +51,18 @@ void Chunk::generate_tasks(World const& world, Generator& generator) const
                         break;
                     case BlockDescriptor::Block:
                     {
-                        if(z < SIZE - 1)
+                        if(last_block_index == block_descriptor.arg)
                         {
-                            if(last_block_index == block_descriptor.arg)
-                            {
-                                same_blocks++;
-                            }
-                            else
-                            {
-                                if(last_block_index != 0)
-                                    save();
-                                last_block_index = block_descriptor.arg;
-                                saved_z = z;
-                                same_blocks = 1;
-                            }
+                            same_blocks++;
                         }
                         else
-                            save();
+                        {
+                            if(last_block_index != 0)
+                                save();
+                            last_block_index = block_descriptor.arg;
+                            saved_z = z;
+                            same_blocks = 1;
+                        }
                     }
                 }
             }
