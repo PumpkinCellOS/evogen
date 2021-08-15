@@ -27,6 +27,31 @@ public:
     // Position specifies position of all-negative corner of structure.
     void place_structure(Structure const&, Vector<int> const& position);
 
+    // Predicate: function of type std::optional<Block>(Vector<int> const& center_offset)
+    template<class Predicate>
+    void fill_blocks_if(Vector<int> const& start, Vector<int> const& end, Predicate&& predicate)
+    {
+        // TODO: Optimize it
+        int minx = std::min(start.x, end.x), maxx = std::max(start.x, end.x);
+        int miny = std::min(start.y, end.y), maxy = std::max(start.y, end.y);
+        int minz = std::min(start.z, end.z), maxz = std::max(start.z, end.z);
+        std::cerr << "fill_blocks_if " << start.to_string() << " / " << end.to_string() << std::endl;
+        auto center = Vector<int>{minx, miny, minz} + Vector<int>{maxx, maxy, maxz} / 2.0;
+        for(int x = minx; x <= maxx; x++)
+        {
+            for(int y = miny; y <= maxy; y++)
+            {
+                for(int z = minz; z <= maxz; z++)
+                {
+                    auto offset_vector = Vector<int>{x, y, z} - center;
+                    auto block = predicate(offset_vector);
+                    if(block.has_value())
+                        set_block_at({x, y, z}, block.value());
+                }
+            }
+        }
+    }
+
     void set_block_descriptor_at(Vector<int> const&, BlockDescriptor);
     BlockDescriptor ensure_block_descriptor_at(Vector<int> const&);
     BlockDescriptor* get_block_descriptor_at(Vector<int> const&);
