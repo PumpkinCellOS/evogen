@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libevogen/BlockStates.h>
 #include <libevogen/VanillaBlock.h>
 #include <libevogen/Vector.h>
 
@@ -14,16 +15,16 @@ public:
     Block()
     : m_id{}, m_states{}, m_nbt{} {}
 
-    Block(std::string const& id, std::string const& states = "", std::string const& nbt = "")
+    Block(std::string const& id, BlockStates const& states = {}, std::string const& nbt = "")
     : m_id(id), m_states(states), m_nbt(nbt) {}
 
-    Block(VanillaBlock type, std::string const& states = "", std::string const& nbt = "");
+    Block(VanillaBlock type, BlockStates const& states = {}, std::string const& nbt = "");
 
     std::string id() const { return m_id; }
-    std::string states() const { return m_states; }
+    BlockStates states() const { return m_states; }
     std::string nbt() const { return m_nbt; }
 
-    std::string to_command_format() const { return m_id + "[" + m_states + "]" + m_nbt; }
+    std::string to_command_format() const { return m_id + "[" + m_states.to_string() + "]" + m_nbt; }
 
     bool operator==(Block const& other) const
     {
@@ -32,7 +33,7 @@ public:
 
 private:
     std::string m_id;
-    std::string m_states;
+    BlockStates m_states;
     std::string m_nbt;
 };
 

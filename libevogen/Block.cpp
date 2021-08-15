@@ -44,7 +44,7 @@ static constexpr char const* BLOCK_IDS[] {
     "dark_oak_log",
 };
 
-Block::Block(VanillaBlock type, std::string const& states, std::string const& nbt)
+Block::Block(VanillaBlock type, BlockStates const& states, std::string const& nbt)
 : Block(BLOCK_IDS[static_cast<size_t>(type)], states, nbt) {}
 
 }

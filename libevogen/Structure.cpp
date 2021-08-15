@@ -25,7 +25,7 @@ bool Structure::load_from_file(std::string const& name, Format format)
         //auto palettes = nbt::get_list<nbt::TagCompound>(nbt.at<nbt::TagList>("palettes"));
         std::cerr << "Loading blocks" << std::endl;
         auto blocks = nbt::get_list<nbt::TagCompound>(nbt.at<nbt::TagList>("blocks"));
-        for(auto& block: blocks)
+        for(auto& block : blocks)
         {
             auto state = block.at<nbt::TagInt>("state");
             auto pos = nbt::get_list<nbt::TagInt>(block.at<nbt::TagList>("pos"));
@@ -40,7 +40,19 @@ bool Structure::load_from_file(std::string const& name, Format format)
             }
             catch(...) {}
             // TODO: Handle states
-            set_block_at(position_vec, name);
+            BlockStates states;
+            for(auto& property : properties.base)
+            {
+                auto property_string = std::get_if<nbt::TagString>(&property.second);
+                if(!property_string)
+                {
+                    std::cerr << "Blockstate property must be a String" << std::endl;
+                    return false;
+                }
+                states.set_state(property.first, *property_string);
+            }
+
+            set_block_at(position_vec, {name, states});
         }
         // TODO: Handle this
         //auto entities = nbt::get_list<nbt::TagCompound>(nbt.at<nbt::TagList>("entities"));
