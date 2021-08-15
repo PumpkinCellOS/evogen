@@ -39,7 +39,10 @@ std::string MapObject::dump_string() const
     std::ostringstream oss;
     for(auto& value: m_values)
     {
-        oss << value.first << ": " << value.second->dump_string() << ", ";
+        if(value.second->value().is_object() && value.second->value().get_object().get() == this)
+            oss << value.first << ": <recursive reference>, ";
+        else
+            oss << value.first << ": " << value.second->dump_string() << ", ";
     }
     return oss.str();
 }
