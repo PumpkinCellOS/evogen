@@ -286,7 +286,24 @@ std::shared_ptr<Expression> EVOParser::parse_assignment_expression()
     auto rhs = parse_assignment_expression();
     if(rhs->is_error())
         return rhs;
-    return std::make_shared<AssignmentExpression>(lhs, rhs, AssignmentExpression::Assign);
+
+    AssignmentExpression::Operation operation;
+    if(op->value() == "=")
+        operation = AssignmentExpression::Assign;
+    else if(op->value() == "+=")
+        operation = AssignmentExpression::Add;
+    else if(op->value() == "-=")
+        operation = AssignmentExpression::Subtract;
+    else if(op->value() == "*=")
+        operation = AssignmentExpression::Multiply;
+    else if(op->value() == "/=")
+        operation = AssignmentExpression::Divide;
+    else if(op->value() == "%=")
+        operation = AssignmentExpression::Modulo;
+    else
+        assert(false);
+
+    return std::make_shared<AssignmentExpression>(lhs, rhs, operation);
 }
 
 std::shared_ptr<Statement> EVOParser::parse_statement()

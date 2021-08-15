@@ -87,6 +87,13 @@ bool EVOLexer::lex(std::vector<Token>& output)
                         output.emplace_back(Token::NormalOperator, "--", token_start, location());
                     }
                     break;
+                case '=':
+                    if(next == '-' || next == '+' || next == '*' || next == '/' || next == '%')
+                    {
+                        consume();
+                        output.emplace_back(Token::AssignmentOperator, next + std::string("="), token_start, location());
+                    }
+                    break;
                 default:
                     output.emplace_back(Token::NormalOperator, std::string(&next, 1), token_start, location());
                     break;

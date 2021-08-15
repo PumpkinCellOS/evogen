@@ -156,7 +156,37 @@ Value AssignmentExpression::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {}; // LHS is not a reference
 
-    reference->value().assign(rhs);
+    auto& lhs_value = reference->value();
+
+    Value result;
+    switch(m_operation)
+    {
+        case Assign:
+            result = rhs;
+            break;
+        case Add:
+            result = abstract::add(rt, lhs_value, rhs);
+            break;
+        case Subtract:
+            result = abstract::subtract(rt, lhs_value, rhs);
+            break;
+        case Multiply:
+            result = abstract::multiply(rt, lhs_value, rhs);
+            break;
+        case Divide:
+            result = abstract::divide(rt, lhs_value, rhs);
+            break;
+        case Modulo:
+            result = abstract::modulo(rt, lhs_value, rhs);
+            break;
+        default:
+            assert(false);
+    }
+
+    if(rt.has_exception())
+        return {};
+
+    lhs_value.assign(result);
     return Value::new_reference(reference);
 }
 

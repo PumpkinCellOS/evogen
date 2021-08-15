@@ -317,7 +317,12 @@ class AssignmentExpression : public BinaryExpression
 public:
     enum Operation
     {
-        Assign // =
+        Assign,     // =
+        Add,        // +=
+        Subtract,   // -=
+        Multiply,   // *=
+        Divide,     // /=
+        Modulo,     // %=
     };
 
     AssignmentExpression(_ErrorTag tag, ErrorMessage message)
@@ -332,9 +337,14 @@ public:
     {
         switch(op)
         {
-            case Assign: return "";
+            case Assign:    return "=";
+            case Add:       return "+=";
+            case Subtract:  return "-=";
+            case Multiply:  return "*=";
+            case Divide:    return "/=";
+            case Modulo:    return "%=";
         }
-        return "?";
+        return "?=";
     }
 
     virtual std::string to_string() const override
@@ -342,7 +352,7 @@ public:
         if(is_error())
             return ASTNode::to_string();
 
-        return "AssignmentExpression(" + m_lhs->to_string() + " =" + operation_string(m_operation) + " " + m_rhs->to_string() + ")";
+        return "AssignmentExpression(" + m_lhs->to_string() + " " + operation_string(m_operation) + " " + m_rhs->to_string() + ")";
     }
 
 private:
