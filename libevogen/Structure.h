@@ -1,11 +1,11 @@
 #pragma once
 
-#include <libevogen/World.h>
+#include <libevogen/BlockContainer.h>
 
 namespace evo
 {
 
-class Structure : public World
+class Structure : public BlockContainer
 {
 public:
     enum class Format
