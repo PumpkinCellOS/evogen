@@ -100,6 +100,8 @@ Value Program::evaluate(Runtime& rt) const
     for(auto& it: m_nodes)
     {
         val = it->evaluate(rt);
+        if(rt.has_exception())
+            return {};
     }
     return val;
 }
