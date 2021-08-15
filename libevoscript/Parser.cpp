@@ -159,7 +159,7 @@ std::shared_ptr<Expression> EVOParser::parse_assignment_expression()
     auto rhs = parse_assignment_expression();
     if(rhs->is_error())
         return rhs;
-    return std::make_shared<AssignmentExpression>(lhs, rhs);
+    return std::make_shared<AssignmentExpression>(lhs, rhs, AssignmentExpression::Assign);
 }
 
 std::shared_ptr<Statement> EVOParser::parse_statement()

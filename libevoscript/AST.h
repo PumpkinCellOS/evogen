@@ -1,5 +1,6 @@
 #pragma once
 
+#include <compare>
 #include <libevoscript/Value.h>
 #include <libevoscript/Runtime.h>
 
@@ -227,29 +228,64 @@ private:
     std::shared_ptr<Expression> m_callable;
 };
 
-class AssignmentExpression : public Expression
+class BinaryExpression : public Expression
 {
 public:
-    AssignmentExpression(_ErrorTag tag, ErrorMessage message)
+    BinaryExpression(_ErrorTag tag, ErrorMessage message)
     : Expression(tag, message) {}
-
-    AssignmentExpression(std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs)
-    : m_lhs(lhs), m_rhs(rhs) {}
-
-    virtual Value evaluate(Runtime&) const override;
 
     virtual std::string to_string() const override
     {
         if(is_error())
             return ASTNode::to_string();
 
-        return "AssignmentExpression(" + m_lhs->to_string() + " = " + m_rhs->to_string() + ")";
+        return "BinaryExpression(" + m_lhs->to_string() + " @ " + m_rhs->to_string() + ")";
     }
 
-private:
+protected:
+    BinaryExpression(std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs)
+    : m_lhs(lhs), m_rhs(rhs) {}
+
     std::shared_ptr<Expression> m_lhs;
     std::shared_ptr<Expression> m_rhs;
 };
+
+// lhs must be a reference, returns modified lhs (equivalent of {lhs = op(lhs, rhs); return lhs})
+class AssignmentExpression : public BinaryExpression
+{
+public:
+    enum Operation
+    {
+        Assign // =
+    };
+
+    AssignmentExpression(std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs, Operation operation)
+    : BinaryExpression(lhs, rhs), m_operation(operation) {}
+
+    virtual Value evaluate(Runtime&) const override;
+
+    static std::string operation_string(Operation op)
+    {
+        switch(op)
+        {
+            case Assign: return "";
+        }
+        return "?";
+    }
+
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        return "AssignmentExpression(" + m_lhs->to_string() + " =" + operation_string(m_operation) + " " + m_rhs->to_string() + ")";
+    }
+
+private:
+    Operation m_operation;
+};
+
+// lhs + rhs can be values, return result of op(lhs, rhs)
 
 class Statement : public ASTNode
 {
