@@ -228,6 +228,40 @@ private:
     std::shared_ptr<Expression> m_callable;
 };
 
+class UnaryExpression : public Expression
+{
+public:
+    enum Operation
+    {
+        Not,        // !
+        BitwiseNot, // ~
+        Minus,      // -
+        Plus,       // +
+        Increment,  // ++
+        Decrement,  // --
+    };
+
+    UnaryExpression(_ErrorTag tag, ErrorMessage message)
+    : Expression(tag, message) {}
+
+    UnaryExpression(std::shared_ptr<Expression> expression, Operation operation)
+    : m_expression(expression), m_operation(operation) {}
+
+    virtual Value evaluate(Runtime&) const override;
+
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        return "UnaryExpression(" + m_expression->to_string() + ")";
+    }
+
+private:
+    std::shared_ptr<Expression> m_expression;
+    Operation m_operation;
+};
+
 class BinaryExpression : public Expression
 {
 public:

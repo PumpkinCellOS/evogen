@@ -73,6 +73,40 @@ Value FunctionCall::evaluate(Runtime& rt) const
     return callable.call(rt);
 }
 
+Value UnaryExpression::evaluate(Runtime& rt) const
+{
+    auto value = m_expression->evaluate(rt);
+    if(rt.has_exception())
+        return {}; // Error evaluating expression
+
+    Value result;
+    switch(m_operation)
+    {
+        case Not:
+            result = abstract::not_(rt, value);
+            break;
+        case BitwiseNot:
+            result = abstract::bitwise_not(rt, value);
+            break;
+        case Minus:
+            result = abstract::minus(rt, value);
+            break;
+        case Plus:
+            result = abstract::plus(rt, value);
+            break;
+        case Increment:
+            result = abstract::prefix_increment(rt, value);
+            break;
+        case Decrement:
+            result = abstract::prefix_decrement(rt, value);
+            break;
+        default:
+            assert(false);
+    }
+
+    return result;
+}
+
 Value AssignmentExpression::evaluate(Runtime& rt) const
 {
     auto lhs = m_lhs->evaluate(rt);
@@ -101,29 +135,29 @@ Value NormalBinaryExpression::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {}; // Error evaluating RHS
 
-    Value new_value;
+    Value result;
     switch(m_operation)
     {
         case Add:
-            new_value = abstract::add(rt, lhs, rhs);
+            result = abstract::add(rt, lhs, rhs);
             break;
         case Subtract:
-            new_value = abstract::subtract(rt, lhs, rhs);
+            result = abstract::subtract(rt, lhs, rhs);
             break;
         case Multiply:
-            new_value = abstract::multiply(rt, lhs, rhs);
+            result = abstract::multiply(rt, lhs, rhs);
             break;
         case Divide:
-            new_value = abstract::divide(rt, lhs, rhs);
+            result = abstract::divide(rt, lhs, rhs);
             break;
         case Modulo:
-            new_value = abstract::modulo(rt, lhs, rhs);
+            result = abstract::modulo(rt, lhs, rhs);
             break;
         default:
             assert(false);
     }
 
-    return new_value;
+    return result;
 }
 
 Value ExpressionStatement::evaluate(Runtime& rt) const

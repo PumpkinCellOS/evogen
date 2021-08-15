@@ -146,11 +146,50 @@ std::shared_ptr<Expression> EVOParser::parse_function_call()
     return function_call;
 }
 
+std::shared_ptr<Expression> EVOParser::parse_unary_expression()
+{
+    auto op = consume_of_type(Token::NormalOperator);
+
+    auto lhs = parse_function_call();
+    if(lhs->is_error())
+        return lhs;
+
+    if(!op)
+        return lhs;
+
+    /*
+        Not,        // !
+        BitwiseNot, // ~
+        Minus,      // -
+        Plus,       // +
+        Increment,  // ++
+        Decrement,  // --
+    */
+
+    UnaryExpression::Operation operation;
+    if(op->value() == "!")
+        operation = UnaryExpression::Not;
+    else if(op->value() == "~")
+        operation = UnaryExpression::BitwiseNot;
+    else if(op->value() == "-")
+        operation = UnaryExpression::Minus;
+    else if(op->value() == "+")
+        operation = UnaryExpression::Plus;
+    else if(op->value() == "++")
+        operation = UnaryExpression::Increment;
+    else if(op->value() == "--")
+        operation = UnaryExpression::Decrement;
+    else
+        return std::make_shared<FunctionCall>(ASTNode::Error, "Invalid unary expression");
+    
+    return std::make_shared<UnaryExpression>(lhs, operation);
+}
+
 std::shared_ptr<Expression> EVOParser::parse_multiplicative_expression(std::shared_ptr<Expression> lhs)
 {
     if(!lhs)
     {
-        lhs = parse_function_call();
+        lhs = parse_unary_expression();
         if(lhs->is_error())
             return lhs;
     }
@@ -160,7 +199,7 @@ std::shared_ptr<Expression> EVOParser::parse_multiplicative_expression(std::shar
     if(!op)
         return lhs;
 
-    auto rhs = parse_function_call();
+    auto rhs = parse_unary_expression();
     if(rhs->is_error())
         return rhs;
 
