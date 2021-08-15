@@ -259,6 +259,9 @@ public:
         Assign // =
     };
 
+    AssignmentExpression(_ErrorTag tag, ErrorMessage message)
+    : BinaryExpression(tag, message) {}
+
     AssignmentExpression(std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs, Operation operation)
     : BinaryExpression(lhs, rhs), m_operation(operation) {}
 
@@ -293,7 +296,13 @@ public:
     {
         Add,        // +
         Subtract,   // -
+        Multiply,   // *
+        Divide,     // /
+        Modulo,     // %
     };
+
+    NormalBinaryExpression(_ErrorTag tag, ErrorMessage message)
+    : BinaryExpression(tag, message) {}
 
     NormalBinaryExpression(std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs, Operation operation)
     : BinaryExpression(lhs, rhs), m_operation(operation) {}
@@ -306,6 +315,9 @@ public:
         {
             case Add:       return "+";
             case Subtract:  return "-";
+            case Multiply:  return "*";
+            case Divide:    return "/";
+            case Modulo:    return "%";
         }
         return "?";
     }

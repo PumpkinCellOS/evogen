@@ -110,6 +110,15 @@ Value NormalBinaryExpression::evaluate(Runtime& rt) const
         case Subtract:
             new_value = abstract::subtract(rt, lhs, rhs);
             break;
+        case Multiply:
+            new_value = abstract::multiply(rt, lhs, rhs);
+            break;
+        case Divide:
+            new_value = abstract::divide(rt, lhs, rhs);
+            break;
+        case Modulo:
+            new_value = abstract::modulo(rt, lhs, rhs);
+            break;
         default:
             assert(false);
     }
