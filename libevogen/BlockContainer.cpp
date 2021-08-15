@@ -171,6 +171,9 @@ std::optional<uint16_t> BlockContainer::index_of(Block const& block) const
 Vector<int> BlockContainer::chunk_position_from_block(Vector<int> const& position)
 {
     auto [ax, ay, az] = position;
+    if(ax < -1) ax++;
+    if(ay < -1) ay++;
+    if(az < -1) az++;
     int px = ax / Chunk::SIZE; if(ax < 0) px--;
     int py = ay / Chunk::SIZE; if(ay < 0) py--;
     int pz = az / Chunk::SIZE; if(az < 0) pz--;
