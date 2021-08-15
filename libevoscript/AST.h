@@ -286,6 +286,41 @@ private:
 };
 
 // lhs + rhs can be values, return result of op(lhs, rhs)
+class NormalBinaryExpression : public BinaryExpression
+{
+public:
+    enum Operation
+    {
+        Add,        // +
+        Subtract,   // -
+    };
+
+    NormalBinaryExpression(std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs, Operation operation)
+    : BinaryExpression(lhs, rhs), m_operation(operation) {}
+
+    virtual Value evaluate(Runtime&) const override;
+
+    static std::string operation_string(Operation op)
+    {
+        switch(op)
+        {
+            case Add:       return "+";
+            case Subtract:  return "-";
+        }
+        return "?";
+    }
+
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        return "NormalBinaryExpression(" + m_lhs->to_string() + " " + operation_string(m_operation) + " " + m_rhs->to_string() + ")";
+    }
+
+private:
+    Operation m_operation;
+};
 
 class Statement : public ASTNode
 {

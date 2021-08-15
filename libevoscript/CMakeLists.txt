@@ -1,4 +1,5 @@
 add_library(libevoscript
+    "AbstractOperations.cpp"
     "AST.cpp"
     "ExecutionContext.cpp"
     "Lexer.cpp"

@@ -26,6 +26,7 @@ public:
         AssignmentOperator,     // =
         Dot,                    // .
         Name,                   // /_?[a-zA-Z_]/
+        NormalOperator,         // + | -
         Number,                 // /[0-9]/
         ParenOpen,              // (
         ParenClose,             // )
@@ -102,6 +103,7 @@ public:
     std::shared_ptr<Expression> parse_special_value();
     std::shared_ptr<Expression> parse_member_expression();
     std::shared_ptr<Expression> parse_function_call();
+    std::shared_ptr<Expression> parse_additive_expression(std::shared_ptr<Expression> lhs); // +x
     std::shared_ptr<Expression> parse_assignment_expression();
 
     std::shared_ptr<Statement>  parse_statement();

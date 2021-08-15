@@ -65,6 +65,11 @@ bool EVOLexer::lex(std::vector<Token>& output)
             consume();
             output.emplace_back(Token::AssignmentOperator, std::string(&next, 1), token_start, location());
         }
+        else if(next == '-' || next == '+')
+        {
+            consume();
+            output.emplace_back(Token::NormalOperator, std::string(&next, 1), token_start, location());
+        }
         else if(next == ';')
         {
             consume();

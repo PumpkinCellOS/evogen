@@ -1,5 +1,7 @@
-#include "libevoscript/ExecutionContext.h"
 #include <libevoscript/AST.h>
+
+#include <libevoscript/AbstractOperations.h>
+#include <libevoscript/ExecutionContext.h>
 
 #include <cassert>
 #include <memory>
@@ -87,6 +89,32 @@ Value AssignmentExpression::evaluate(Runtime& rt) const
 
     reference->value().assign(rhs);
     return Value::new_reference(reference);
+}
+
+Value NormalBinaryExpression::evaluate(Runtime& rt) const
+{
+    auto lhs = m_lhs->evaluate(rt);
+    if(rt.has_exception())
+        return {}; // Error evaluating LHS
+    
+    auto rhs = m_rhs->evaluate(rt);
+    if(rt.has_exception())
+        return {}; // Error evaluating RHS
+
+    Value new_value;
+    switch(m_operation)
+    {
+        case Add:
+            new_value = abstract::add(rt, lhs, rhs);
+            break;
+        case Subtract:
+            new_value = abstract::subtract(rt, lhs, rhs);
+            break;
+        default:
+            assert(false);
+    }
+
+    return new_value;
 }
 
 Value ExpressionStatement::evaluate(Runtime& rt) const

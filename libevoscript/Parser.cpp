@@ -146,9 +146,40 @@ std::shared_ptr<Expression> EVOParser::parse_function_call()
     return function_call;
 }
 
+std::shared_ptr<Expression> EVOParser::parse_additive_expression(std::shared_ptr<Expression> lhs)
+{
+    if(!lhs)
+    {
+        lhs = parse_function_call();
+        if(lhs->is_error())
+            return lhs;
+    }
+
+    auto op = consume_of_type(Token::NormalOperator);
+    if(!op)
+        return lhs;
+
+    auto rhs = parse_function_call();
+    if(rhs->is_error())
+        return rhs;
+
+    NormalBinaryExpression::Operation operation;
+    if(op->value() == "+")
+        operation = NormalBinaryExpression::Add;
+    else if(op->value() == "-")
+        operation = NormalBinaryExpression::Subtract;
+    else
+        assert(false);
+
+    auto expression = std::make_shared<NormalBinaryExpression>(lhs, rhs, operation);
+    auto maybe_additive_expression = parse_additive_expression(expression);
+
+    return !maybe_additive_expression->is_error() ? maybe_additive_expression : expression;
+}
+
 std::shared_ptr<Expression> EVOParser::parse_assignment_expression()
 {
-    auto lhs = parse_function_call();
+    auto lhs = parse_additive_expression(nullptr);
     if(lhs->is_error())
         return lhs;
 
