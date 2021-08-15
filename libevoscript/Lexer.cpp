@@ -32,9 +32,10 @@ bool EVOLexer::lex(std::vector<Token>& output)
     {
         char next = peek();
         auto token_start = location();
-        if(isalpha(next))
+        if(isalpha(next) || next == '_')
         {
-            std::string value = consume_while(isalpha);
+            consume();
+            std::string value = next + consume_while([](char ch) { return isalnum(ch) || ch == '_'; });
             if(value == "this" || value == "null" || value == "undefined")
                 output.emplace_back(Token::ReservedKeyword, value, token_start, location());
             else
