@@ -64,6 +64,28 @@ void BlockContainer::fill_blocks_outline(Vector<int> const& start, Vector<int> c
     fill_blocks_at(Vector<int>(min_vector.x + 1, min_vector.y, max_vector.z), Vector<int>(max_vector.x - 1, max_vector.y, max_vector.z), outline);
 }
 
+void BlockContainer::fill_ball(Vector<int> const& center, double radius, Block const& block)
+{
+    auto start = center - Vector<int>(radius+1, radius+1, radius+1);
+    auto end = center + Vector<int>(radius+1, radius+1, radius+1);
+    std::cerr << "fill_ball r=" << radius << " : " << start.to_string() << "/" << end.to_string() << " = " << block.to_command_format() << std::endl;
+    fill_blocks_if(start, end, [&](Vector<int> const& offset) {
+        return offset.x * offset.x + offset.y * offset.y + offset.z * offset.z < radius * radius ?
+            block : std::optional<Block>();
+    });
+}
+
+void BlockContainer::fill_cylinder(Vector<int> const& bottom_side_center, double radius, double height, Block const& block)
+{
+    auto start = bottom_side_center + Vector<int>(-radius-1, 0, -radius-1);
+    auto end = bottom_side_center + Vector<int>(radius+1, height, radius+1);
+    std::cerr << "fill_cylinder r=" << radius << " h=" << height << " : " << start.to_string() << "/" << end.to_string() << " = " << block.to_command_format() << std::endl;
+    fill_blocks_if(start, end, [&](Vector<int> const& offset) {
+        return offset.x * offset.x + offset.z * offset.z < radius * radius ?
+            block : std::optional<Block>();
+    });
+}
+
 void BlockContainer::place_structure(Structure const& structure, Vector<int> const& offset)
 {
     auto [sx, sy, sz] = structure.size();

@@ -36,7 +36,7 @@ public:
         int miny = std::min(start.y, end.y), maxy = std::max(start.y, end.y);
         int minz = std::min(start.z, end.z), maxz = std::max(start.z, end.z);
         std::cerr << "fill_blocks_if " << start.to_string() << " / " << end.to_string() << std::endl;
-        auto center = Vector<int>{minx, miny, minz} + Vector<int>{maxx, maxy, maxz} / 2.0;
+        auto center = (Vector<int>{minx, miny, minz} + Vector<int>{maxx, maxy, maxz}) / 2.0;
         for(int x = minx; x <= maxx; x++)
         {
             for(int y = miny; y <= maxy; y++)
@@ -51,6 +51,9 @@ public:
             }
         }
     }
+
+    void fill_ball(Vector<int> const& center, double radius, Block const& block);
+    void fill_cylinder(Vector<int> const& bottom_side_center, double radius, double height, Block const& block);
 
     void set_block_descriptor_at(Vector<int> const&, BlockDescriptor);
     BlockDescriptor ensure_block_descriptor_at(Vector<int> const&);

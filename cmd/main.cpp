@@ -33,6 +33,9 @@ int main()
         }
     }
 
+    world.fill_ball({-25, 20, -25}, 6, evo::VanillaBlock::Cobblestone);
+    world.fill_cylinder({-25, 40, -25}, 10, 10, evo::VanillaBlock::AcaciaPlanks);
+
     evo::Generator generator;
     generator.load_from_world(world);
     generator.generate_to_file("functions/output.mcfunction");
