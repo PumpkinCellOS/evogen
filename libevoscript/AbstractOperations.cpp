@@ -5,13 +5,15 @@ namespace evo::script::abstract
 
 Value add(Runtime& rt, Value const& lhs, Value const& rhs)
 {
-    if(lhs.is_int())
+    auto real_lhs = lhs.dereferenced();
+    auto real_rhs = rhs.dereferenced();
+    if(real_lhs.is_int())
     {
-        auto lhs_int = lhs.to_int(rt);
+        auto lhs_int = real_lhs.to_int(rt);
         if(rt.has_exception())
             return {};
 
-        auto rhs_int = rhs.to_int(rt);
+        auto rhs_int = real_rhs.to_int(rt);
         if(rt.has_exception())
             return {};
 
@@ -19,27 +21,29 @@ Value add(Runtime& rt, Value const& lhs, Value const& rhs)
     }
     else if(lhs.is_string())
     {
-        auto lhs_int = lhs.to_string(rt);
+        auto lhs_int = real_lhs.to_string(rt);
         if(rt.has_exception())
             return {};
 
-        auto rhs_int = rhs.to_string(rt);
+        auto rhs_int = real_rhs.to_string(rt);
         if(rt.has_exception())
             return {};
 
         return Value::new_string(lhs_int + rhs_int);
     }
-    rt.throw_exception("Failed to evaluate " + lhs.type_to_string(lhs.type()) + " + " + rhs.type_to_string(rhs.type()));
+    rt.throw_exception("Failed to evaluate " + real_lhs.type_to_string(lhs.type()) + " + " + real_rhs.type_to_string(rhs.type()));
     return {};
 }
 
 Value subtract(Runtime& rt, Value const& lhs, Value const& rhs)
 {
-    auto lhs_int = lhs.to_int(rt);
+    auto real_lhs = lhs.dereferenced();
+    auto real_rhs = rhs.dereferenced();
+    auto lhs_int = real_lhs.to_int(rt);
     if(rt.has_exception())
         return {};
 
-    auto rhs_int = rhs.to_int(rt);
+    auto rhs_int = real_rhs.to_int(rt);
     if(rt.has_exception())
         return {};
 
@@ -48,11 +52,13 @@ Value subtract(Runtime& rt, Value const& lhs, Value const& rhs)
 
 Value multiply(Runtime& rt, Value const& lhs, Value const& rhs)
 {
-    auto lhs_int = lhs.to_int(rt);
+    auto real_lhs = lhs.dereferenced();
+    auto real_rhs = rhs.dereferenced();
+    auto lhs_int = real_lhs.to_int(rt);
     if(rt.has_exception())
         return {};
 
-    auto rhs_int = rhs.to_int(rt);
+    auto rhs_int = real_rhs.to_int(rt);
     if(rt.has_exception())
         return {};
 
@@ -61,11 +67,13 @@ Value multiply(Runtime& rt, Value const& lhs, Value const& rhs)
 
 Value divide(Runtime& rt, Value const& lhs, Value const& rhs)
 {
-    auto lhs_int = lhs.to_int(rt);
+    auto real_lhs = lhs.dereferenced();
+    auto real_rhs = rhs.dereferenced();
+    auto lhs_int = real_lhs.to_int(rt);
     if(rt.has_exception())
         return {};
 
-    auto rhs_int = rhs.to_int(rt);
+    auto rhs_int = real_rhs.to_int(rt);
     if(rt.has_exception())
         return {};
 
@@ -79,11 +87,13 @@ Value divide(Runtime& rt, Value const& lhs, Value const& rhs)
 
 Value modulo(Runtime& rt, Value const& lhs, Value const& rhs)
 {
-    auto lhs_int = lhs.to_int(rt);
+    auto real_lhs = lhs.dereferenced();
+    auto real_rhs = rhs.dereferenced();
+    auto lhs_int = real_lhs.to_int(rt);
     if(rt.has_exception())
         return {};
 
-    auto rhs_int = rhs.to_int(rt);
+    auto rhs_int = real_rhs.to_int(rt);
     if(rt.has_exception())
         return {};
 
@@ -97,7 +107,8 @@ Value modulo(Runtime& rt, Value const& lhs, Value const& rhs)
 
 Value not_(Runtime& rt, Value const& value)
 {
-    auto value_int = value.to_int(rt);
+    auto real_value = value.dereferenced();
+    auto value_int = real_value.to_int(rt);
     if(rt.has_exception())
         return {};
 
@@ -106,7 +117,8 @@ Value not_(Runtime& rt, Value const& value)
 
 Value bitwise_not(Runtime& rt, Value const& value)
 {
-    auto value_int = value.to_int(rt);
+    auto real_value = value.dereferenced();
+    auto value_int = real_value.to_int(rt);
     if(rt.has_exception())
         return {};
 
@@ -115,7 +127,8 @@ Value bitwise_not(Runtime& rt, Value const& value)
 
 Value minus(Runtime& rt, Value const& value)
 {
-    auto value_int = value.to_int(rt);
+    auto real_value = value.dereferenced();
+    auto value_int = real_value.to_int(rt);
     if(rt.has_exception())
         return {};
 
@@ -124,7 +137,8 @@ Value minus(Runtime& rt, Value const& value)
 
 Value plus(Runtime& rt, Value const& value)
 {
-    auto value_int = value.to_int(rt);
+    auto real_value = value.dereferenced();
+    auto value_int = real_value.to_int(rt);
     if(rt.has_exception())
         return {};
 
