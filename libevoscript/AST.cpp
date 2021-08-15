@@ -65,12 +65,22 @@ Value FunctionCall::evaluate(Runtime& rt) const
     auto callable = m_callable->evaluate(rt);
     if(rt.has_exception())
         return {}; // failed to evaluate callable
+    
+    std::vector<Value> arguments;
+    for(auto& expr: m_arguments)
+    {
+        auto value = expr->evaluate(rt);
+        if(rt.has_exception())
+            return {}; // failed to evaluate argument;
+
+        arguments.push_back(value.dereferenced());
+    }
 
     ScopedExecutionContext context(rt, callable.container());
     if(rt.has_exception())
         return {}; // 'this' is not an object
 
-    return callable.call(rt);
+    return callable.call(rt, arguments);
 }
 
 Value UnaryExpression::evaluate(Runtime& rt) const

@@ -24,6 +24,7 @@ public:
     enum Type
     {
         AssignmentOperator,     // =
+        Comma,                  // ,
         Dot,                    // .
         Name,                   // /_?[a-zA-Z_]/
         NormalOperator,         // + | -

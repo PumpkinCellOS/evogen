@@ -96,6 +96,11 @@ bool EVOLexer::lex(std::vector<Token>& output)
             consume();
             output.emplace_back(Token::Semicolon, std::string(&next, 1), token_start, location());
         }
+        else if(next == ',')
+        {
+            consume();
+            output.emplace_back(Token::Comma, std::string(&next, 1), token_start, location());
+        }
         else
         {
             was_error = true;

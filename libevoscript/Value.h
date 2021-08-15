@@ -19,7 +19,7 @@ public:
     virtual Value get(std::string const& member) = 0;
     virtual std::string type_name() const { return "Object"; }
     virtual std::string dump_string() const { return ""; }
-    virtual Value call(Runtime&);
+    virtual Value call(Runtime&, std::vector<Value> const& arguments);
 };
 
 class MapObject : public Object
@@ -44,16 +44,18 @@ public:
 class NativeFunction : public Function
 {
 public:
-    NativeFunction(std::function<Value(Runtime&)>&& function)
+    using FunctionType = std::function<Value(Runtime&, std::vector<Value> const&)>;
+
+    NativeFunction(FunctionType&& function)
     : m_function(function) {}
 
-    static Value create_value(std::function<Value(Runtime&)>&& function);
+    static Value create_value(FunctionType&& function);
 
     virtual std::string type_name() const override { return "NativeFunction"; }
-    virtual Value call(Runtime& rt) override;
+    virtual Value call(Runtime& rt, std::vector<Value> const& arguments) override;
 
 private:
-    std::function<Value(Runtime&)> m_function;
+    FunctionType m_function;
 };
 
 class Value
@@ -108,7 +110,7 @@ public:
 
     Value dereferenced() const;
 
-    Value call(Runtime&);
+    Value call(Runtime&, std::vector<Value> const& arguments);
     std::shared_ptr<Object> container() const { return m_container; }
     void set_container(std::shared_ptr<Object> object) { m_container = object; }
 

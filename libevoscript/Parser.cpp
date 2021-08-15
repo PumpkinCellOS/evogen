@@ -120,13 +120,30 @@ std::shared_ptr<Expression> EVOParser::parse_argument_list(std::shared_ptr<Expre
     if(!paren_open)
         return std::make_shared<FunctionCall>(ASTNode::Error, "Invalid argument list");
 
-    // TODO: Arguments
-    
+    std::vector<std::shared_ptr<Expression>> arguments;
+
     auto paren_close = consume_of_type(Token::ParenClose);
     if(!paren_close)
-        return std::make_shared<FunctionCall>(ASTNode::Error, "Unmatched '('");
+    {
+        while(true)
+        {
+            auto argument = parse_expression();
+            if(argument->is_error())
+                return argument;
 
-    auto function_call = std::make_shared<FunctionCall>(callable);
+            arguments.push_back(argument);
+
+            auto comma = consume_of_type(Token::Comma);
+            if(!comma)
+                break;
+        }
+        
+        auto paren_close = consume_of_type(Token::ParenClose);
+        if(!paren_close)
+            return std::make_shared<FunctionCall>(ASTNode::Error, "Unmatched '('");
+    }
+
+    auto function_call = std::make_shared<FunctionCall>(callable, arguments);
 
     auto maybe_chained_call = parse_argument_list(function_call);
     if(!maybe_chained_call->is_error())
@@ -157,15 +174,6 @@ std::shared_ptr<Expression> EVOParser::parse_unary_expression()
     if(!op)
         return lhs;
 
-    /*
-        Not,        // !
-        BitwiseNot, // ~
-        Minus,      // -
-        Plus,       // +
-        Increment,  // ++
-        Decrement,  // --
-    */
-
     UnaryExpression::Operation operation;
     if(op->value() == "!")
         operation = UnaryExpression::Not;
@@ -180,7 +188,7 @@ std::shared_ptr<Expression> EVOParser::parse_unary_expression()
     else if(op->value() == "--")
         operation = UnaryExpression::Decrement;
     else
-        return std::make_shared<FunctionCall>(ASTNode::Error, "Invalid unary expression");
+        return std::make_shared<UnaryExpression>(ASTNode::Error, "Invalid unary expression");
     
     return std::make_shared<UnaryExpression>(lhs, operation);
 }

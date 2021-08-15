@@ -15,12 +15,14 @@ public:
     virtual std::string type_name() const override { return "ReplObject"; }
 
     bool running() const { return m_running; }
+    int exit_code() const { return m_exit_code; }
 
 private:
-    void exit() { m_running = false; }
+    void exit(int code) { m_running = false; m_exit_code = code; }
     std::shared_ptr<MemoryValue> m_dumped;
 
     bool m_running = true;
+    int m_exit_code = 0;
 };
 
 ReplObject::ReplObject()
@@ -30,17 +32,20 @@ ReplObject::ReplObject()
 
 Value ReplObject::get(std::string const& member)
 {
-    if(member == "dumped")
-        return Value::new_reference(m_dumped);
-    else if(member == "dump")
-        return NativeFunction::create_value([](Runtime& rt)->Value {
-            // TODO: dump() should take an argument if it will be possible.
-            std::cout << rt.this_object<ReplObject>()->m_dumped->dump_string() << std::endl;
-            return Value::new_int(1);
+    if(member == "dump")
+        return NativeFunction::create_value([](Runtime& rt, std::vector<Value> const& args)->Value {
+            for(auto& value: args)
+                std::cout << value.dump_string() << std::endl;
+
+            return Value::new_int(args.size());
         });
     else if(member == "exit")
-        return NativeFunction::create_value([](Runtime& rt)->Value {
-            rt.this_object<ReplObject>()->exit();
+        return NativeFunction::create_value([](Runtime& rt, std::vector<Value> const& args)->Value {
+            auto exit_code = args.size() == 1 ? args[0].to_int(rt) : 0;
+            if(rt.has_exception())
+                return {};
+
+            rt.this_object<ReplObject>()->exit(exit_code);
             return Value::undefined();
         });
     else
@@ -87,7 +92,7 @@ int main()
         runtime.clear_exception();
 
         if(!repl_object->running())
-            return 0;
+            return repl_object->exit_code();
     }
     return 0;
 }

@@ -8,7 +8,7 @@
 namespace evo::script
 {
 
-Value Object::call(Runtime& rt)
+Value Object::call(Runtime& rt, std::vector<Value> const&)
 {
     rt.throw_exception("Cannot call non-callable object");
     return {};
@@ -18,7 +18,7 @@ Value MapObject::get(std::string const& member)
 {
     if(member == "length")
     {
-        return Value::new_object(std::make_shared<NativeFunction>([](Runtime& rt)->Value {
+        return Value::new_object(std::make_shared<NativeFunction>([](Runtime& rt, std::vector<Value> const&)->Value {
             return Value::new_int(rt.current_execution_context().this_object<MapObject>()->m_values.size());
         }));
     }
@@ -49,15 +49,15 @@ Value Function::get(std::string const&)
     return Value::undefined();
 }
 
-Value NativeFunction::create_value(std::function<Value(Runtime&)>&& function)
+Value NativeFunction::create_value(FunctionType&& function)
 {
     return Value::new_object(std::make_shared<NativeFunction>(std::move(function)));
 }
 
-Value NativeFunction::call(Runtime& rt)
+Value NativeFunction::call(Runtime& rt, std::vector<Value> const& arguments)
 {
     assert(m_function);
-    return m_function(rt);
+    return m_function(rt, arguments);
 }
 
 std::string Value::type_to_string(Type type)
@@ -253,7 +253,7 @@ Value Value::dereferenced() const
     return is_reference() ? get_reference()->value().dereferenced() : *this;
 }
 
-Value Value::call(Runtime& rt)
+Value Value::call(Runtime& rt, std::vector<Value> const& arguments)
 {
     Value real_value = dereferenced();
     if(!real_value.is_object())
@@ -261,7 +261,7 @@ Value Value::call(Runtime& rt)
         rt.throw_exception("Cannot call non-object");
         return {};
     }
-    return real_value.get_object()->call(rt);
+    return real_value.get_object()->call(rt, arguments);
 }
 
 std::ostream& operator<<(std::ostream& stream, Value const& value)

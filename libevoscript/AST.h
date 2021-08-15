@@ -211,8 +211,8 @@ public:
     FunctionCall(_ErrorTag tag, ErrorMessage message)
     : Expression(tag, message) {}
 
-    FunctionCall(std::shared_ptr<Expression> callable)
-    : m_callable(callable) {}
+    FunctionCall(std::shared_ptr<Expression> callable, std::vector<std::shared_ptr<Expression>> const& arguments)
+    : m_callable(callable), m_arguments(std::move(arguments)) {}
 
     virtual Value evaluate(Runtime&) const override;
 
@@ -221,11 +221,15 @@ public:
         if(is_error())
             return ASTNode::to_string();
 
-        return "FunctionCall(" + m_callable->to_string() + "())";
+        std::string output = "FunctionCall(" + m_callable->to_string() + "(";
+        for(auto& it: m_arguments)
+            output += it->to_string() + ", ";
+        return output + "))";
     }
 
 private:
     std::shared_ptr<Expression> m_callable;
+    std::vector<std::shared_ptr<Expression>> m_arguments;
 };
 
 class UnaryExpression : public Expression
