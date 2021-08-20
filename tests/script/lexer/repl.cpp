@@ -1,4 +1,5 @@
-#include "libevoscript/Value.h"
+#include <libevoscript/NativeFunction.h>
+#include <libevoscript/Value.h>
 #include <libevoscript/Lexer.h>
 
 #include <iostream>
@@ -33,19 +34,19 @@ ReplObject::ReplObject()
 Value ReplObject::get(std::string const& member)
 {
     if(member == "dump")
-        return NativeFunction::create_value([](Runtime& rt, std::vector<Value> const& args)->Value {
+        return NativeFunction<ReplObject>::create_value([](Runtime& rt, ReplObject& container, std::vector<Value> const& args)->Value {
             for(auto& value: args)
                 std::cout << value.dump_string() << std::endl;
 
             return Value::new_int(args.size());
         });
     else if(member == "exit")
-        return NativeFunction::create_value([](Runtime& rt, std::vector<Value> const& args)->Value {
+        return NativeFunction<ReplObject>::create_value([](Runtime& rt, ReplObject& container, std::vector<Value> const& args)->Value {
             auto exit_code = args.size() == 1 ? args[0].to_int(rt) : 0;
             if(rt.has_exception())
                 return {};
 
-            rt.this_object<ReplObject>()->exit(exit_code);
+            container.exit(exit_code);
             return Value::undefined();
         });
     else

@@ -19,7 +19,7 @@ public:
     virtual Value get(std::string const& member) = 0;
     virtual std::string type_name() const { return "Object"; }
     virtual std::string dump_string() const { return ""; }
-    virtual Value call(Runtime&, std::vector<Value> const& arguments);
+    virtual Value call(Runtime&, Object& container, std::vector<Value> const& arguments);
 };
 
 class MapObject : public Object
@@ -41,21 +41,10 @@ public:
     virtual std::string dump_string() const override { return "function() {}"; }
 };
 
-class NativeFunction : public Function
+class NativeFunctionBase : public Function
 {
 public:
-    using FunctionType = std::function<Value(Runtime&, std::vector<Value> const&)>;
-
-    NativeFunction(FunctionType&& function)
-    : m_function(function) {}
-
-    static Value create_value(FunctionType&& function);
-
-    virtual std::string type_name() const override { return "NativeFunction"; }
-    virtual Value call(Runtime& rt, std::vector<Value> const& arguments) override;
-
-private:
-    FunctionType m_function;
+    virtual Value call(Runtime&, Object& container, std::vector<Value> const& arguments) override;
 };
 
 class Value

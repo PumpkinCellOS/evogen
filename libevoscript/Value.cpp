@@ -1,5 +1,6 @@
 #include <libevoscript/Value.h>
 
+#include <libevoscript/NativeFunction.h>
 #include <libevoscript/Runtime.h>
 
 #include <cassert>
@@ -8,7 +9,7 @@
 namespace evo::script
 {
 
-Value Object::call(Runtime& rt, std::vector<Value> const&)
+Value Object::call(Runtime& rt, Object&, std::vector<Value> const&)
 {
     rt.throw_exception("Cannot call non-callable object");
     return {};
@@ -18,8 +19,8 @@ Value MapObject::get(std::string const& member)
 {
     if(member == "length")
     {
-        return Value::new_object(std::make_shared<NativeFunction>([](Runtime& rt, std::vector<Value> const&)->Value {
-            return Value::new_int(rt.current_execution_context().this_object<MapObject>()->m_values.size());
+        return Value::new_object(std::make_shared<NativeFunction<MapObject>>([](Runtime& rt, MapObject& container, std::vector<Value> const&)->Value {
+            return Value::new_int(container.m_values.size());
         }));
     }
 
@@ -50,17 +51,6 @@ std::string MapObject::dump_string() const
 Value Function::get(std::string const&)
 {
     return Value::undefined();
-}
-
-Value NativeFunction::create_value(FunctionType&& function)
-{
-    return Value::new_object(std::make_shared<NativeFunction>(std::move(function)));
-}
-
-Value NativeFunction::call(Runtime& rt, std::vector<Value> const& arguments)
-{
-    assert(m_function);
-    return m_function(rt, arguments);
 }
 
 std::string Value::type_to_string(Type type)
@@ -289,7 +279,8 @@ Value Value::call(Runtime& rt, std::vector<Value> const& arguments)
         rt.throw_exception("Cannot call non-object");
         return {};
     }
-    return real_value.get_object()->call(rt, arguments);
+    assert(m_container);
+    return real_value.get_object()->call(rt, *m_container, arguments);
 }
 
 std::ostream& operator<<(std::ostream& stream, Value const& value)
