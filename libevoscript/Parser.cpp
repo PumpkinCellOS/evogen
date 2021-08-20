@@ -113,7 +113,11 @@ std::shared_ptr<Expression> EVOParser::parse_member_name(std::shared_ptr<Express
     if(!member_name)
         return std::make_shared<MemberExpression>(ASTNode::Error, "Expected name in member expression");
 
-    auto member_expression = std::make_shared<MemberExpression>(container, member_name->value());
+    std::shared_ptr<Expression> member_expression = std::make_shared<MemberExpression>(container, member_name->value());
+
+    auto maybe_function_call = parse_argument_list(member_expression);
+    if(!maybe_function_call->is_error())
+        member_expression = maybe_function_call;
 
     auto maybe_chained_reference = parse_member_name(member_expression);
     if(!maybe_chained_reference->is_error())
