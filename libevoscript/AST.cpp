@@ -22,11 +22,11 @@ Value StringLiteral::evaluate(Runtime&) const
 
 Value Identifier::evaluate(Runtime& rt) const
 {
-    auto object = rt.current_execution_context().local_scope_object()->value().to_object(rt);
+    auto local_scope_object = rt.current_execution_context().local_scope_object()->value().to_object(rt);
     if(rt.has_exception())
         return {}; // Local scope is not an object (unlikely to happen)
 
-    auto memory_object = object->get(m_name).to_reference(rt);
+    auto memory_object = local_scope_object->get(m_name).to_reference(rt);
     if(rt.has_exception())
         return {}; // MemoryObject is not a reference
 
@@ -42,6 +42,7 @@ Value Identifier::evaluate(Runtime& rt) const
         auto value = global_object->get(m_name);
         if(!value.is_reference()) 
         {
+            value.set_container(global_object);
             return value;
         }
         
@@ -49,7 +50,9 @@ Value Identifier::evaluate(Runtime& rt) const
         assert(!rt.has_exception());
     }
 
-    return Value::new_reference(memory_object);
+    auto value = Value::new_reference(memory_object);
+    value.set_container(local_scope_object);
+    return value;
 }
 
 Value SpecialValue::evaluate(Runtime& rt) const
