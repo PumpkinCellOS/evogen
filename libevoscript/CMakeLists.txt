@@ -6,6 +6,7 @@ add_library(libevoscript
     "Parser.cpp"
     "Runtime.cpp"
     "Value.cpp"
+    "objects/Object.cpp"
     "objects/StringObject.cpp"
 )
 

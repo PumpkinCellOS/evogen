@@ -1,5 +1,7 @@
 #include <libevoscript/Runtime.h>
 
+#include <libevoscript/objects/Object.h>
+
 #include <iostream>
 
 namespace evo::script

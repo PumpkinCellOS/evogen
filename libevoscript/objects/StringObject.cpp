@@ -1,6 +1,6 @@
-#include "libevoscript/AbstractOperations.h"
 #include <libevoscript/objects/StringObject.h>
 
+#include <libevoscript/AbstractOperations.h>
 #include <libevoscript/NativeFunction.h>
 
 namespace evo::script

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libevoscript/Value.h>
+#include <libevoscript/objects/Object.h>
 
 namespace evo::script
 {

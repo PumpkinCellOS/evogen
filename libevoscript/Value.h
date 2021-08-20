@@ -10,36 +10,8 @@ namespace evo::script
 {
 
 class MemoryValue;
+class Object;
 class Runtime;
-class Value;
-
-class Object
-{
-public:
-    virtual Value get(std::string const& member) = 0;
-    virtual std::string type_name() const { return "Object"; }
-    virtual std::string dump_string() const { return ""; }
-    virtual Value call(Runtime&, Object& container, std::vector<Value> const& arguments);
-};
-
-class MapObject : public Object
-{
-public:
-    virtual Value get(std::string const& member) override;
-    virtual std::string type_name() const override { return "MapObject"; }
-    virtual std::string dump_string() const override;
-
-private:
-    std::map<std::string, std::shared_ptr<MemoryValue>> m_values;
-};
-
-class Function : public Object
-{
-public:
-    virtual Value get(std::string const& member) override;
-    virtual std::string type_name() const override { return "Function"; }
-    virtual std::string dump_string() const override { return "function() {}"; }
-};
 
 class Value
 {

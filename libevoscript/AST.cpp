@@ -2,6 +2,7 @@
 
 #include <libevoscript/AbstractOperations.h>
 #include <libevoscript/ExecutionContext.h>
+#include <libevoscript/objects/Object.h>
 
 #include <cassert>
 #include <iostream>
