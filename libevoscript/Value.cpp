@@ -2,6 +2,7 @@
 
 #include <libevoscript/NativeFunction.h>
 #include <libevoscript/Runtime.h>
+#include <libevoscript/objects/StringObject.h>
 
 #include <cassert>
 #include <sstream>
@@ -113,9 +114,10 @@ std::shared_ptr<Object> Value::to_object(Runtime& rt) const
     case Type::Null:
     case Type::Undefined:
     case Type::Int:
-    case Type::String: // TODO: String object
         rt.throw_exception("Cannot convert " + type_to_string(m_type) + " to object");
         return nullptr;
+    case Type::String:
+        return std::make_shared<StringObject>(m_string_value);
     case Type::Object:
         assert(m_object_value);
         return m_object_value;

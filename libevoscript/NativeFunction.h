@@ -39,4 +39,10 @@ private:
     FunctionType m_function;
 };
 
+#define NATIVE_FUNCTION(ContainerType, script_name, internal_name)                                      \
+    do {                                                                                                \
+        if(member == script_name)                                                                        \
+            return Value::new_object(std::make_shared<NativeFunction<ContainerType>>(internal_name));   \
+    } while(false)
+
 }

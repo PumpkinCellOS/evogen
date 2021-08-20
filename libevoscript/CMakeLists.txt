@@ -6,6 +6,7 @@ add_library(libevoscript
     "Parser.cpp"
     "Runtime.cpp"
     "Value.cpp"
+    "objects/StringObject.cpp"
 )
 
 target_include_directories(libevoscript PUBLIC ${CMAKE_SOURCE_DIR})

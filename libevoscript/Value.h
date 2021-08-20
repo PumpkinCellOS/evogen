@@ -41,12 +41,6 @@ public:
     virtual std::string dump_string() const override { return "function() {}"; }
 };
 
-class NativeFunctionBase : public Function
-{
-public:
-    virtual Value call(Runtime&, Object& container, std::vector<Value> const& arguments) override;
-};
-
 class Value
 {
 public:
