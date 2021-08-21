@@ -31,7 +31,7 @@ bool Image::load_from_file(std::string const& name)
         return false;
     }
 
-    std::cout << "Loaded image '" << name << "': " << m_size.to_string() << " @ " << m_channels << " channels" << std::endl;
+    std::cout << "Loaded image '" << name << "': " << to_string() << std::endl;
     return true;
 }
 

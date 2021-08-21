@@ -26,6 +26,8 @@ public:
     Size<int> size() const { return m_size; }
     int channels() const { return m_channels; }
 
+    std::string to_string() const { return m_size.to_string() + " @ " + std::to_string(m_channels) + " channels"; }
+
 private:
     uint8_t* pixel_ptr(Size<int> const& coords)
     {
