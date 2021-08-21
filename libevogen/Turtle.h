@@ -18,9 +18,14 @@ public:
 
     void generate_spawn_command(std::ostream&) const;
 
-    std::string to_selector() const { return "@e[tag=evogen,type=armor_stand,name=" + m_custom_name + "]"; }
-    std::string to_execute_as() const { return "execute as " + to_selector(); }
-    std::string to_execute_at() const { return "execute at " + to_selector(); }
+    std::string to_strict_selector() const { return "@e[tag=evogen,type=armor_stand,name=" + m_custom_name + "]"; }
+    std::string to_general_selector() const { return "@e[tag=evogen]"; }
+
+    // Use for teleporting (e.g player)
+    std::string to_execute_as() const { return "execute as " + to_general_selector(); }
+
+    // Use for filling, when you need to execute command once
+    std::string to_execute_at() const { return "execute at " + to_strict_selector(); }
 
 private:
     Vector<int> m_start_position;
