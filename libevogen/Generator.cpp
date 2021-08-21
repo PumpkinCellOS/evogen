@@ -22,6 +22,7 @@ void Generator::generate(std::ostream& stream) const
     }
     stream << "kill @e[tag=evogen]" << std::endl;
     m_stream = nullptr;
+    std::cout << "Generated commands from " << m_tasks.size() << " tasks!" << std::endl;
 }
 
 bool Generator::generate_to_file(std::string const& name) const
