@@ -35,7 +35,7 @@ public:
         int minx = std::min(start.x, end.x), maxx = std::max(start.x, end.x);
         int miny = std::min(start.y, end.y), maxy = std::max(start.y, end.y);
         int minz = std::min(start.z, end.z), maxz = std::max(start.z, end.z);
-        std::cerr << "fill_blocks_if " << start.to_string() << " / " << end.to_string() << std::endl;
+        //std::cerr << "fill_blocks_if " << start.to_string() << " / " << end.to_string() << std::endl;
         auto center = (Vector<int>{minx, miny, minz} + Vector<int>{maxx, maxy, maxz}) / 2.0;
         for(int x = minx; x <= maxx; x++)
         {

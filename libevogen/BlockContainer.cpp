@@ -24,7 +24,7 @@ void BlockContainer::fill_blocks_at(Vector<int> const& start, Vector<int> const&
     int minx = std::min(start.x, end.x), maxx = std::max(start.x, end.x);
     int miny = std::min(start.y, end.y), maxy = std::max(start.y, end.y);
     int minz = std::min(start.z, end.z), maxz = std::max(start.z, end.z);
-    std::cerr << "fill_blocks_at " << start.to_string() << " / " << end.to_string() << " = " << block.to_command_format() << std::endl;
+    //std::cerr << "fill_blocks_at " << start.to_string() << " / " << end.to_string() << " = " << block.to_command_format() << std::endl;
     for(int x = minx; x <= maxx; x++)
     {
         for(int y = miny; y <= maxy; y++)
@@ -68,7 +68,7 @@ void BlockContainer::fill_ball(Vector<int> const& center, double radius, Block c
 {
     auto start = center - Vector<int>(radius+1, radius+1, radius+1);
     auto end = center + Vector<int>(radius+1, radius+1, radius+1);
-    std::cerr << "fill_ball r=" << radius << " : " << start.to_string() << "/" << end.to_string() << " = " << block.to_command_format() << std::endl;
+    //std::cerr << "fill_ball r=" << radius << " : " << start.to_string() << "/" << end.to_string() << " = " << block.to_command_format() << std::endl;
     fill_blocks_if(start, end, [&](Vector<int> const& offset) {
         return offset.x * offset.x + offset.y * offset.y + offset.z * offset.z < radius * radius ?
             block : std::optional<Block>();
@@ -79,7 +79,7 @@ void BlockContainer::fill_cylinder(Vector<int> const& bottom_side_center, double
 {
     auto start = bottom_side_center + Vector<int>(-radius-1, 0, -radius-1);
     auto end = bottom_side_center + Vector<int>(radius+1, height, radius+1);
-    std::cerr << "fill_cylinder r=" << radius << " h=" << height << " : " << start.to_string() << "/" << end.to_string() << " = " << block.to_command_format() << std::endl;
+    //std::cerr << "fill_cylinder r=" << radius << " h=" << height << " : " << start.to_string() << "/" << end.to_string() << " = " << block.to_command_format() << std::endl;
     fill_blocks_if(start, end, [&](Vector<int> const& offset) {
         return offset.x * offset.x + offset.z * offset.z < radius * radius ?
             block : std::optional<Block>();
@@ -101,7 +101,7 @@ void BlockContainer::place_structure(Structure const& structure, Vector<int> con
                 {
                     auto block = structure.block_from_index(descriptor->arg);
                     assert(block.has_value());
-                    // TODO: Handle states+nbt
+                    // TODO: Handle nbt
                     set_block_at(Vector<int>(x, y, z) + offset, block.value());
                 }
             }
