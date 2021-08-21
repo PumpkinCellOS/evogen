@@ -1,5 +1,6 @@
 #include <libevogen/Block.h>
 #include <libevogen/Generator.h>
+#include <libevogen/Image.h>
 #include <libevogen/Structure.h>
 #include <libevogen/Task.h>
 #include <libevogen/VanillaBlock.h>
@@ -7,6 +8,10 @@
 
 int main()
 {
+    evo::Image image;
+    if(!image.load_from_file("image.png"))
+        std::cout << "could not load image :(" << std::endl;
+
     evo::World world;
     
     world.set_block_at({10, 10, 10}, evo::VanillaBlock::Stone);
@@ -14,7 +19,7 @@ int main()
     world.fill_blocks_outline({-50, 50, -50}, {-40, 40, -40}, evo::VanillaBlock::OakPlanks);
     world.fill_blocks_hollow({50, 50, 50}, {40, 40, 40}, evo::VanillaBlock::OakLog, evo::VanillaBlock::Podzol);
     world.fill_blocks_if({50, 100, 50}, {40, 140, 40}, [](auto& offset)->std::optional<evo::Block> {
-        if(offset.x % 2 == offset.y % 2)
+        if(abs(offset.x % 2) == abs(offset.y % 2))
             return {evo::VanillaBlock::OakLog};
         return {evo::VanillaBlock::Stone};
     });

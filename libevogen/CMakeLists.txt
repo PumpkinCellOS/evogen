@@ -4,6 +4,7 @@ add_library(libevogen
     "BlockStates.cpp"
     "Chunk.cpp"
     "Generator.cpp"
+    "Image.cpp"
     "Structure.cpp"
     "Task.cpp"
     "Turtle.cpp"
