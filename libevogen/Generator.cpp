@@ -20,7 +20,7 @@ void Generator::generate(std::ostream& stream) const
     {
         task->generate_code(*this);
     }
-    stream << "kill @e[tag=evogen]" << std::endl;
+    stream << "kill " << m_turtle.to_strict_selector() << std::endl;
     m_stream = nullptr;
     std::cout << "Generated commands from " << m_tasks.size() << " tasks!" << std::endl;
 }
