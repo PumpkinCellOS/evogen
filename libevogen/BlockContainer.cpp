@@ -109,6 +109,24 @@ void BlockContainer::place_structure(Structure const& structure, Vector<int> con
     }
 }
 
+void BlockContainer::load_markers_from_image(Image const& image, int y, Vector<int> const& offset)
+{
+    assert(image.channels() == 4);
+    std::cerr << "Loading markers from image " << image.to_string() << std::endl;
+    for(int x = 0; x < image.size().x; x++)
+    {
+        for(int z = 0; z < image.size().y; z++)
+        {
+            auto pixel = image.pixel({x, z});
+            if(pixel.a >= 128)
+            {
+                BlockDescriptor descriptor{BlockDescriptor::Marker, {}, marker_index_from_color(pixel)};
+                set_block_descriptor_at({x + offset.x, y + offset.y, z + offset.z}, descriptor);
+            }
+        }
+    }
+}
+
 void BlockContainer::set_block_descriptor_at(Vector<int> const& position, BlockDescriptor block)
 {
     //std::cerr << "set_block_descriptor_at " << position.to_string() << " = " << block.arg << std::endl;
@@ -143,7 +161,7 @@ Chunk& BlockContainer::ensure_chunk_at(Vector<int> const& chunk_position)
     if(it == m_chunks.end())
     {
         auto result = m_chunks.try_emplace(chunk_position);
-        std::cerr << "ensure_chunk_at: creating at " << chunk_position.to_string() << " = " << result.second << std::endl;
+        //std::cerr << "ensure_chunk_at: creating at " << chunk_position.to_string() << " = " << result.second << std::endl;
         initialize_chunk(result.first->second);
         it = result.first;
     }
@@ -178,6 +196,18 @@ uint16_t BlockContainer::generate_index(Block const& block)
     return m_current_index;
 }
 
+uint16_t BlockContainer::marker_index_from_color(Color const& color)
+{
+    uint16_t r = color.r >> 3;
+    uint16_t g = color.g >> 3;
+    uint16_t b = color.b >> 3;
+    uint16_t value = b | (g << 5) | (r << 10);
+
+    // MSB should be always 0.
+    assert(!(value & 0x8000));
+    return value;
+}
+
 std::optional<Block> BlockContainer::block_from_index(uint16_t index) const
 {
     auto it = m_index_to_block.find(index);
@@ -188,6 +218,17 @@ std::optional<uint16_t> BlockContainer::index_of(Block const& block) const
 {
     auto it = m_block_to_index.find(block);
     return it == m_block_to_index.end() ? std::optional<uint16_t>() : std::optional<uint16_t>(it->second);
+}
+
+void BlockContainer::set_marker(uint16_t index, Block const& block)
+{
+    m_marker_index_to_block.insert({index, block});
+}
+
+std::optional<Block> BlockContainer::block_from_marker_index(uint16_t index) const
+{
+    auto it = m_marker_index_to_block.find(index);
+    return it == m_marker_index_to_block.end() ? std::optional<Block>() : std::optional<Block>(it->second);
 }
 
 Vector<int> BlockContainer::chunk_position_from_block(Vector<int> const& position)

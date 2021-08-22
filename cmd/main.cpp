@@ -13,7 +13,10 @@ int main()
         std::cout << "could not load image :(" << std::endl;
 
     evo::World world;
-    
+
+    world.load_markers_from_image(image, 63, {128, 0, 128});
+    world.set_marker(evo::World::marker_index_from_color({255, 255, 0}), {"minecraft:yellow_wool"});
+    world.set_marker(evo::World::marker_index_from_color({255, 0, 0}), {"minecraft:red_wool"});
     world.set_block_at({10, 10, 10}, evo::VanillaBlock::Stone);
     world.fill_blocks_at({11, 11, 11}, {-11, 50, -11}, evo::VanillaBlock::Stone);
     world.fill_blocks_outline({-50, 50, -50}, {-40, 40, -40}, evo::VanillaBlock::OakPlanks);
