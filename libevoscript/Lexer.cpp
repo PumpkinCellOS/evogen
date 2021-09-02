@@ -112,9 +112,9 @@ bool EVOLexer::lex(std::vector<Token>& output)
                     }
                     break;
                 default:
-                    output.emplace_back(Token::NormalOperator, std::string(&next, 1), token_start, location());
                     break;
             } 
+            output.emplace_back(Token::NormalOperator, std::string(&next, 1), token_start, location());
         }
         else if(next == ';')
         {
