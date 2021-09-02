@@ -301,6 +301,20 @@ Value BlockStatement::evaluate(Runtime& rt) const
     return val;
 }
 
+Value IfStatement::evaluate(Runtime& rt) const
+{
+    auto condition = m_condition->evaluate(rt);
+    if(rt.has_exception())
+        return {};
+    
+    auto condition_is_true = condition.to_bool(rt);
+    if(condition_is_true)
+        return m_true_statement->evaluate(rt);
+    else
+        // TODO: else statements
+        return Value::undefined();
+}
+
 Value Program::evaluate(Runtime& rt) const
 {
     Value val;
@@ -315,7 +329,7 @@ Value Program::evaluate(Runtime& rt) const
 
 std::ostream& operator<<(std::ostream& stream, ASTNode& node)
 {
-    return stream << node.to_string();
+    return stream << (node.is_error() ? "" : node.to_string());
 }
 
 }

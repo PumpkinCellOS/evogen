@@ -74,9 +74,12 @@ bool run_code_from_stream(Runtime& rt, std::istream& input)
 
     EVOParser parser(tokens);
     auto program = parser.parse_program();
-    std::cerr << *program << std::endl;
     if(program->is_error())
+    {
+        std::cerr << "\e[31mSyntax Error: \e[0m" << program->error_message() << std::endl;
         return false;
+    }
+    std::cerr << *program << std::endl;
 
     auto value = program->evaluate(rt);
     if(rt.has_exception())

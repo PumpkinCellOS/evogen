@@ -478,10 +478,7 @@ std::shared_ptr<Statement> EVOParser::parse_block_statement()
             break;
         statement->add_node(node);
         if(node->is_error())
-        {
-            std::cerr << node->error_message() << std::endl;
             break;
-        }
 
         if(node->requires_semicolon())
         {
@@ -503,6 +500,31 @@ std::shared_ptr<Statement> EVOParser::parse_block_statement()
     return statement;
 }
 
+std::shared_ptr<Statement> EVOParser::parse_if_statement()
+{
+    auto if_keyword = consume_of_type(Token::Name);
+    if(!if_keyword || if_keyword->value() != "if")
+        return {};
+
+    auto paren_open = consume_of_type(Token::ParenOpen);
+    if(!paren_open)
+        return std::make_shared<IfStatement>(ASTNode::Error, "Expected '(' after 'if'");
+
+    auto condition = parse_expression();
+    if(condition->is_error())
+        return std::make_shared<ExpressionStatement>(ASTNode::Error, condition->error_message());
+
+    auto paren_close = consume_of_type(Token::ParenClose);
+    if(!paren_close)
+        return std::make_shared<IfStatement>(ASTNode::Error, "Expected ')' after 'if' condition");
+
+    auto true_statement = parse_statement();
+    if(!true_statement || true_statement->is_error())
+        return std::make_shared<IfStatement>(ASTNode::Error, "Expected statement");
+
+    return std::make_shared<IfStatement>(condition, true_statement);
+}
+
 std::shared_ptr<Statement> EVOParser::parse_statement()
 {
     size_t off = offset();
@@ -510,13 +532,19 @@ std::shared_ptr<Statement> EVOParser::parse_statement()
     if(!statement)
     {
         set_offset(off);
-        statement = parse_expression_statement();
-        if(statement->is_error())
+        statement = parse_if_statement();
+        if(!statement)
         {
             set_offset(off);
-            return statement;
+            statement = parse_expression_statement();
+            if(!statement || statement->is_error())
+            {
+                set_offset(off);
+                return statement;
+            }
         }
     }
+    assert(statement);
     return statement;
 }
 
@@ -532,15 +560,13 @@ std::shared_ptr<Program> EVOParser::parse_program()
 
         program->add_node(node);
         if(node->is_error())
-        {
-            std::cerr << node->error_message() << std::endl;
             break;
-        }
 
         if(node->requires_semicolon())
         {
             auto semicolon = consume_of_type(Token::Semicolon);
             if(!semicolon && !eof())
+                // TODO: Fix error propagation here.
                 return std::make_shared<Program>(ASTNode::Error, "Expected ';' after statement");
         }
     }

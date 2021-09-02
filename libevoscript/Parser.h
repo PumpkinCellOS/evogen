@@ -117,6 +117,7 @@ public:
     std::shared_ptr<Statement>  parse_statement();
     std::shared_ptr<Statement>  parse_expression_statement();
     std::shared_ptr<Statement>  parse_block_statement();
+    std::shared_ptr<Statement>  parse_if_statement();
     std::shared_ptr<Program>    parse_program();
 
     // Postfix helpers
