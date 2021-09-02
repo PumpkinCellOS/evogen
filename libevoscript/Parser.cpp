@@ -204,12 +204,11 @@ std::shared_ptr<Expression> EVOParser::parse_postfix_expression()
 std::shared_ptr<Expression> EVOParser::parse_unary_expression()
 {
     auto op = consume_of_type(Token::NormalOperator);
-
-    auto lhs = parse_postfix_expression();
-    if(lhs->is_error())
-        return lhs;
-
     if(!op)
+        return parse_postfix_expression();
+
+    auto lhs = parse_unary_expression();
+    if(lhs->is_error())
         return lhs;
 
     UnaryExpression::Operation operation;
