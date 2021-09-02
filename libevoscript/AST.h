@@ -39,7 +39,7 @@ private:
 };
 
 template<class T>
-class ASTGroupNode : public ASTNode
+class ASTGroupNode : virtual public ASTNode
 {
 public:
     ASTGroupNode(_ErrorTag tag, ErrorMessage message)
@@ -426,7 +426,7 @@ private:
     Operation m_operation;
 };
 
-class Statement : public ASTNode
+class Statement : virtual public ASTNode
 {
 public:
     Statement(_ErrorTag tag, ErrorMessage message)
@@ -458,6 +458,19 @@ public:
 
 private:
     std::shared_ptr<Expression> m_expression;
+};
+
+class BlockStatement : public ASTGroupNode<Statement>, public Statement
+{
+public:
+    BlockStatement(_ErrorTag tag, ErrorMessage message)
+    : ASTGroupNode<Statement>(tag, message) {}
+
+    BlockStatement() = default;
+
+    virtual Value evaluate(Runtime&) const override;
+
+    virtual bool requires_semicolon() const override { return false; }
 };
 
 class Program : public ASTGroupNode<Statement>

@@ -12,8 +12,8 @@ namespace evo::script
 
 struct SourceLocation
 {
-    size_t line;
-    size_t column;
+    size_t line = 0;
+    size_t column = 0;
 };
 
 std::ostream& operator<<(std::ostream&, SourceLocation const&);
@@ -33,6 +33,8 @@ public:
         ParenClose,             // )
         Semicolon,              // ;
         String,                 // /["']([^"']*)["']/
+        CurlyOpen,              // {
+        CurlyClose,             // }
         Invalid                 // (others)
     };
 
@@ -114,6 +116,7 @@ public:
 
     std::shared_ptr<Statement>  parse_statement();
     std::shared_ptr<Statement>  parse_expression_statement();
+    std::shared_ptr<Statement>  parse_block_statement();
     std::shared_ptr<Program>    parse_program();
 
     // Postfix helpers

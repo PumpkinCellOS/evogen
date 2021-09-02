@@ -287,6 +287,20 @@ Value ExpressionStatement::evaluate(Runtime& rt) const
     return m_expression->evaluate(rt);
 }
 
+Value BlockStatement::evaluate(Runtime& rt) const
+{
+    // TODO: Add some "inheritance" mechanism for block statement nodes
+    ScopedExecutionContext context(rt, rt.this_object());
+    Value val = Value::undefined();
+    for(auto& it: m_nodes)
+    {
+        val = it->evaluate(rt);
+        if(rt.has_exception())
+            return {};
+    }
+    return val;
+}
+
 Value Program::evaluate(Runtime& rt) const
 {
     Value val;

@@ -1,5 +1,7 @@
-#include "libevoscript/AST.h"
+#include <libevoscript/AST.h>
 #include <libevoscript/Parser.h>
+
+#include <iostream>
 
 namespace evo::script
 {
@@ -449,11 +451,6 @@ std::shared_ptr<Expression> EVOParser::parse_assignment_expression()
     return std::make_shared<AssignmentExpression>(lhs, rhs, operation);
 }
 
-std::shared_ptr<Statement> EVOParser::parse_statement()
-{
-    return parse_expression_statement();
-}
-
 std::shared_ptr<Statement> EVOParser::parse_expression_statement()
 {
     auto expression = parse_expression();
@@ -461,6 +458,66 @@ std::shared_ptr<Statement> EVOParser::parse_expression_statement()
         return std::make_shared<ExpressionStatement>(ASTNode::Error, expression->error_message());
     
     return std::make_shared<ExpressionStatement>(expression);
+}
+
+std::shared_ptr<Statement> EVOParser::parse_block_statement()
+{
+    auto curly_open = consume_of_type(Token::CurlyOpen);
+    if(!curly_open)
+        return {};
+
+    auto statement = std::make_shared<BlockStatement>();
+    while(!eof())
+    {
+        auto curly_close = consume_of_type(Token::CurlyClose);
+        if(curly_close)
+            return statement;
+
+        auto node = parse_statement();
+        if(!node)
+            break;
+        statement->add_node(node);
+        if(node->is_error())
+        {
+            std::cerr << node->error_message() << std::endl;
+            break;
+        }
+
+        if(node->requires_semicolon())
+        {
+            auto semicolon = consume_of_type(Token::Semicolon);
+            if(!semicolon)
+            {
+                auto curly_close = consume_of_type(Token::CurlyClose);
+                if(curly_close)
+                    return statement;
+                return std::make_shared<BlockStatement>(ASTNode::Error, "Expected ';' after statement");
+            }
+        }
+    }
+
+    auto curly_close = consume_of_type(Token::CurlyClose);
+    if(!curly_close)
+        return std::make_shared<BlockStatement>(ASTNode::Error, "Unclosed block statement");
+
+    return statement;
+}
+
+std::shared_ptr<Statement> EVOParser::parse_statement()
+{
+    size_t off = offset();
+    auto statement = parse_block_statement();
+    if(!statement)
+    {
+        set_offset(off);
+        statement = parse_expression_statement();
+        if(statement->is_error())
+        {
+            set_offset(off);
+            return statement;
+        }
+    }
+    return statement;
 }
 
 std::shared_ptr<Program> EVOParser::parse_program()
@@ -475,13 +532,16 @@ std::shared_ptr<Program> EVOParser::parse_program()
 
         program->add_node(node);
         if(node->is_error())
+        {
+            std::cerr << node->error_message() << std::endl;
             break;
+        }
 
         if(node->requires_semicolon())
         {
             auto semicolon = consume_of_type(Token::Semicolon);
             if(!semicolon && !eof())
-                return std::make_shared<Program>(ASTNode::Error, "Expected ';' in statement");
+                return std::make_shared<Program>(ASTNode::Error, "Expected ';' after statement");
         }
     }
     return program;
