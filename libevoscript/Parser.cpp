@@ -213,73 +213,77 @@ std::shared_ptr<Expression> EVOParser::parse_unary_expression()
     return std::make_shared<UnaryExpression>(lhs, operation);
 }
 
-std::shared_ptr<Expression> EVOParser::parse_multiplicative_expression(std::shared_ptr<Expression> lhs)
+std::shared_ptr<Expression> EVOParser::parse_multiplicative_expression()
 {
-    if(!lhs)
+    auto lhs = parse_unary_expression();
+    if(lhs->is_error())
+        return lhs;
+
+    while(true)
     {
-        lhs = parse_unary_expression();
-        if(lhs->is_error())
+        size_t off = offset();
+        auto op = consume_of_type(Token::NormalOperator);
+        if(!op)
             return lhs;
+
+        auto rhs = parse_unary_expression();
+        if(rhs->is_error())
+            return rhs;
+
+        NormalBinaryExpression::Operation operation;
+        if(op->value() == "*")
+            operation = NormalBinaryExpression::Multiply;
+        else if(op->value() == "/")
+            operation = NormalBinaryExpression::Divide;
+        else if(op->value() == "%")
+            operation = NormalBinaryExpression::Modulo;
+        else
+        {
+            set_offset(off);
+            return lhs;
+        }
+
+        lhs = std::make_shared<NormalBinaryExpression>(lhs, rhs, operation);
     }
-
-    size_t off = offset();
-    auto op = consume_of_type(Token::NormalOperator);
-    if(!op)
-        return lhs;
-
-    auto rhs = parse_unary_expression();
-    if(rhs->is_error())
-        return rhs;
-
-    NormalBinaryExpression::Operation operation;
-    if(op->value() == "*")
-        operation = NormalBinaryExpression::Multiply;
-    else if(op->value() == "/")
-        operation = NormalBinaryExpression::Divide;
-    else if(op->value() == "%")
-        operation = NormalBinaryExpression::Modulo;
-    else
-    {
-        set_offset(off);
-        return lhs;
-    }
-
-    auto expression = std::make_shared<NormalBinaryExpression>(lhs, rhs, operation);
-    auto maybe_multiplicative_expression = parse_multiplicative_expression(expression);
-
-    return !maybe_multiplicative_expression->is_error() ? maybe_multiplicative_expression : expression;
+    assert(false);
 }
 
-std::shared_ptr<Expression> EVOParser::parse_additive_expression(std::shared_ptr<Expression> lhs)
+std::shared_ptr<Expression> EVOParser::parse_additive_expression()
 {
-    if(!lhs)
-        lhs = parse_multiplicative_expression(nullptr);
-
-    auto op = consume_of_type(Token::NormalOperator);
-    if(!op)
+    auto lhs = parse_multiplicative_expression();
+    if(lhs->is_error())
         return lhs;
 
-    auto rhs = parse_multiplicative_expression(nullptr);
-    if(rhs->is_error())
-        return rhs;
+    while(true)
+    {
+        size_t off = offset();
+        auto op = consume_of_type(Token::NormalOperator);
+        if(!op)
+            return lhs;
 
-    NormalBinaryExpression::Operation operation;
-    if(op->value() == "+")
-        operation = NormalBinaryExpression::Add;
-    else if(op->value() == "-")
-        operation = NormalBinaryExpression::Subtract;
-    else
-        return std::make_shared<NormalBinaryExpression>(ASTNode::Error, "Invalid additive operator");
+        auto rhs = parse_multiplicative_expression();
+        if(rhs->is_error())
+            return rhs;
 
-    auto expression = std::make_shared<NormalBinaryExpression>(lhs, rhs, operation);
-    auto maybe_additive_expression = parse_additive_expression(expression);
+        NormalBinaryExpression::Operation operation;
+        if(op->value() == "+")
+            operation = NormalBinaryExpression::Add;
+        else if(op->value() == "-")
+            operation = NormalBinaryExpression::Subtract;
+        else
+        {
+            set_offset(off);
+            return lhs;
+        }
 
-    return !maybe_additive_expression->is_error() ? maybe_additive_expression : expression;
+        lhs = std::make_shared<NormalBinaryExpression>(lhs, rhs, operation);
+    }
+    assert(false);
 }
 
 std::shared_ptr<Expression> EVOParser::parse_assignment_expression()
 {
-    auto lhs = parse_additive_expression(nullptr);
+    auto lhs = parse_additive_expression();
     if(lhs->is_error())
         return lhs;
 

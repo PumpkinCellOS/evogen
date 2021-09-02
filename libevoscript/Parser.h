@@ -107,8 +107,8 @@ public:
     std::shared_ptr<Expression> parse_member_expression();
     std::shared_ptr<Expression> parse_function_call();
     std::shared_ptr<Expression> parse_unary_expression();
-    std::shared_ptr<Expression> parse_multiplicative_expression(std::shared_ptr<Expression> lhs); // +x
-    std::shared_ptr<Expression> parse_additive_expression(std::shared_ptr<Expression> lhs); // +x
+    std::shared_ptr<Expression> parse_multiplicative_expression();
+    std::shared_ptr<Expression> parse_additive_expression();
     std::shared_ptr<Expression> parse_assignment_expression();
 
     std::shared_ptr<Statement>  parse_statement();
