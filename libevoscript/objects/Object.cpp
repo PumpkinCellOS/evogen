@@ -44,14 +44,20 @@ std::string MapObject::repl_string() const
 {
     std::ostringstream oss;
     oss << "{ ";
+    size_t counter = 0;
     for(auto& value: m_values)
     {
         if(value.second->value().is_object() && value.second->value().get_object().get() == this)
-            oss << value.first << ": <recursive reference>, ";
+            oss << value.first << ": <recursive reference>";
         else
-            oss << value.first << ": " << value.second->repl_string() << ", ";
+            // TODO: Use dump_string if called from dump_string
+            oss << value.first << ": " << value.second->repl_string();
+
+        if(counter < m_values.size() - 1)
+            oss << ", ";
+        counter++;
     }
-    oss << "} ";
+    oss << " }";
     return oss.str();
 }
 

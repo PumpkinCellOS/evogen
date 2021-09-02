@@ -30,7 +30,7 @@ int main()
     std::cout << assignment2->evaluate(runtime) << std::endl; // reference null
 
     // this.length()
-    auto nativeFunctionCall = std::make_shared<FunctionCall>(std::make_shared<MemberExpression>(std::make_shared<SpecialValue>(SpecialValue::This), "length"));
+    auto nativeFunctionCall = std::make_shared<FunctionCall>(std::make_shared<MemberExpression>(std::make_shared<SpecialValue>(SpecialValue::This), "length"), {});
     std::cout << "this.length() == " << nativeFunctionCall->evaluate(runtime) << std::endl; 
     std::cout << "exception: " << runtime.exception_message() << std::endl;
 
