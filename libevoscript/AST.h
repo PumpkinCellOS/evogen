@@ -268,6 +268,8 @@ public:
         Plus,       // +
         Increment,  // ++
         Decrement,  // --
+        PostfixIncrement,   // ++
+        PostfixDecrement,   // --
     };
 
     UnaryExpression(_ErrorTag tag, ErrorMessage message)

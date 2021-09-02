@@ -107,42 +107,24 @@ std::shared_ptr<Expression> EVOParser::parse_special_value()
     return std::make_shared<SpecialValue>(ASTNode::Error, "Invalid special value");
 }
 
-std::shared_ptr<Expression> EVOParser::parse_member_name(std::shared_ptr<Expression> container)
+std::shared_ptr<Expression> EVOParser::parse_member_name(std::shared_ptr<Expression> lhs)
 {
     auto dot = consume_of_type(Token::Dot);
     if(!dot)
-        return container;
+        return {};
 
     auto member_name = consume_of_type(Token::Name);
     if(!member_name)
         return std::make_shared<MemberExpression>(ASTNode::Error, "Expected name in member expression");
 
-    std::shared_ptr<Expression> member_expression = std::make_shared<MemberExpression>(container, member_name->value());
-
-    auto maybe_function_call = parse_argument_list(member_expression);
-    if(!maybe_function_call->is_error())
-        member_expression = maybe_function_call;
-
-    auto maybe_chained_reference = parse_member_name(member_expression);
-    if(!maybe_chained_reference->is_error())
-        return maybe_chained_reference;
-    return member_expression;
+    return std::make_shared<MemberExpression>(lhs, member_name->value());
 }
 
-std::shared_ptr<Expression> EVOParser::parse_member_expression()
-{
-    auto lhs = parse_primary_expression();
-    if(lhs->is_error())
-        return lhs;
-
-    return parse_member_name(lhs);
-}
-
-std::shared_ptr<Expression> EVOParser::parse_argument_list(std::shared_ptr<Expression> callable)
+std::shared_ptr<Expression> EVOParser::parse_argument_list(std::shared_ptr<Expression> lhs)
 {
     auto paren_open = consume_of_type(Token::ParenOpen);
     if(!paren_open)
-        return std::make_shared<FunctionCall>(ASTNode::Error, "Invalid argument list");
+        return {};
 
     std::vector<std::shared_ptr<Expression>> arguments;
 
@@ -167,31 +149,60 @@ std::shared_ptr<Expression> EVOParser::parse_argument_list(std::shared_ptr<Expre
             return std::make_shared<FunctionCall>(ASTNode::Error, "Unmatched '('");
     }
 
-    auto function_call = std::make_shared<FunctionCall>(callable, arguments);
-
-    auto maybe_chained_call = parse_argument_list(function_call);
-    if(!maybe_chained_call->is_error())
-        return maybe_chained_call;
-    return function_call;
+    return std::make_shared<FunctionCall>(lhs, arguments);
 }
 
-std::shared_ptr<Expression> EVOParser::parse_function_call()
+std::shared_ptr<Expression> EVOParser::parse_postfix_operator(std::shared_ptr<Expression> lhs)
 {
-    auto lhs = parse_member_expression();
+    auto op = consume_of_type(Token::NormalOperator);
+    if(!op)
+        return {};
+    
+    UnaryExpression::Operation operation;
+    if(op->value() == "++")
+        operation = UnaryExpression::Operation::PostfixIncrement;
+    else if(op->value() == "--")
+        operation = UnaryExpression::Operation::PostfixDecrement;
+    else
+        return std::make_shared<FunctionCall>(ASTNode::Error, op->value() + " is not a postfix operator");
+
+    return std::make_shared<UnaryExpression>(lhs, operation);
+}
+
+std::shared_ptr<Expression> EVOParser::parse_postfix_expression()
+{
+    auto lhs = parse_primary_expression();
     if(lhs->is_error())
         return lhs;
 
-    auto function_call = parse_argument_list(lhs);
-    if(function_call->is_error())
-        return lhs;
-    return function_call;
+    while(true)
+    {
+        size_t off = offset();
+        std::shared_ptr<Expression> new_lhs = parse_member_name(lhs);
+        if(!new_lhs)
+        {
+            set_offset(off);
+            new_lhs = parse_argument_list(lhs);
+            if(!new_lhs)
+            {
+                set_offset(off);
+                new_lhs = parse_postfix_operator(lhs);
+                if(!new_lhs)
+                    return lhs;
+            }
+        }
+        if(new_lhs->is_error())
+            return new_lhs;
+        lhs = new_lhs;
+    }
+    assert(false);
 }
 
 std::shared_ptr<Expression> EVOParser::parse_unary_expression()
 {
     auto op = consume_of_type(Token::NormalOperator);
 
-    auto lhs = parse_function_call();
+    auto lhs = parse_postfix_expression();
     if(lhs->is_error())
         return lhs;
 

@@ -97,26 +97,26 @@ private:
 class EVOParser : public Parser
 {
 public:
-    std::shared_ptr<Expression> parse_expression();
-    std::shared_ptr<Expression> parse_primary_expression(); // ( expression ) | integer_literal | string_literal | identifier | special_value
     std::shared_ptr<Expression> parse_integer_literal();
     std::shared_ptr<Expression> parse_string_literal();
     std::shared_ptr<Expression> parse_identifier();
     std::shared_ptr<Expression> parse_special_value();
-    std::shared_ptr<Expression> parse_member_expression();
-    std::shared_ptr<Expression> parse_function_call();
+    std::shared_ptr<Expression> parse_primary_expression(); // ( expression ) | integer_literal | string_literal | identifier | special_value
+    std::shared_ptr<Expression> parse_postfix_expression(); // .name | (arg1, arg2, ...) | expr++ | expr--
     std::shared_ptr<Expression> parse_unary_expression();
     std::shared_ptr<Expression> parse_multiplicative_expression();
     std::shared_ptr<Expression> parse_additive_expression();
     std::shared_ptr<Expression> parse_assignment_expression();
+    std::shared_ptr<Expression> parse_expression();
 
     std::shared_ptr<Statement>  parse_statement();
     std::shared_ptr<Statement>  parse_expression_statement();
     std::shared_ptr<Program>    parse_program();
 
     // Postfix helpers
-    std::shared_ptr<Expression> parse_member_name(std::shared_ptr<Expression> container); // .name
-    std::shared_ptr<Expression> parse_argument_list(std::shared_ptr<Expression> callable); // (arg1, arg2, ...)
+    std::shared_ptr<Expression> parse_member_name(std::shared_ptr<Expression> lhs); // .name
+    std::shared_ptr<Expression> parse_argument_list(std::shared_ptr<Expression> lhs); // (arg1, arg2, ...)
+    std::shared_ptr<Expression> parse_postfix_operator(std::shared_ptr<Expression> lhs); // ++ | --
 };
 
 }

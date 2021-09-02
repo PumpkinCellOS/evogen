@@ -17,6 +17,9 @@ Value bitwise_not(Runtime&, Value const&);
 Value minus(Runtime&, Value const&);
 Value plus(Runtime&, Value const&);
 
+Value postfix_increment(Runtime&, Value const&);
+Value postfix_decrement(Runtime&, Value const&);
+
 // Requires a reference!
 Value prefix_increment(Runtime&, Value const&);
 Value prefix_decrement(Runtime&, Value const&);

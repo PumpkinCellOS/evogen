@@ -143,6 +143,20 @@ Value plus(Runtime& rt, Value const& value)
     return Value::new_int(+value_int);
 }
 
+Value postfix_increment(Runtime& rt, Value const& value)
+{
+    auto old_value = value.dereferenced();
+    prefix_increment(rt, value);
+    return old_value;
+}
+
+Value postfix_decrement(Runtime& rt, Value const& value)
+{
+    auto old_value = value.dereferenced();
+    prefix_decrement(rt, value);
+    return old_value;
+}
+
 Value prefix_increment(Runtime& rt, Value const& value)
 {
     auto reference = value.to_reference(rt);

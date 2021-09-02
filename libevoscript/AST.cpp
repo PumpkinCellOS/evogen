@@ -144,6 +144,12 @@ Value UnaryExpression::evaluate(Runtime& rt) const
         case Decrement:
             result = abstract::prefix_decrement(rt, value);
             break;
+        case PostfixIncrement:
+            result = abstract::postfix_increment(rt, value);
+            break;
+        case PostfixDecrement:
+            result = abstract::postfix_decrement(rt, value);
+            break;
         default:
             assert(false);
     }
