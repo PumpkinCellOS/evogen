@@ -12,12 +12,12 @@ Runtime::Runtime(std::shared_ptr<MemoryValue> global_object, std::shared_ptr<Mem
 {
     if(!m_global_object)
     {
-        std::cout << "Creating new global object as it was not specified" << std::endl;
+        std::cerr << "Creating new global object as it was not specified" << std::endl;
         m_global_object = MemoryValue::create_object<MapObject>();
     }
     if(!m_global_this)
     {
-        std::cout << "Creating new global this as it was not specified" << std::endl;
+        std::cerr << "Creating new global this as it was not specified" << std::endl;
         m_global_this = MemoryValue::create_object<MapObject>();
     }
 
@@ -29,9 +29,9 @@ Runtime::Runtime(std::shared_ptr<MemoryValue> global_object, std::shared_ptr<Mem
     auto _global = global_object;
     auto _local = context.local_scope_object();
 
-    std::cout << "this = " << _this->dump_string() << std::endl;
-    std::cout << "global object = " << *_global << std::endl;
-    std::cout << "local scope = " << *_local << std::endl;
+    std::cerr << "this = " << _this->dump_string() << std::endl;
+    std::cerr << "global object = " << *_global << std::endl;
+    std::cerr << "local scope = " << *_local << std::endl;
 }
 
 Runtime::~Runtime()
@@ -41,9 +41,9 @@ Runtime::~Runtime()
     auto _global = global_object();
     auto _local = context.local_scope_object();
 
-    std::cout << "this = " << _this->dump_string() << std::endl;
-    std::cout << "global object = " << *_global << std::endl;
-    std::cout << "local scope = " << *_local << std::endl;
+    std::cerr << "this = " << _this->dump_string() << std::endl;
+    std::cerr << "global object = " << *_global << std::endl;
+    std::cerr << "local scope = " << *_local << std::endl;
 
     pop_execution_context();
 }

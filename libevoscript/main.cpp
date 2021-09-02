@@ -2,9 +2,12 @@
 #include <libevoscript/Value.h>
 #include <libevoscript/Lexer.h>
 
+#include <fstream>
 #include <iostream>
+#include <istream>
 #include <limits>
 #include <sstream>
+#include <unistd.h>
 
 using namespace evo::script;
 
@@ -53,10 +56,49 @@ Value ReplObject::get(std::string const& member)
         return MapObject::get(member);
 }
 
-int main()
+bool run_code_from_stream(Runtime& rt, std::istream& input)
+{
+    EVOLexer lexer(input);
+    std::vector<Token> tokens;
+    if(!lexer.lex(tokens))
+    {
+        std::cerr << "Lexer error :(" << std::endl;
+        return false;
+    }
+
+    EVOParser parser(tokens);
+    auto program = parser.parse_program();
+    std::cerr << *program << std::endl;
+    if(program->is_error())
+        return false;
+
+    auto value = program->evaluate(rt);
+    if(rt.has_exception())
+    {
+        std::cerr << "\e[31mException: \e[0m" + rt.exception_message() << std::endl;
+        rt.clear_exception();
+        return false;
+    }
+    else
+    {
+        // TODO: Do not print escape sequences if not running in tty
+        std::cout << "\e[1m" << value.repl_string() << "\e[0m" << std::endl;
+    }
+    return true;
+}
+
+int main(int argc, char** argv)
 {
     auto repl_object = std::make_shared<ReplObject>();
     Runtime runtime(MemoryValue::create_existing_object(repl_object));
+
+    if(argc == 2)
+    {
+        auto file = std::ifstream(argv[1]);
+        return run_code_from_stream(runtime, file);
+    }
+    else if(!isatty(0))
+        return run_code_from_stream(runtime, std::cin);
 
     std::cout << "EvoGen Script REPL" << std::endl;
     while(true)
@@ -71,26 +113,7 @@ int main()
         
         std::cout << "\e[0m";
         std::istringstream iss(source);
-        EVOLexer lexer(iss);
-        std::vector<Token> tokens;
-        if(!lexer.lex(tokens))
-        {
-            std::cout << "Lexer error :(" << std::endl;
-            continue;
-        }
-
-        EVOParser parser(tokens);
-        auto program = parser.parse_program();
-        std::cout << *program << std::endl;
-        if(program->is_error())
-            continue;
-    
-        auto value = program->evaluate(runtime);
-        if(runtime.has_exception())
-            std::cout << "\e[31mException: \e[0m" + runtime.exception_message() << std::endl;
-        else
-            std::cout << "\e[1m" << value.repl_string() << "\e[0m" << std::endl;
-        runtime.clear_exception();
+        run_code_from_stream(runtime, iss);
 
         if(!repl_object->running())
             return repl_object->exit_code();
