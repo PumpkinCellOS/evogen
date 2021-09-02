@@ -11,3 +11,9 @@ add_library(libevoscript
 )
 
 target_include_directories(libevoscript PUBLIC ${CMAKE_SOURCE_DIR})
+
+add_executable(evos
+    "main.cpp"
+)
+target_include_directories(evos PUBLIC ${CMAKE_SOURCE_DIR})
+target_link_libraries(evos libevoscript)
