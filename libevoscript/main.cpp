@@ -1,6 +1,7 @@
 #include <libevoscript/NativeFunction.h>
 #include <libevoscript/Value.h>
 #include <libevoscript/Lexer.h>
+#include <libevoscript/objects/MapObject.h>
 
 #include <fstream>
 #include <iostream>

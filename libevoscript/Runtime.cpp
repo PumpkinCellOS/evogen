@@ -1,5 +1,6 @@
 #include <libevoscript/Runtime.h>
 
+#include <libevoscript/objects/MapObject.h>
 #include <libevoscript/objects/Object.h>
 
 #include <iostream>

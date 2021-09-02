@@ -28,18 +28,6 @@ public:
     virtual Value operator_add(Runtime& rt, Value const& rhs) const;
 };
 
-// TODO: Move these to separate files
-class MapObject : public Object
-{
-public:
-    virtual Value get(std::string const& member) override;
-    virtual std::string type_name() const override { return "MapObject"; }
-    virtual std::string repl_string() const override;
-
-private:
-    std::map<std::string, std::shared_ptr<MemoryValue>> m_values;
-};
-
 class Function : public Object
 {
 public:

@@ -1,6 +1,7 @@
 #include <libevoscript/ExecutionContext.h>
 
 #include <libevoscript/Runtime.h>
+#include <libevoscript/objects/MapObject.h>
 #include <libevoscript/objects/Object.h>
 
 namespace evo::script
