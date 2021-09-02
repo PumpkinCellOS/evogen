@@ -151,23 +151,25 @@ static CompareResult compare_primitive(T const& l, T const& r)
 
 CompareResult compare(Runtime& rt, Value const& lhs, Value const& rhs)
 {
-    if(lhs.type() != rhs.type())
+    auto real_lhs = lhs.dereferenced();
+    auto real_rhs = rhs.dereferenced();
+    if(real_lhs.type() != real_rhs.type())
     {
         rt.throw_exception("Cannot compare values of different type (For now)");
         return CompareResult::Unknown;
     }
-    if(lhs.is_null() || rhs.is_null() || lhs.is_undefined() || rhs.is_undefined())
+    if(real_lhs.is_null() || real_rhs.is_null() || real_lhs.is_undefined() || real_rhs.is_undefined())
         return CompareResult::Unknown;
     
-    if(lhs.is_int())
-        return compare_primitive(lhs.get_int(), rhs.get_int());
-    else if(lhs.is_string())
-        return compare_primitive(lhs.get_string(), rhs.get_string());
-    else if(lhs.is_bool())
-        return lhs.get_bool() == rhs.get_bool() ? CompareResult::Equal : CompareResult::Unknown;
+    if(real_lhs.is_int())
+        return compare_primitive(real_lhs.get_int(), real_rhs.get_int());
+    else if(real_lhs.is_string())
+        return compare_primitive(real_lhs.get_string(), real_rhs.get_string());
+    else if(real_lhs.is_bool())
+        return real_lhs.get_bool() == real_rhs.get_bool() ? CompareResult::Equal : CompareResult::Unknown;
     else
     {
-        rt.throw_exception("Cannot compare values of type " + lhs.type_string());
+        rt.throw_exception("Cannot compare values of type " + real_lhs.type_string());
         return CompareResult::Unknown;
     }
 }
