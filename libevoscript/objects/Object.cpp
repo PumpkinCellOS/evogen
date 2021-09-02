@@ -43,13 +43,15 @@ Value MapObject::get(std::string const& member)
 std::string MapObject::repl_string() const
 {
     std::ostringstream oss;
+    oss << "{ ";
     for(auto& value: m_values)
     {
         if(value.second->value().is_object() && value.second->value().get_object().get() == this)
             oss << value.first << ": <recursive reference>, ";
         else
-            oss << value.first << ": " << value.second->dump_string() << ", ";
+            oss << value.first << ": " << value.second->repl_string() << ", ";
     }
+    oss << "} ";
     return oss.str();
 }
 

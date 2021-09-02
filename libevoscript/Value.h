@@ -155,6 +155,7 @@ public:
     void set_read_only(bool read_only) { m_read_only = read_only; }
 
     std::string dump_string() const;
+    std::string repl_string() const;
 
 private:
     Value m_value { Value::null() };

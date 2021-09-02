@@ -278,6 +278,11 @@ std::string MemoryValue::dump_string() const
     return oss.str();
 }
 
+std::string MemoryValue::repl_string() const
+{
+    return m_value.repl_string();
+}
+
 std::ostream& operator<<(std::ostream& stream, MemoryValue const& value)
 {
     return stream << value.dump_string(); 
