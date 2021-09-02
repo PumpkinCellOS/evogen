@@ -29,11 +29,11 @@ std::shared_ptr<Expression> EVOParser::parse_primary_expression()
             if(literal->is_error())
             {
                 set_offset(off);
-                literal = parse_identifier();
+                literal = parse_special_value();
                 if(literal->is_error())
                 {
                     set_offset(off);
-                    literal = parse_special_value();
+                    literal = parse_identifier();
                     if(literal->is_error())
                         return std::make_shared<SpecialValue>(ASTNode::Error, "Expected primary expression");
                 }
@@ -89,7 +89,7 @@ std::shared_ptr<Expression> EVOParser::parse_identifier()
 
 std::shared_ptr<Expression> EVOParser::parse_special_value()
 {
-    auto name = consume_of_type(Token::ReservedKeyword);
+    auto name = consume_of_type(Token::Name);
     if(!name)
         return std::make_shared<SpecialValue>(ASTNode::Error, "Invalid special value");
 
@@ -97,6 +97,10 @@ std::shared_ptr<Expression> EVOParser::parse_special_value()
         return std::make_shared<SpecialValue>(SpecialValue::This);
     if(name->value() == "null")
         return std::make_shared<SpecialValue>(SpecialValue::Null);
+    if(name->value() == "true")
+        return std::make_shared<SpecialValue>(SpecialValue::True);
+    if(name->value() == "false")
+        return std::make_shared<SpecialValue>(SpecialValue::False);
     if(name->value() == "undefined")
         return std::make_shared<SpecialValue>(SpecialValue::Undefined);
 

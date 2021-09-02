@@ -65,6 +65,10 @@ Value SpecialValue::evaluate(Runtime& rt) const
         return Value::new_reference(MemoryValue::create_existing_object(rt.current_execution_context().this_object()));
     case Null:
         return Value::null();
+    case True:
+        return Value::new_bool(true);
+    case False:
+        return Value::new_bool(false);
     case Undefined:
         return Value::undefined();
     default:

@@ -36,10 +36,7 @@ bool EVOLexer::lex(std::vector<Token>& output)
         {
             consume();
             std::string value = next + consume_while([](char ch) { return isalnum(ch) || ch == '_'; });
-            if(value == "this" || value == "null" || value == "undefined")
-                output.emplace_back(Token::ReservedKeyword, value, token_start, location());
-            else
-                output.emplace_back(Token::Name, value, token_start, location());
+            output.emplace_back(Token::Name, value, token_start, location());
         }
         else if(isdigit(next))
         {

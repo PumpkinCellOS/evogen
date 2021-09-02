@@ -21,18 +21,16 @@ Value add(Runtime& rt, Value const& lhs, Value const& rhs)
 
         return Value::new_int(lhs_int + rhs_int);
     }
-    else if(real_lhs.is_string())
+    else if(real_lhs.is_object())
+    {
+        return real_lhs.get_object()->operator_add(rt, real_rhs);
+    }
+    else
     {
         auto lhs_int = real_lhs.to_string();
         auto rhs_int = real_rhs.to_string();
         return Value::new_string(lhs_int + rhs_int);
     }
-    else if(real_lhs.is_object())
-    {
-        return real_lhs.get_object()->operator_add(rt, real_rhs);
-    }
-    rt.throw_exception("Failed to evaluate " + real_lhs.type_string() + " + " + real_rhs.type_string());
-    return {};
 }
 
 Value subtract(Runtime& rt, Value const& lhs, Value const& rhs)

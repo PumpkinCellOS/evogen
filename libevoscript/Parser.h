@@ -31,7 +31,6 @@ public:
         Number,                 // /([0-9])/
         ParenOpen,              // (
         ParenClose,             // )
-        ReservedKeyword,        // null | this | undefined
         Semicolon,              // ;
         String,                 // /["']([^"']*)["']/
         Invalid                 // (others)

@@ -179,6 +179,8 @@ public:
     {
         This,
         Null,
+        True,
+        False,
         Undefined
     };
 

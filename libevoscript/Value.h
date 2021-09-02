@@ -23,6 +23,7 @@ public:
         Undefined,
         Int,
         String,
+        Bool,
         Object,
         Reference
     };
@@ -39,6 +40,7 @@ public:
     static Value undefined() { return Value(Undefined); }
     static Value new_int(int value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
     static Value new_string(std::string const& value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
+    static Value new_bool(bool value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
     static Value new_object(std::shared_ptr<Object> value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
     static Value new_reference(std::shared_ptr<MemoryValue> value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
 
@@ -46,11 +48,13 @@ public:
     bool is_null() const { return m_type == Type::Null; }
     bool is_undefined() const { return m_type == Type::Undefined; }
     bool is_int() const { return m_type == Type::Int; }
+    bool is_bool() const { return m_type == Type::Bool; }
     bool is_string() const { return m_type == Type::String; }
     bool is_object() const { return m_type == Type::Object; }
     bool is_reference() const { return m_type == Type::Reference; }
 
     int to_int(Runtime&) const;
+    bool to_bool(Runtime&) const;
     std::string to_string() const;
     std::shared_ptr<Object> to_object(Runtime&) const;
     std::shared_ptr<MemoryValue> to_reference(Runtime&) const;
@@ -60,11 +64,13 @@ public:
 
     // This is type-unsafe and should be used only internally / by Runtime!
     int& get_int() { return m_int_value; }
+    bool& get_bool() { return m_bool_value; }
     std::string& get_string() { return m_string_value; }
     std::shared_ptr<Object>& get_object() { return m_object_value; }
     std::shared_ptr<MemoryValue>& get_reference() { return m_reference_value; }
 
     int const& get_int() const { return m_int_value; }
+    bool const& get_bool() const { return m_bool_value; }
     std::string const& get_string() const { return m_string_value; }
     std::shared_ptr<Object> const& get_object() const { return m_object_value; }
     std::shared_ptr<MemoryValue> const& get_reference() const { return m_reference_value; }
@@ -81,6 +87,9 @@ public:
 private:
     explicit Value(int value, std::shared_ptr<Object> container)
     : m_type(Type::Int), m_int_value(value), m_container(container) {}
+
+    explicit Value(bool value, std::shared_ptr<Object> container)
+    : m_type(Type::Bool), m_bool_value(value), m_container(container) {}
 
     explicit Value(std::string const& value, std::shared_ptr<Object> container)
     : m_type(Type::String), m_string_value(value), m_container(container) {}
@@ -106,6 +115,7 @@ private:
     Type m_type = Type::Null;
 
     int m_int_value = 0;
+    bool m_bool_value = false;
     std::string m_string_value;
     std::shared_ptr<Object> m_object_value;
     std::shared_ptr<MemoryValue> m_reference_value;

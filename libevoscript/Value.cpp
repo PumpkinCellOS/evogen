@@ -25,6 +25,8 @@ std::string Value::type_to_string(Type type)
         return "int";
     case Type::String:
         return "string";
+    case Type::Bool:
+        return "bool";
     case Type::Object:
         return "object";
     case Type::Reference:
@@ -56,6 +58,8 @@ int Value::to_int(Runtime& rt) const
             rt.throw_exception("Cannot convert string '" + m_string_value + "' to int");
             return {};
         }
+    case Type::Bool:
+        return m_bool_value ? 1 : 0;
     case Type::Reference:
         assert(m_reference_value);
         return m_reference_value->value().to_int(rt);
@@ -71,6 +75,7 @@ std::shared_ptr<Object> Value::to_object(Runtime& rt) const
     case Type::Null:
     case Type::Undefined:
     case Type::Int:
+    case Type::Bool:
         rt.throw_exception("Cannot convert " + type_to_string(m_type) + " to object");
         return nullptr;
     case Type::String:
@@ -99,6 +104,8 @@ std::string Value::to_string() const
         return std::to_string(m_int_value);
     case Type::String:
         return m_string_value;
+    case Type::Bool:
+        return m_bool_value ? "true" : "false";
     case Type::Reference:
         assert(m_reference_value);
         return m_reference_value->value().to_string();
@@ -117,6 +124,7 @@ std::shared_ptr<MemoryValue> Value::to_reference(Runtime& rt) const
     case Type::Undefined:
     case Type::Int:
     case Type::String:
+    case Type::Bool:
     case Type::Object:
         rt.throw_exception("Cannot bind " + type_to_string(m_type) + " to reference");
         return nullptr;
@@ -142,6 +150,9 @@ std::string Value::dump_string() const
         break;
     case Type::String:
         oss << ": \"" << m_string_value << "\"";
+        break;
+    case Type::Bool:
+        oss << ": " << (m_bool_value ? "true" : "false");
         break;
     case Type::Reference:
         assert(m_reference_value);
@@ -171,6 +182,8 @@ std::string Value::repl_string() const
         return std::to_string(m_int_value);
     case Type::String:
         return "\"" + m_string_value + "\"";
+    case Type::Bool:
+        return m_bool_value ? "true" : "false";
     case Type::Reference:
         assert(m_reference_value);
         return m_reference_value->value().repl_string();
@@ -204,6 +217,9 @@ void Value::assign(Value const& other)
     case Type::String:
         m_string_value = real_other.m_string_value;
         break;
+    case Type::Bool:
+        m_bool_value = real_other.m_bool_value;
+        break;
     case Type::Object:
         assert(real_other.m_object_value);
         m_object_value = real_other.m_object_value;
@@ -236,6 +252,9 @@ void Value::assign_direct(Value const& other)
         break;
     case Type::String:
         m_string_value = other.m_string_value;
+        break;
+    case Type::Bool:
+        m_bool_value = other.m_bool_value;
         break;
     case Type::Object:
         assert(other.m_object_value);

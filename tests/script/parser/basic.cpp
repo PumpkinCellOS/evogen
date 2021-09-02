@@ -18,7 +18,7 @@ int main()
         std::vector<Token> tokens;
         // (this).testInt = 54;
         tokens.emplace_back(Token::ParenOpen, "(");
-        tokens.emplace_back(Token::ReservedKeyword, "this");
+        tokens.emplace_back(Token::Name, "this");
         tokens.emplace_back(Token::ParenClose, ")");
         tokens.emplace_back(Token::Dot, ".");
         tokens.emplace_back(Token::Name, "testInt");
@@ -40,7 +40,7 @@ int main()
         // testNull = this.testObject.length();
         tokens.emplace_back(Token::Name, "testNull");
         tokens.emplace_back(Token::AssignmentOperator, "=");
-        tokens.emplace_back(Token::ReservedKeyword, "this");
+        tokens.emplace_back(Token::Name, "this");
         tokens.emplace_back(Token::Dot, ".");
         tokens.emplace_back(Token::Name, "testObject");
         tokens.emplace_back(Token::Dot, ".");
