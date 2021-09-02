@@ -203,32 +203,7 @@ void Value::assign(Value const& other)
         return;
     }
 
-    Value real_other = other.dereferenced();
-    assert(!real_other.is_reference());
-    switch(real_other.m_type)
-    {
-    case Type::Invalid:
-    case Type::Null:
-    case Type::Undefined:
-        break;
-    case Type::Int:
-        m_int_value = real_other.m_int_value;
-        break;
-    case Type::String:
-        m_string_value = real_other.m_string_value;
-        break;
-    case Type::Bool:
-        m_bool_value = real_other.m_bool_value;
-        break;
-    case Type::Object:
-        assert(real_other.m_object_value);
-        m_object_value = real_other.m_object_value;
-        break;
-    // References are handled at the beginning and
-    // for real_other. They should not appear here.
-    default: assert(false);
-    }
-    m_type = real_other.m_type;
+    assign_direct(other.dereferenced());
 }
 
 void Value::assign_direct(Value const& other)
