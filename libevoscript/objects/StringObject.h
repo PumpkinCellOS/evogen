@@ -14,19 +14,25 @@ public:
     virtual Value get(std::string const& member) override;
     virtual std::string type_name() const override { return "String"; }
     virtual std::string dump_string() const override { return "StringObject(" + m_string + ")"; }
+    virtual std::string repl_string() const override { return "\"" + m_string + "\""; }
+    virtual Value to_primitive(Runtime&, Value::Type) const override;
+    virtual Value operator_add(Runtime& rt, Value const& rhs) const override;
 
 private:
-    // string string()
-    static Value string(Runtime&, StringObject& container, std::vector<Value> const& args);
+    // string string() const
+    static Value raw_string(Runtime&, StringObject const& container, std::vector<Value> const& args);
 
-    // int length()
-    static Value length(Runtime&, StringObject& container, std::vector<Value> const& args);
+    // int length() const
+    static Value length(Runtime&, StringObject const& container, std::vector<Value> const& args);
 
-    // string concat(value... args)
-    static Value concat(Runtime&, StringObject& container, std::vector<Value> const& args);
+    // string concat(value... args) const
+    static Value concat(Runtime&, StringObject const& container, std::vector<Value> const& args);
 
-    // string substring(int start, int seq_length = -1)
-    static Value substring(Runtime&, StringObject& container, std::vector<Value> const& args);
+    // string substring(int start, int seq_length = -1) const
+    static Value substring(Runtime&, StringObject const& container, std::vector<Value> const& args);
+
+    // void append(value... args)
+    static Value append(Runtime&, StringObject& container, std::vector<Value> const& args);
 
     std::string m_string;
 };

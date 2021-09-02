@@ -14,6 +14,12 @@ Value Object::call(Runtime& rt, Object&, std::vector<Value> const&)
     return {};
 }
 
+Value Object::operator_add(Runtime& rt, Value const& rhs) const
+{
+    rt.throw_exception("Cannot call operator+ on object lhs=" + repl_string() + " with rhs=" + rhs.repl_string());
+    return {};
+}
+
 Value MapObject::get(std::string const& member)
 {
     if(member == "length")
@@ -34,7 +40,7 @@ Value MapObject::get(std::string const& member)
     return Value::new_reference(it->second);
 }
 
-std::string MapObject::dump_string() const
+std::string MapObject::repl_string() const
 {
     std::ostringstream oss;
     for(auto& value: m_values)

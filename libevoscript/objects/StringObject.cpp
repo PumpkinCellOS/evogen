@@ -8,24 +8,39 @@ namespace evo::script
 
 Value StringObject::get(std::string const& member)
 {
-    NATIVE_FUNCTION(StringObject, "string", string);
+    NATIVE_FUNCTION(StringObject, "raw_string", raw_string);
     NATIVE_FUNCTION(StringObject, "length", length);
     NATIVE_FUNCTION(StringObject, "concat", concat);
     NATIVE_FUNCTION(StringObject, "substring", substring);
+    NATIVE_FUNCTION(StringObject, "append", append);
     return Value::undefined();
 }
 
-Value StringObject::string(Runtime&, StringObject& container, std::vector<Value> const& args)
+Value StringObject::to_primitive(Runtime& rt, Value::Type type) const
+{
+    if(type == Value::Type::String)
+        return raw_string(rt, *this, {});
+
+    // TODO: Int conversions?
+    return {};
+}
+
+Value StringObject::operator_add(Runtime& rt, Value const& rhs) const
+{
+    return Value::new_object(std::make_shared<StringObject>(m_string + rhs.to_string()));
+}
+
+Value StringObject::raw_string(Runtime&, StringObject const& container, std::vector<Value> const& args)
 {
     return Value::new_string(container.m_string);
 }
 
-Value StringObject::length(Runtime&, StringObject& container, std::vector<Value> const& args)
+Value StringObject::length(Runtime&, StringObject const& container, std::vector<Value> const& args)
 {
     return Value::new_int(container.m_string.length());
 }
 
-Value StringObject::concat(Runtime& rt, StringObject& container, std::vector<Value> const& args)
+Value StringObject::concat(Runtime& rt, StringObject const& container, std::vector<Value> const& args)
 {
     Value result = Value::new_string(container.m_string);
     for(auto& arg: args)
@@ -35,7 +50,7 @@ Value StringObject::concat(Runtime& rt, StringObject& container, std::vector<Val
     return result;
 }
 
-Value StringObject::substring(Runtime& rt, StringObject& container, std::vector<Value> const& args)
+Value StringObject::substring(Runtime& rt, StringObject const& container, std::vector<Value> const& args)
 {
     if(args.size() < 1 || args.size() > 2)
     {
@@ -73,6 +88,22 @@ Value StringObject::substring(Runtime& rt, StringObject& container, std::vector<
     }
 
     return Value::new_string(seq_length == -1 ? container.m_string.substr(start) : container.m_string.substr(start, seq_length));
+}
+
+Value StringObject::append(Runtime& rt, StringObject& container, std::vector<Value> const& args)
+{
+    Value result = Value::new_string(container.m_string);
+    for(auto& arg: args)
+    {
+        result = abstract::add(rt, result, arg);
+    }
+    auto result_string = result.to_string();
+    if(rt.has_exception())
+        return {};
+    container.m_string = std::move(result_string);
+
+    // TODO: Return reference to this
+    return Value::undefined();
 }
 
 }

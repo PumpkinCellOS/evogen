@@ -3,6 +3,7 @@
 #include <libevoscript/AbstractOperations.h>
 #include <libevoscript/ExecutionContext.h>
 #include <libevoscript/objects/Object.h>
+#include <libevoscript/objects/StringObject.h>
 
 #include <cassert>
 #include <iostream>
@@ -18,7 +19,7 @@ Value IntegerLiteral::evaluate(Runtime&) const
 
 Value StringLiteral::evaluate(Runtime&) const
 {
-    return Value::new_string(m_value);
+    return Value::new_object(std::make_shared<StringObject>(m_value));
 }
 
 Value Identifier::evaluate(Runtime& rt) const

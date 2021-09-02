@@ -22,7 +22,7 @@ public:
         return Value::new_object(std::make_shared<NativeFunction>(std::move(function)));
     }
 
-    Value call(Runtime& rt, Object& container, std::vector<Value> const& arguments)
+    virtual Value call(Runtime& rt, Object& container, std::vector<Value> const& arguments) override
     {
         assert(m_function);
         auto this_container = dynamic_cast<ContainerType*>(&container);

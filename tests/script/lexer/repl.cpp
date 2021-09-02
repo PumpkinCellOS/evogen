@@ -89,7 +89,7 @@ int main()
         if(runtime.has_exception())
             std::cout << "\e[31mException: \e[0m" + runtime.exception_message() << std::endl;
         else
-            std::cout << "\e[1m" << value.to_string(runtime) << "\e[0m" << std::endl;
+            std::cout << "\e[1m" << value.repl_string() << "\e[0m" << std::endl;
         runtime.clear_exception();
 
         if(!repl_object->running())

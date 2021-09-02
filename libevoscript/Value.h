@@ -51,11 +51,12 @@ public:
     bool is_reference() const { return m_type == Type::Reference; }
 
     int to_int(Runtime&) const;
-    std::string to_string(Runtime&) const;
+    std::string to_string() const;
     std::shared_ptr<Object> to_object(Runtime&) const;
     std::shared_ptr<MemoryValue> to_reference(Runtime&) const;
 
     std::string dump_string() const;
+    std::string repl_string() const;
 
     // This is type-unsafe and should be used only internally / by Runtime!
     int& get_int() { return m_int_value; }

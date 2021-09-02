@@ -85,7 +85,7 @@ std::shared_ptr<Object> Value::to_object(Runtime& rt) const
     }
 }
 
-std::string Value::to_string(Runtime& rt) const
+std::string Value::to_string() const
 {
     switch(m_type)
     {
@@ -101,7 +101,7 @@ std::string Value::to_string(Runtime& rt) const
         return m_string_value;
     case Type::Reference:
         assert(m_reference_value);
-        return m_reference_value->value().to_string(rt);
+        return m_reference_value->value().to_string();
     case Type::Object:
         assert(m_object_value);
         return "[object " + m_object_value->type_name() + "]";
@@ -155,6 +155,30 @@ std::string Value::dump_string() const
     }
     oss << " }";
     return oss.str();
+}
+
+std::string Value::repl_string() const
+{
+    switch(m_type)
+    {
+    case Type::Invalid:
+        return "<invalid>";
+    case Type::Null:
+        return "null";
+    case Type::Undefined:
+        return "undefined";
+    case Type::Int:
+        return std::to_string(m_int_value);
+    case Type::String:
+        return "\"" + m_string_value + "\"";
+    case Type::Reference:
+        assert(m_reference_value);
+        return m_reference_value->value().repl_string();
+    case Type::Object:
+        assert(m_object_value);
+        return m_object_value->repl_string();
+    default: assert(false);
+    }
 }
 
 void Value::assign(Value const& other)
