@@ -164,7 +164,7 @@ std::shared_ptr<Expression> EVOParser::parse_postfix_operator(std::shared_ptr<Ex
     else if(op->value() == "--")
         operation = UnaryExpression::Operation::PostfixDecrement;
     else
-        return std::make_shared<FunctionCall>(ASTNode::Error, op->value() + " is not a postfix operator");
+        return {};
 
     return std::make_shared<UnaryExpression>(lhs, operation);
 }
@@ -188,7 +188,10 @@ std::shared_ptr<Expression> EVOParser::parse_postfix_expression()
                 set_offset(off);
                 new_lhs = parse_postfix_operator(lhs);
                 if(!new_lhs)
+                {
+                    set_offset(off);
                     return lhs;
+                }
             }
         }
         if(new_lhs->is_error())
@@ -243,7 +246,10 @@ std::shared_ptr<Expression> EVOParser::parse_multiplicative_expression()
 
         auto rhs = parse_unary_expression();
         if(rhs->is_error())
+        {
+            set_offset(off);
             return rhs;
+        }
 
         NormalBinaryExpression::Operation operation;
         if(op->value() == "*")
@@ -278,7 +284,10 @@ std::shared_ptr<Expression> EVOParser::parse_additive_expression()
 
         auto rhs = parse_multiplicative_expression();
         if(rhs->is_error())
+        {
+            set_offset(off);
             return rhs;
+        }
 
         NormalBinaryExpression::Operation operation;
         if(op->value() == "+")
@@ -296,9 +305,53 @@ std::shared_ptr<Expression> EVOParser::parse_additive_expression()
     assert(false);
 }
 
-std::shared_ptr<Expression> EVOParser::parse_assignment_expression()
+std::shared_ptr<Expression> EVOParser::parse_comparison_expression()
 {
     auto lhs = parse_additive_expression();
+    if(lhs->is_error())
+        return lhs;
+
+    while(true)
+    {
+        size_t off = offset();
+        auto op = consume_of_type(Token::NormalOperator);
+        if(!op)
+            return lhs;
+
+        auto rhs = parse_additive_expression();
+        if(rhs->is_error())
+        {
+            set_offset(off);
+            return rhs;
+        }
+
+        NormalBinaryExpression::Operation operation;
+        if(op->value() == "==")
+            operation = NormalBinaryExpression::Equal;
+        else if(op->value() == "!=")
+            operation = NormalBinaryExpression::NonEqual;
+        else if(op->value() == ">")
+            operation = NormalBinaryExpression::Greater;
+        else if(op->value() == ">=")
+            operation = NormalBinaryExpression::GreaterEqual;
+        else if(op->value() == "<")
+            operation = NormalBinaryExpression::Less;
+        else if(op->value() == "<=")
+            operation = NormalBinaryExpression::LessEqual;
+        else
+        {
+            set_offset(off);
+            return lhs;
+        }
+
+        lhs = std::make_shared<NormalBinaryExpression>(lhs, rhs, operation);
+    }
+    assert(false);
+}
+
+std::shared_ptr<Expression> EVOParser::parse_assignment_expression()
+{
+    auto lhs = parse_comparison_expression();
     if(lhs->is_error())
         return lhs;
 

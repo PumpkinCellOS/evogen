@@ -143,6 +143,35 @@ Value plus(Runtime& rt, Value const& value)
     return Value::new_int(+value_int);
 }
 
+template<class T>
+static CompareResult compare_primitive(T const& l, T const& r)
+{
+    return l == r ? CompareResult::Equal : (l < r ? CompareResult::Less : CompareResult::Greater);
+}
+
+CompareResult compare(Runtime& rt, Value const& lhs, Value const& rhs)
+{
+    if(lhs.type() != rhs.type())
+    {
+        rt.throw_exception("Cannot compare values of different type (For now)");
+        return CompareResult::Unknown;
+    }
+    if(lhs.is_null() || rhs.is_null() || lhs.is_undefined() || rhs.is_undefined())
+        return CompareResult::Unknown;
+    
+    if(lhs.is_int())
+        return compare_primitive(lhs.get_int(), rhs.get_int());
+    else if(lhs.is_string())
+        return compare_primitive(lhs.get_string(), rhs.get_string());
+    else if(lhs.is_bool())
+        return lhs.get_bool() == rhs.get_bool() ? CompareResult::Equal : CompareResult::Unknown;
+    else
+    {
+        rt.throw_exception("Cannot compare values of type " + lhs.type_string());
+        return CompareResult::Unknown;
+    }
+}
+
 Value postfix_increment(Runtime& rt, Value const& value)
 {
     auto old_value = value.dereferenced();

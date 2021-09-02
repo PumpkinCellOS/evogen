@@ -106,6 +106,7 @@ public:
     std::shared_ptr<Expression> parse_unary_expression();
     std::shared_ptr<Expression> parse_multiplicative_expression();
     std::shared_ptr<Expression> parse_additive_expression();
+    std::shared_ptr<Expression> parse_comparison_expression();
     std::shared_ptr<Expression> parse_assignment_expression();
     std::shared_ptr<Expression> parse_expression();
 

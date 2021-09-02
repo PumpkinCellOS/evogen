@@ -67,6 +67,11 @@ bool run_code_from_stream(Runtime& rt, std::istream& input)
         return false;
     }
 
+    for(auto& token: tokens)
+        std::cerr << token.value() << "; ";
+
+    std::cerr << std::endl;
+
     EVOParser parser(tokens);
     auto program = parser.parse_program();
     std::cerr << *program << std::endl;

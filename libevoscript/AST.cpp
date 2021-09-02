@@ -233,6 +233,30 @@ Value NormalBinaryExpression::evaluate(Runtime& rt) const
         case Modulo:
             result = abstract::modulo(rt, lhs, rhs);
             break;
+        case Equal: 
+            result = Value::new_bool(abstract::compare(rt, lhs, rhs) == CompareResult::Equal);
+            break;
+        case NonEqual: 
+            result = Value::new_bool(abstract::compare(rt, lhs, rhs) != CompareResult::Equal);
+            break;
+        case Greater: 
+            result = Value::new_bool(abstract::compare(rt, lhs, rhs) == CompareResult::Greater);
+            break;
+        case GreaterEqual:
+        {
+            auto compare = abstract::compare(rt, lhs, rhs);
+            result = Value::new_bool(compare != CompareResult::Less && compare != CompareResult::Unknown);
+            break;
+        }
+        case Less:
+            result = Value::new_bool(abstract::compare(rt, lhs, rhs) == CompareResult::Less);
+            break;
+        case LessEqual:
+        {
+            auto compare = abstract::compare(rt, lhs, rhs);
+            result = Value::new_bool(compare != CompareResult::Greater && compare != CompareResult::Unknown);
+            break;
+        }
         default:
             assert(false);
     }

@@ -369,11 +369,18 @@ class NormalBinaryExpression : public BinaryExpression
 public:
     enum Operation
     {
-        Add,        // +
-        Subtract,   // -
-        Multiply,   // *
-        Divide,     // /
-        Modulo,     // %
+        Add,            // +
+        Subtract,       // -
+        Multiply,       // *
+        Divide,         // /
+        Modulo,         // %
+        Equal,          // ==
+        NonEqual,       // !=
+        Greater,        // >
+        GreaterEqual,   // >=
+        Less,           // <
+        LessEqual,      // <=
+
     };
 
     NormalBinaryExpression(_ErrorTag tag, ErrorMessage message)
@@ -388,11 +395,17 @@ public:
     {
         switch(op)
         {
-            case Add:       return "+";
-            case Subtract:  return "-";
-            case Multiply:  return "*";
-            case Divide:    return "/";
-            case Modulo:    return "%";
+            case Add:           return "+";
+            case Subtract:      return "-";
+            case Multiply:      return "*";
+            case Divide:        return "/";
+            case Modulo:        return "%";
+            case Equal:         return "==";
+            case NonEqual:      return "!=";
+            case Greater:       return "?";
+            case GreaterEqual:  return ">=";
+            case Less:          return "<";
+            case LessEqual:     return "<=";
         }
         return "?";
     }
