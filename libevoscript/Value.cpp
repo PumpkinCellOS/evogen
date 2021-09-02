@@ -262,8 +262,7 @@ Value Value::call(Runtime& rt, std::vector<Value> const& arguments)
         rt.throw_exception("Cannot call non-object");
         return {};
     }
-    assert(m_container);
-    return real_value.get_object()->call(rt, *m_container, arguments);
+    return real_value.get_object()->call(rt, m_container ? *m_container : *real_value.get_object(), arguments);
 }
 
 std::ostream& operator<<(std::ostream& stream, Value const& value)
