@@ -106,11 +106,11 @@ Value modulo(Runtime& rt, Value const& lhs, Value const& rhs)
 Value not_(Runtime& rt, Value const& value)
 {
     auto real_value = value.dereferenced();
-    auto value_int = real_value.to_int(rt);
+    auto value_bool = real_value.to_bool(rt);
     if(rt.has_exception())
         return {};
 
-    return Value::new_int(!value_int);
+    return Value::new_bool(!value_bool);
 }
 
 Value bitwise_not(Runtime& rt, Value const& value)
