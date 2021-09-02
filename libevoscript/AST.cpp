@@ -257,6 +257,24 @@ Value NormalBinaryExpression::evaluate(Runtime& rt) const
             result = Value::new_bool(compare != CompareResult::Greater && compare != CompareResult::Unknown);
             break;
         }
+        case And:
+        {
+            auto lhs_bool = lhs.to_bool(rt);
+            if(rt.has_exception())
+                return {};
+            // NOTE: C++ handles short-circuit.
+            result = Value::new_bool(lhs_bool && rhs.to_bool(rt));
+            break;
+        }
+        case Or:
+        {
+            auto lhs_bool = lhs.to_bool(rt);
+            if(rt.has_exception())
+                return {};
+            // NOTE: C++ handles short-circuit.
+            result = Value::new_bool(lhs_bool || rhs.to_bool(rt));
+            break;
+        }
         default:
             assert(false);
     }

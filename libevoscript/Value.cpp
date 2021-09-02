@@ -67,6 +67,29 @@ int Value::to_int(Runtime& rt) const
         assert(false);
     }
 }
+    
+bool Value::to_bool(Runtime& rt) const
+{
+    switch(m_type)
+    {
+    case Type::Null:
+    case Type::Undefined:
+        return false;
+    case Type::Object:
+        return true;
+    case Type::Int:
+        return m_int_value != 0;
+    case Type::String:
+        return m_string_value == "1" || m_string_value == "true";
+    case Type::Bool:
+        return m_bool_value;
+    case Type::Reference:
+        assert(m_reference_value);
+        return m_reference_value->value().to_bool(rt);
+    default:
+        assert(false);
+    }
+}
 
 std::shared_ptr<Object> Value::to_object(Runtime& rt) const
 {

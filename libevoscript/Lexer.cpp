@@ -78,6 +78,24 @@ bool EVOLexer::lex(std::vector<Token>& output)
                     break;
             }
         }
+        else if(next == '&')
+        {
+            consume();
+            if(peek() == '&')
+            {
+                consume();
+                output.emplace_back(Token::NormalOperator, "&&", token_start, location());
+            }
+        }
+        else if(next == '|')
+        {
+            consume();
+            if(peek() == '|')
+            {
+                consume();
+                output.emplace_back(Token::NormalOperator, "||", token_start, location());
+            }
+        }
         else if(next == '-' || next == '+' || next == '*' || next == '/' || next == '%'
              || next == '!' || next == '~' || next == '<' || next == '>')
         {

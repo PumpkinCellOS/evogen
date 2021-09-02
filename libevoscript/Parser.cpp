@@ -348,9 +348,77 @@ std::shared_ptr<Expression> EVOParser::parse_comparison_expression()
     assert(false);
 }
 
-std::shared_ptr<Expression> EVOParser::parse_assignment_expression()
+std::shared_ptr<Expression> EVOParser::parse_logical_and_expression()
 {
     auto lhs = parse_comparison_expression();
+    if(lhs->is_error())
+        return lhs;
+
+    while(true)
+    {
+        size_t off = offset();
+        auto op = consume_of_type(Token::NormalOperator);
+        if(!op)
+            return lhs;
+
+        auto rhs = parse_comparison_expression();
+        if(rhs->is_error())
+        {
+            set_offset(off);
+            return rhs;
+        }
+
+        NormalBinaryExpression::Operation operation;
+        if(op->value() == "&&")
+            operation = NormalBinaryExpression::And;
+        else
+        {
+            set_offset(off);
+            return lhs;
+        }
+
+        lhs = std::make_shared<NormalBinaryExpression>(lhs, rhs, operation);
+    }
+    assert(false);
+}
+
+std::shared_ptr<Expression> EVOParser::parse_logical_or_expression()
+{
+    auto lhs = parse_logical_and_expression();
+    if(lhs->is_error())
+        return lhs;
+
+    while(true)
+    {
+        size_t off = offset();
+        auto op = consume_of_type(Token::NormalOperator);
+        if(!op)
+            return lhs;
+
+        auto rhs = parse_logical_and_expression();
+        if(rhs->is_error())
+        {
+            set_offset(off);
+            return rhs;
+        }
+
+        NormalBinaryExpression::Operation operation;
+        if(op->value() == "||")
+            operation = NormalBinaryExpression::Or;
+        else
+        {
+            set_offset(off);
+            return lhs;
+        }
+
+        lhs = std::make_shared<NormalBinaryExpression>(lhs, rhs, operation);
+    }
+    assert(false);
+}
+
+std::shared_ptr<Expression> EVOParser::parse_assignment_expression()
+{
+    auto lhs = parse_logical_or_expression();
     if(lhs->is_error())
         return lhs;
 

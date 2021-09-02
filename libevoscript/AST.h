@@ -380,6 +380,8 @@ public:
         GreaterEqual,   // >=
         Less,           // <
         LessEqual,      // <=
+        And,            // &&
+        Or,             // ||
 
     };
 
@@ -406,6 +408,8 @@ public:
             case GreaterEqual:  return ">=";
             case Less:          return "<";
             case LessEqual:     return "<=";
+            case And:           return "&&";
+            case Or:            return "||";
         }
         return "?";
     }
