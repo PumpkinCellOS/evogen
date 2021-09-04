@@ -57,6 +57,32 @@ Value ReplObject::get(std::string const& member)
         return MapObject::get(member);
 }
 
+void display_source_range(std::istream& input, SourceSpan const& span)
+{
+    // TODO: Handle EOF errors
+    size_t start = span.start.index - span.start.column;
+    std::cerr << start << std::endl;
+    input.clear();
+    input.seekg(start);
+
+    std::string code;
+    if(!std::getline(input, code))
+    {
+        std::cerr << "(failed to read code)" << std::endl;
+        return;
+    }
+    
+    // TODO: Handle multiline
+    std::cerr << " | " << code << std::endl << " | ";
+    for(size_t s = 0; s < span.start.column; s++)
+        std::cerr << " ";
+
+    for(size_t s = 0; s < span.size; s++)
+        std::cerr << "^";
+
+    std::cerr << std::endl;
+}
+
 bool run_code_from_stream(Runtime& rt, std::istream& input)
 {
     EVOLexer lexer(input);
@@ -77,7 +103,11 @@ bool run_code_from_stream(Runtime& rt, std::istream& input)
     if(program->is_error())
     {
         std::cerr << "\e[31mSyntax Errors detected:\e[0m" << std::endl;
-        std::cerr << program->errors().display();
+        for(auto& it: program->errors())
+        {
+            std::cerr << it.location.start << ": " << it.message << std::endl;
+            display_source_range(input, it.location);
+        }
         return false;
     }
     std::cerr << *program << std::endl;

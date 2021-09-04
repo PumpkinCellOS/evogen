@@ -45,13 +45,6 @@ public:
         bool empty() const { return m_errors.empty(); }
         void add(Error const& error) { m_errors.push_back(error); }
 
-        std::string display() const
-        {
-            std::ostringstream out;
-            for(auto& it: m_errors)
-                out << "    " << it.location.start << ": " << it.message << std::endl;
-            return out.str();
-        }
     private:
         Type m_errors;
     };
