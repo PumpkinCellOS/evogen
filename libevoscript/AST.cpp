@@ -28,11 +28,14 @@ Value Identifier::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {}; // Local scope is not an object (unlikely to happen)
 
-    auto memory_object = local_scope_object->get(m_name).to_reference(rt);
+    auto value = local_scope_object->get(m_name);
     if(rt.has_exception())
-        return {}; // MemoryObject is not a reference
+        return {}; // Getter thrown an exception
 
-    if(memory_object->value().type() == Value::Type::Undefined)
+    std::shared_ptr<MemoryValue> memory_object;
+    std::shared_ptr<Object> container;
+
+    if(value.is_invalid())
     {
         // Not in local scope; try searching global scope
         // TODO: This means that not existing "local" variables will
@@ -41,20 +44,26 @@ Value Identifier::evaluate(Runtime& rt) const
         if(rt.has_exception())
             return {}; // Global scope is not an object (unlikely to happen)
 
-        auto value = global_object->get(m_name);
-        if(!value.is_reference()) 
-        {
-            value.set_container(global_object);
-            return value;
-        }
-        
-        memory_object = value.to_reference(rt);
-        assert(!rt.has_exception());
+        value = global_object->get(m_name);
+        container = global_object;
     }
+    else
+        container = local_scope_object;
 
-    auto value = Value::new_reference(memory_object);
-    value.set_container(local_scope_object);
-    return value;
+    if(!value.is_reference()) 
+    {
+        value.set_container(container);
+        return value;
+    }
+    
+    memory_object = value.to_reference(rt);
+    assert(!rt.has_exception());
+
+    auto new_value = Value::new_reference(value.to_reference(rt));
+    if(rt.has_exception())
+        return {};
+    new_value.set_container(container);
+    return new_value;
 }
 
 Value SpecialValue::evaluate(Runtime& rt) const
