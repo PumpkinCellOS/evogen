@@ -36,4 +36,10 @@ public:
     virtual std::string repl_string() const override { return "function() {}"; }
 };
 
+#define NATIVE_OBJECT(type, script_name, internal_name) \
+    do {                                                \
+        if(member == script_name)                       \
+            return Value::new_##type(internal_name);    \
+    } while(false)
+
 }
