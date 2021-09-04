@@ -1,5 +1,6 @@
 #include <libevoscript/AbstractOperations.h>
 
+#include <libevoscript/Runtime.h>
 #include <libevoscript/objects/Object.h>
 #include <libevoscript/objects/StringObject.h>
 
@@ -166,6 +167,8 @@ CompareResult compare(Runtime& rt, Value const& lhs, Value const& rhs)
         return compare_primitive(real_lhs.get_int(), real_rhs.get_int());
     else if(real_lhs.is_bool())
         return real_lhs.get_bool() == real_rhs.get_bool() ? CompareResult::Equal : CompareResult::Unknown;
+    else if(real_lhs.is_object())
+        return real_lhs.get_object()->operator_compare(rt, real_rhs);
     else
     {
         // TODO: Object compare

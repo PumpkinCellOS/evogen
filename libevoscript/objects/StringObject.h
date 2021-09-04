@@ -18,6 +18,7 @@ public:
     virtual std::string to_string() const override { return m_string; }
     virtual Value to_primitive(Runtime&, Value::Type) const override;
     virtual Value operator_add(Runtime& rt, Value const& rhs) const override;
+    virtual CompareResult operator_compare(Runtime& rt, Value const& rhs) const override;
 
 private:
     // int length() const

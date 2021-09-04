@@ -21,6 +21,12 @@ Value Object::operator_add(Runtime& rt, Value const& rhs) const
     return {};
 }
 
+CompareResult Object::operator_compare(Runtime& rt, Value const& rhs) const
+{
+    rt.throw_exception("Cannot call operator<> on object lhs=" + repl_string() + " with rhs=" + rhs.repl_string());
+    return {};
+}
+
 Value Function::get(std::string const& member)
 {
     NATIVE_OBJECT(object, "name", std::make_shared<StringObject>(m_name));

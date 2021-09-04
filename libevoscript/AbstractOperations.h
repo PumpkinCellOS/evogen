@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libevoscript/Runtime.h>
 #include <libevoscript/Value.h>
 
 namespace evo::script
@@ -13,6 +12,8 @@ enum class CompareResult
     Greater,
     Unknown
 };
+
+class Runtime;
 
 namespace abstract
 {

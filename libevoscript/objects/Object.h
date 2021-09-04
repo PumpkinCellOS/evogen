@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libevoscript/AbstractOperations.h>
 #include <libevoscript/Value.h>
 
 namespace evo::script
@@ -28,6 +29,8 @@ public:
     virtual Value to_primitive(Runtime&, Value::Type) const { return {}; }
     // function operator+(rhs: Value) : Value
     virtual Value operator_add(Runtime& rt, Value const& rhs) const;
+    // function operator<>(rhs: Value) : CompareResult
+    virtual CompareResult operator_compare(Runtime& rt, Value const& rhs) const;
     // function name(): Value // this is already done for Function
     virtual std::string name() const { return ""; }
 };

@@ -25,6 +25,12 @@ Value StringObject::operator_add(Runtime& rt, Value const& rhs) const
     return concat(rt, *this, {rhs});
 }
 
+CompareResult StringObject::operator_compare(Runtime& rt, Value const& rhs) const
+{
+    auto rhs_string = rhs.to_string();
+    return m_string == rhs_string ? CompareResult::Equal : (m_string < rhs_string ? CompareResult::Less : CompareResult::Greater);
+}
+
 Value StringObject::length(Runtime&, StringObject const& container, std::vector<Value> const& args)
 {
     return Value::new_int(container.m_string.length());
