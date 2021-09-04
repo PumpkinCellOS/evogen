@@ -72,7 +72,7 @@ bool run_code_from_stream(Runtime& rt, std::istream& input)
 
     std::cerr << std::endl;
 
-    EVOParser parser(tokens);
+    EVOParser parser{tokens};
     auto program = parser.parse_program();
     if(program->is_error())
     {
