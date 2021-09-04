@@ -82,10 +82,7 @@ bool EVOLexer::lex(std::vector<Token>& output)
                     }
                     break;
                 default:
-                    {
-                        consume();
-                        output.emplace_back(Token::AssignmentOperator, std::string(&next, 1), token_start, location());
-                    }
+                    output.emplace_back(Token::AssignmentOperator, std::string(&next, 1), token_start, location());
                     break;
             }
         }

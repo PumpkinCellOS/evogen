@@ -61,7 +61,6 @@ void display_source_range(std::istream& input, SourceSpan const& span)
 {
     // TODO: Handle EOF errors
     size_t start = span.start.index - span.start.column;
-    std::cerr << start << std::endl;
     input.clear();
     input.seekg(start);
 
