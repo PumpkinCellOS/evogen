@@ -113,10 +113,6 @@ Value FunctionCall::evaluate(Runtime& rt) const
         arguments.push_back(value.dereferenced());
     }
 
-    ScopedExecutionContext context(rt, callable.name(), callable.container());
-    if(rt.has_exception())
-        return {}; // 'this' is not an object
-
     return callable.call(rt, arguments);
 }
 

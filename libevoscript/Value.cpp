@@ -279,6 +279,11 @@ Value Value::call(Runtime& rt, std::vector<Value> const& arguments)
         rt.throw_exception("Cannot call non-object");
         return {};
     }
+
+    ScopedExecutionContext context(rt, name(), container());
+    if(rt.has_exception())
+        return {}; // 'this' is not an object
+    
     return real_value.get_object()->call(rt, m_container ? *m_container : *real_value.get_object(), arguments);
 }
 
