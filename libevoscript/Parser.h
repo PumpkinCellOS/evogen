@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libevoscript/AST.h>
+#include <libevoscript/SourceLocation.h>
 
 #include <cassert>
 #include <ostream>
@@ -9,12 +10,6 @@
 
 namespace evo::script
 {
-
-struct SourceLocation
-{
-    size_t line = 0;
-    size_t column = 0;
-};
 
 std::ostream& operator<<(std::ostream&, SourceLocation const&);
 
@@ -90,6 +85,11 @@ public:
 
     size_t offset() const { return m_offset; }
     void set_offset(size_t offset) { m_offset = offset; }
+
+    SourceLocation location() const
+    { 
+        return m_offset > m_tokens.size() ? m_tokens.back().end() : m_tokens[m_offset].start();
+    }
 
 private:
     std::vector<Token> m_tokens;

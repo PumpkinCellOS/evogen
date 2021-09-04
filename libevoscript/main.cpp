@@ -76,7 +76,8 @@ bool run_code_from_stream(Runtime& rt, std::istream& input)
     auto program = parser.parse_program();
     if(program->is_error())
     {
-        std::cerr << "\e[31mSyntax Error: \e[0m" << program->error_message() << std::endl;
+        std::cerr << "\e[31mSyntax Error at " << program->error().location << "\e[0m\n";
+        std::cerr << "    " << program->error_message();
         return false;
     }
     std::cerr << *program << std::endl;
@@ -104,7 +105,7 @@ int main(int argc, char** argv)
     if(argc == 2)
     {
         auto file = std::ifstream(argv[1]);
-        return run_code_from_stream(runtime, file);
+        return !run_code_from_stream(runtime, file);
     }
     else if(!isatty(0))
         return run_code_from_stream(runtime, std::cin);

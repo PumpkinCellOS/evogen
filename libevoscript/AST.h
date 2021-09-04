@@ -1,8 +1,9 @@
 #pragma once
 
 #include <compare>
-#include <libevoscript/Value.h>
 #include <libevoscript/Runtime.h>
+#include <libevoscript/SourceLocation.h>
+#include <libevoscript/Value.h>
 
 #include <memory>
 #include <vector>
@@ -15,13 +16,17 @@ class ASTNode
 public:
     using ErrorMessage = std::string;
 
-    struct _ErrorTag {}; static constexpr _ErrorTag Error {};
-
-    ASTNode(_ErrorTag tag, ErrorMessage const& message)
-    : m_error_message(message)
+    struct Error
     {
+        SourceLocation location;
 
-    }
+        Error() = default;
+        Error(SourceLocation const& _location)
+        : location(std::move(_location)) {}
+    };
+
+    ASTNode(Error const& tag, ErrorMessage const& message)
+    : m_error_message(message), m_error(std::move(tag)) {}
 
     ASTNode() = default;
     ASTNode(ASTNode const&) = delete;
@@ -30,6 +35,7 @@ public:
 
     virtual bool is_error() const { return !m_error_message.empty(); }
     virtual std::string error_message() const { return is_error() ? m_error_message + "\n" : ""; }
+    Error error() const { return m_error; }
 
     virtual std::string to_string() const
     {
@@ -40,13 +46,14 @@ public:
 
 private:
     std::string m_error_message;
+    Error m_error;
 };
 
 template<class T>
 class ASTGroupNode : virtual public ASTNode
 {
 public:
-    ASTGroupNode(_ErrorTag tag, ErrorMessage const& message)
+    ASTGroupNode(Error const& tag, ErrorMessage const& message)
     : ASTNode(tag, message) {}
 
     ASTGroupNode() = default;
@@ -102,7 +109,7 @@ protected:
 class Expression : public ASTNode
 {
 public:
-    Expression(_ErrorTag tag, ErrorMessage const& message)
+    Expression(Error const& tag, ErrorMessage const& message)
     : ASTNode(tag, message) {}
 
     Expression() = default;
@@ -113,7 +120,7 @@ public:
 class IntegerLiteral : public Expression
 {
 public:
-    IntegerLiteral(_ErrorTag tag, ErrorMessage const& message)
+    IntegerLiteral(Error const& tag, ErrorMessage const& message)
     : Expression(tag, message) {}
 
     IntegerLiteral(int value)
@@ -136,7 +143,7 @@ private:
 class StringLiteral : public Expression
 {
 public:
-    StringLiteral(_ErrorTag tag, ErrorMessage const& message)
+    StringLiteral(Error const& tag, ErrorMessage const& message)
     : Expression(tag, message) {}
 
     StringLiteral(std::string const& value)
@@ -159,7 +166,7 @@ private:
 class Identifier : public Expression
 {
 public:
-    Identifier(_ErrorTag tag, ErrorMessage const& message)
+    Identifier(Error const& tag, ErrorMessage const& message)
     : Expression(tag, message) {}
 
     Identifier(std::string const& name)
@@ -191,7 +198,7 @@ public:
         Undefined
     };
 
-    SpecialValue(_ErrorTag tag, ErrorMessage const& message)
+    SpecialValue(Error const& tag, ErrorMessage const& message)
     : Expression(tag, message) {}
 
     SpecialValue(Type type)
@@ -214,7 +221,7 @@ private:
 class MemberExpression : public Expression
 {
 public:
-    MemberExpression(_ErrorTag tag, ErrorMessage const& message)
+    MemberExpression(Error const& tag, ErrorMessage const& message)
     : Expression(tag, message) {}
 
     MemberExpression(std::shared_ptr<Expression> expression, std::string const& name)
@@ -240,7 +247,7 @@ private:
 class FunctionCall : public Expression
 {
 public:
-    FunctionCall(_ErrorTag tag, ErrorMessage const& message)
+    FunctionCall(Error const& tag, ErrorMessage const& message)
     : Expression(tag, message) {}
 
     FunctionCall(std::shared_ptr<Expression> callable, std::vector<std::shared_ptr<Expression>> const& arguments)
@@ -279,7 +286,7 @@ public:
         PostfixDecrement,   // --
     };
 
-    UnaryExpression(_ErrorTag tag, ErrorMessage const& message)
+    UnaryExpression(Error const& tag, ErrorMessage const& message)
     : Expression(tag, message) {}
 
     UnaryExpression(std::shared_ptr<Expression> expression, Operation operation)
@@ -303,7 +310,7 @@ private:
 class BinaryExpression : public Expression
 {
 public:
-    BinaryExpression(_ErrorTag tag, ErrorMessage const& message)
+    BinaryExpression(Error const& tag, ErrorMessage const& message)
     : Expression(tag, message) {}
 
     virtual std::string to_string() const override
@@ -336,7 +343,7 @@ public:
         Modulo,     // %=
     };
 
-    AssignmentExpression(_ErrorTag tag, ErrorMessage const& message)
+    AssignmentExpression(Error const& tag, ErrorMessage const& message)
     : BinaryExpression(tag, message) {}
 
     AssignmentExpression(std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs, Operation operation)
@@ -392,7 +399,7 @@ public:
 
     };
 
-    NormalBinaryExpression(_ErrorTag tag, ErrorMessage const& message)
+    NormalBinaryExpression(Error const& tag, ErrorMessage const& message)
     : BinaryExpression(tag, message) {}
 
     NormalBinaryExpression(std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs, Operation operation)
@@ -436,7 +443,7 @@ private:
 class Statement : public ASTNode
 {
 public:
-    Statement(_ErrorTag tag, ErrorMessage const& message)
+    Statement(Error const& tag, ErrorMessage const& message)
     : ASTNode(tag, message) {}
 
     Statement() = default;
@@ -447,7 +454,7 @@ public:
 class ExpressionStatement : public Statement
 {
 public:
-    ExpressionStatement(_ErrorTag tag, ErrorMessage const& message)
+    ExpressionStatement(Error const& tag, ErrorMessage const& message)
     : Statement(tag, message)
     {
 
@@ -473,7 +480,7 @@ private:
 class BlockStatement : public ASTGroupNode<Statement>, public Statement
 {
 public:
-    BlockStatement(_ErrorTag tag, ErrorMessage const& message)
+    BlockStatement(Error const& tag, ErrorMessage const& message)
     : ASTGroupNode<Statement>(tag, message) {}
 
     BlockStatement() = default;
@@ -485,7 +492,7 @@ public:
 class IfStatement : public Statement
 {
 public:
-    IfStatement(_ErrorTag tag, ErrorMessage const& message)
+    IfStatement(Error const& tag, ErrorMessage const& message)
     : Statement(tag, message) {}
 
     // TODO: else
@@ -493,7 +500,11 @@ public:
     : m_condition(condition), m_true_statement(true_statement) {}
 
     virtual Value evaluate(Runtime&) const override;
-    virtual bool requires_semicolon() const override { return false; }
+    virtual bool requires_semicolon() const override
+    {
+        assert(m_true_statement);
+        return m_true_statement->requires_semicolon();
+    }
 
 private:
     std::shared_ptr<Expression> m_condition;
@@ -505,14 +516,14 @@ class Declaration : public Statement
 public:
     Declaration() = default;
 
-    Declaration(_ErrorTag tag, ErrorMessage const& message)
+    Declaration(Error const& tag, ErrorMessage const& message)
     : Statement(tag, message) {}
 };
 
 class VariableDeclaration : public Declaration
 {
 public:
-    VariableDeclaration(_ErrorTag tag, ErrorMessage const& message)
+    VariableDeclaration(Error const& tag, ErrorMessage const& message)
     : Declaration(tag, message) {}
 
     VariableDeclaration(std::string const& name, std::shared_ptr<Expression> initializer)
@@ -528,7 +539,7 @@ private:
 class Program : public ASTGroupNode<Statement>
 {
 public:
-    Program(_ErrorTag tag, ErrorMessage const& message)
+    Program(Error const& tag, ErrorMessage const& message)
     : ASTGroupNode<Statement>(tag, message) {}
 
     Program() = default;
