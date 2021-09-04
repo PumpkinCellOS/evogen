@@ -27,7 +27,7 @@ public:
     // function operator+(rhs: Value) : Value
     virtual Value operator_add(Runtime& rt, Value const& rhs) const;
     // function name(): Value // this is already done for Function
-    virtual std::string name() const { return "object"; }
+    virtual std::string name() const { return ""; }
 };
 
 class Function : public Object

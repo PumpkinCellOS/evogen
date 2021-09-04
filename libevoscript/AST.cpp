@@ -47,6 +47,7 @@ Value Identifier::evaluate(Runtime& rt) const
     if(!value.is_reference()) 
     {
         value.set_container(container);
+        value.set_name(m_name);
         return value;
     }
     
@@ -57,6 +58,7 @@ Value Identifier::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {};
     new_value.set_container(container);
+    new_value.set_name(m_name);
     return new_value;
 }
 
@@ -94,6 +96,7 @@ Value MemberExpression::evaluate(Runtime& rt) const
         return {}; // get() failed (e.g nonexisting objects are not tolerated)
 
     member.set_container(object);
+    member.set_name(m_name);
     return member;
 }
 

@@ -280,7 +280,7 @@ Value Value::call(Runtime& rt, std::vector<Value> const& arguments)
         return {};
     }
 
-    ScopedExecutionContext context(rt, name(), container());
+    ScopedExecutionContext context(rt, (m_container ? m_container->type_name() + "::" : "") + name() + "()", container());
     if(rt.has_exception())
         return {}; // 'this' is not an object
     
@@ -292,7 +292,14 @@ std::string Value::name() const
     auto real_value = dereferenced();
     if(!real_value.is_object())
         return "?";
-    return real_value.get_object()->name();
+    auto name = real_value.get_object()->name();
+    if(name.empty())
+    {
+        if(!m_name.empty())
+            return m_name;
+        return "<object>";
+    }
+    return name;
 }
 
 std::ostream& operator<<(std::ostream& stream, Value const& value)

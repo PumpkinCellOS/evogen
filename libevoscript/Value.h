@@ -81,7 +81,10 @@ public:
     Value dereferenced() const;
 
     Value call(Runtime&, std::vector<Value> const& arguments);
+
     std::string name() const;
+    void set_name(std::string const& name) { m_name = name; } 
+
     std::shared_ptr<Object> container() const { return m_container; }
     void set_container(std::shared_ptr<Object> object) { m_container = object; }
 
@@ -121,6 +124,7 @@ private:
     std::shared_ptr<Object> m_object_value;
     std::shared_ptr<MemoryValue> m_reference_value;
     std::shared_ptr<Object> m_container;
+    std::string m_name;
 };
 
 std::ostream& operator<<(std::ostream&, Value const&);
