@@ -37,20 +37,6 @@ ReplObject::ReplObject()
 
 Value ReplObject::get(std::string const& member)
 {
-    NATIVE_FUNCTION(ReplObject, "dump", [](Runtime& rt, ReplObject& container, std::vector<Value> const& args)->Value {
-        for(auto& value: args)
-            std::cout << value.dump_string() << std::endl;
-
-        return Value::new_int(args.size());
-    });
-    NATIVE_FUNCTION(ReplObject, "exit", [](Runtime& rt, ReplObject& container, std::vector<Value> const& args)->Value {
-        auto exit_code = args.size() == 1 ? args[0].to_int(rt) : 0;
-        if(rt.has_exception())
-            return {};
-
-        container.exit(exit_code);
-        return Value::undefined();
-    });
     return GlobalObject::get(member);
 }
 
