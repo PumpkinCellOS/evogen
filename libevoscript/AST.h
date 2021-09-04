@@ -500,6 +500,31 @@ private:
     std::shared_ptr<Statement> m_true_statement;
 };
 
+class Declaration : public Statement
+{
+public:
+    Declaration() = default;
+
+    Declaration(_ErrorTag tag, ErrorMessage const& message)
+    : Statement(tag, message) {}
+};
+
+class VariableDeclaration : public Declaration
+{
+public:
+    VariableDeclaration(_ErrorTag tag, ErrorMessage const& message)
+    : Declaration(tag, message) {}
+
+    VariableDeclaration(std::string const& name, std::shared_ptr<Expression> initializer)
+    : m_name(name), m_initializer(initializer) {}
+
+    virtual Value evaluate(Runtime&) const override;
+
+private:
+    std::string m_name;
+    std::shared_ptr<Expression> m_initializer;
+};
+
 class Program : public ASTGroupNode<Statement>
 {
 public:

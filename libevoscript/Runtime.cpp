@@ -32,7 +32,7 @@ Runtime::Runtime(std::shared_ptr<MemoryValue> global_object, std::shared_ptr<Mem
 
     std::cerr << "this = " << _this->dump_string() << std::endl;
     std::cerr << "global object = " << *_global << std::endl;
-    std::cerr << "local scope = " << *_local << std::endl;
+    std::cerr << "local scope = " << _local->dump_string() << std::endl;
 }
 
 Runtime::~Runtime()
@@ -44,7 +44,7 @@ Runtime::~Runtime()
 
     std::cerr << "this = " << _this->dump_string() << std::endl;
     std::cerr << "global object = " << *_global << std::endl;
-    std::cerr << "local scope = " << *_local << std::endl;
+    std::cerr << "local scope = " << _local->dump_string() << std::endl;
 
     pop_execution_context();
 }
@@ -62,7 +62,12 @@ ExecutionContext& Runtime::push_execution_context(std::shared_ptr<Object> this_o
         assert(m_global_this->value().is_object());
         this_object = m_global_this->value().get_object();
     }
-    return m_execution_context_stack.emplace(this_object);
+    return m_execution_context_stack.emplace(this_object, nullptr);
+}
+
+ExecutionContext& Runtime::push_scope()
+{
+    return m_execution_context_stack.emplace(this_object(), current_execution_context().local_scope_object());
 }
 
 ExecutionContext& Runtime::current_execution_context()

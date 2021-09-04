@@ -451,6 +451,41 @@ std::shared_ptr<Expression> EVOParser::parse_assignment_expression()
     return std::make_shared<AssignmentExpression>(lhs, rhs, operation);
 }
 
+std::shared_ptr<Declaration> EVOParser::parse_declaration()
+{
+    size_t off = offset();
+    std::shared_ptr<Declaration> declaration = parse_variable_declaration();
+    if(!declaration)
+    {
+        set_offset(off);
+        return {};
+    }
+    return declaration;
+}
+
+std::shared_ptr<VariableDeclaration> EVOParser::parse_variable_declaration()
+{
+    auto let = consume_of_type(Token::Name);
+    if(!let || let->value() != "let")
+        return {};
+    
+    auto name = consume_of_type(Token::Name);
+    if(!name)
+        return std::make_shared<VariableDeclaration>(ASTNode::Error, "Expected variable name");
+    
+    auto equal = consume_of_type(Token::AssignmentOperator);
+    if(!equal)
+        return std::make_shared<VariableDeclaration>(name->value(), nullptr);
+    if(equal->value() != "=")
+        return std::make_shared<VariableDeclaration>(ASTNode::Error, "Invalid operator for initializer, expected '='");
+
+    auto initializer = parse_expression();
+    if(initializer->is_error())
+        return std::make_shared<VariableDeclaration>(ASTNode::Error, initializer->error_message());
+    
+    return std::make_shared<VariableDeclaration>(name->value(), initializer);
+}
+
 std::shared_ptr<Statement> EVOParser::parse_expression_statement()
 {
     auto expression = parse_expression();
@@ -536,11 +571,16 @@ std::shared_ptr<Statement> EVOParser::parse_statement()
         if(!statement)
         {
             set_offset(off);
-            statement = parse_expression_statement();
-            if(!statement || statement->is_error())
+            statement = parse_declaration();
+            if(!statement)
             {
                 set_offset(off);
-                return statement;
+                statement = parse_expression_statement();
+                if(!statement || statement->is_error())
+                {
+                    set_offset(off);
+                    return statement;
+                }
             }
         }
     }

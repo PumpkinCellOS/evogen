@@ -24,10 +24,7 @@ Value StringLiteral::evaluate(Runtime&) const
 
 Value Identifier::evaluate(Runtime& rt) const
 {
-    auto local_scope_object = rt.current_execution_context().local_scope_object()->value().to_object(rt);
-    if(rt.has_exception())
-        return {}; // Local scope is not an object (unlikely to happen)
-
+    auto local_scope_object = rt.current_execution_context().local_scope_object();
     auto value = local_scope_object->get(m_name);
     if(rt.has_exception())
         return {}; // Getter thrown an exception
@@ -322,6 +319,20 @@ Value IfStatement::evaluate(Runtime& rt) const
     else
         // TODO: else statements
         return Value::undefined();
+}
+
+Value VariableDeclaration::evaluate(Runtime& rt) const
+{
+    auto local_scope = rt.local_scope_object();
+    auto memory_value = local_scope->allocate(m_name);
+    if(m_initializer)
+    {
+        auto init_value = m_initializer->evaluate(rt);
+        if(rt.has_exception())
+            return {};
+        memory_value->value() = init_value;
+    }
+    return Value::new_reference(memory_value);
 }
 
 Value Program::evaluate(Runtime& rt) const

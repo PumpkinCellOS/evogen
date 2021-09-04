@@ -22,13 +22,14 @@ public:
     std::string exception_message() const { return m_exception_message; }
 
     ExecutionContext& push_execution_context(std::shared_ptr<Object> this_object);
+    ExecutionContext& push_scope();
     ExecutionContext& current_execution_context();
     void pop_execution_context();
 
     template<class T = Object>
     std::shared_ptr<T> this_object() { return current_execution_context().this_object<T>(); }
 
-    std::shared_ptr<MemoryValue> local_scope_object() { return current_execution_context().local_scope_object(); }
+    std::shared_ptr<LocalObject> local_scope_object() { return current_execution_context().local_scope_object(); }
     std::shared_ptr<MemoryValue> global_object() { return m_global_object; }
 
 private:
