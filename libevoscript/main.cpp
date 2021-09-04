@@ -12,7 +12,7 @@
 
 using namespace evo::script;
 
-class ReplObject : public MapObject
+class ReplObject : public GlobalObject
 {
 public:
     ReplObject();
@@ -37,24 +37,21 @@ ReplObject::ReplObject()
 
 Value ReplObject::get(std::string const& member)
 {
-    if(member == "dump")
-        return NativeFunction<ReplObject>::create_value([](Runtime& rt, ReplObject& container, std::vector<Value> const& args)->Value {
-            for(auto& value: args)
-                std::cout << value.dump_string() << std::endl;
+    NATIVE_FUNCTION(ReplObject, "dump", [](Runtime& rt, ReplObject& container, std::vector<Value> const& args)->Value {
+        for(auto& value: args)
+            std::cout << value.dump_string() << std::endl;
 
-            return Value::new_int(args.size());
-        });
-    else if(member == "exit")
-        return NativeFunction<ReplObject>::create_value([](Runtime& rt, ReplObject& container, std::vector<Value> const& args)->Value {
-            auto exit_code = args.size() == 1 ? args[0].to_int(rt) : 0;
-            if(rt.has_exception())
-                return {};
+        return Value::new_int(args.size());
+    });
+    NATIVE_FUNCTION(ReplObject, "exit", [](Runtime& rt, ReplObject& container, std::vector<Value> const& args)->Value {
+        auto exit_code = args.size() == 1 ? args[0].to_int(rt) : 0;
+        if(rt.has_exception())
+            return {};
 
-            container.exit(exit_code);
-            return Value::undefined();
-        });
-    else
-        return MapObject::get(member);
+        container.exit(exit_code);
+        return Value::undefined();
+    });
+    return GlobalObject::get(member);
 }
 
 void display_source_range(std::istream& input, SourceSpan const& span)
@@ -129,7 +126,7 @@ bool run_code_from_stream(Runtime& rt, std::istream& input)
 int main(int argc, char** argv)
 {
     auto repl_object = std::make_shared<ReplObject>();
-    Runtime runtime(MemoryValue::create_existing_object(repl_object));
+    Runtime runtime{repl_object};
 
     if(argc == 2)
     {

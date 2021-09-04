@@ -477,6 +477,7 @@ std::shared_ptr<VariableDeclaration> EVOParser::parse_variable_declaration()
     if(!equal)
         return std::make_shared<VariableDeclaration>(name->value(), nullptr);
     if(equal->value() != "=")
+        // TODO: Fix syntax error displayed at expression instead of operator itself
         return std::make_shared<VariableDeclaration>(ASTNode::Error(location(), "Invalid operator for initializer, expected '='"));
 
     auto initializer = parse_expression();

@@ -37,10 +37,7 @@ Value Identifier::evaluate(Runtime& rt) const
         // Not in local scope; try searching global scope
         // TODO: This means that not existing "local" variables will
         // be created on global object!
-        auto global_object = rt.global_object()->value().to_object(rt);
-        if(rt.has_exception())
-            return {}; // Global scope is not an object (unlikely to happen)
-
+        auto global_object = rt.global_object();
         value = global_object->get(m_name);
         container = global_object;
     }
