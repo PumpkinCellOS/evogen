@@ -145,8 +145,7 @@ bool EVOLexer::lex(std::vector<Token>& output)
                     consume();
                     output.emplace_back(Token::Invalid, std::string(&next, 1), token_start, location());
                     break;
-            } 
-            output.emplace_back(Token::NormalOperator, std::string(&next, 1), token_start, location());
+            }
         }
         else if(next == ';')
         {
