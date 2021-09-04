@@ -320,12 +320,17 @@ Value IfStatement::evaluate(Runtime& rt) const
 Value VariableDeclaration::evaluate(Runtime& rt) const
 {
     auto local_scope = rt.local_scope_object();
+    Value init_value;
+    if(m_initializer)
+    {
+        init_value = m_initializer->evaluate(rt);
+        if(rt.has_exception())
+            return {};
+    }
     auto memory_value = local_scope->allocate(m_name);
     if(m_initializer)
     {
-        auto init_value = m_initializer->evaluate(rt);
-        if(rt.has_exception())
-            return {};
+        assert(!init_value.is_invalid());
         memory_value->value() = init_value;
     }
     return Value::new_reference(memory_value);
