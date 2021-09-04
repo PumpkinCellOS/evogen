@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <vector>
+#include <sstream>
 
 namespace evo::script
 {
@@ -19,42 +20,65 @@ public:
     struct Error
     {
         SourceLocation location;
+        std::string message;
 
         Error() = default;
-        Error(SourceLocation const& _location)
-        : location(std::move(_location)) {}
+        Error(SourceLocation const& _location, std::string const& message_)
+        : location(std::move(_location)), message(std::move(message_)) {}
     };
 
-    ASTNode(Error const& tag, ErrorMessage const& message)
-    : m_error_message(message), m_error(std::move(tag)) {}
+    class ErrorList
+    {
+    public:
+        using Type = std::vector<Error>;
+
+        ErrorList() = default;
+
+        ErrorList(Error const& error)
+        : m_errors({error}) {}
+
+        ErrorList(std::vector<Error> const& errors)
+        : m_errors(errors) {}
+
+        Type::const_iterator begin() const { return m_errors.begin(); }
+        Type::const_iterator end() const { return m_errors.end(); }
+        bool empty() const { return m_errors.empty(); }
+        void add(Error const& error) { m_errors.push_back(error); }
+
+        std::string display() const
+        {
+            std::ostringstream out;
+            for(auto& it: m_errors)
+                out << "    " << it.location << ": " << it.message << std::endl;
+            return out.str();
+        }
+    private:
+        Type m_errors;
+    };
+
+    ASTNode(ErrorList const& error)
+    : m_errors(error) {}
 
     ASTNode() = default;
     ASTNode(ASTNode const&) = delete;
 
     virtual Value evaluate(Runtime&) const = 0;
 
-    virtual bool is_error() const { return !m_error_message.empty(); }
-    virtual std::string error_message() const { return is_error() ? m_error_message + "\n" : ""; }
-    Error error() const { return m_error; }
+    bool is_error() const { return !m_errors.empty(); }
+    ErrorList errors() const { return m_errors; }
 
-    virtual std::string to_string() const
-    {
-        if(is_error())
-            return "SyntaxError(" + error_message() + ")";
-        return "";
-    }
+    virtual std::string to_string() const { return "??"; }
 
-private:
-    std::string m_error_message;
-    Error m_error;
+protected:
+    ErrorList m_errors;
 };
 
 template<class T>
-class ASTGroupNode : virtual public ASTNode
+class ASTGroupNode : public ASTNode
 {
 public:
-    ASTGroupNode(Error const& tag, ErrorMessage const& message)
-    : ASTNode(tag, message) {}
+    ASTGroupNode(ErrorList const& error)
+    : ASTNode(error) {}
 
     ASTGroupNode() = default;
 
@@ -62,38 +86,15 @@ public:
     {
         assert(node);
         m_nodes.push_back(node);
-    }
-
-    virtual bool is_error() const override
-    {
-        if(ASTNode::is_error())
-            return true;
-        for(auto& it: m_nodes)
+        if(node->is_error())
         {
-            if(it->is_error())
-                return true;
+            for(auto& error: node->errors())
+                m_errors.add(error);
         }
-        return false;
-    }
-    
-    virtual std::string error_message() const override
-    {
-        // FIXME: This is bad
-        std::string messages = ASTNode::error_message();
-
-        for(auto& it: m_nodes)
-        {
-            if(it->is_error())
-                messages += it->error_message() + "\n";
-        }
-        return messages;
     }
 
     virtual std::string to_string() const override
     {
-        if(is_error())
-            return ASTNode::to_string();
-
         std::string out = "ASTGroupNode(";
         for(auto& it: m_nodes)
         {
@@ -109,8 +110,8 @@ protected:
 class Expression : public ASTNode
 {
 public:
-    Expression(Error const& tag, ErrorMessage const& message)
-    : ASTNode(tag, message) {}
+    Expression(ErrorList const& error)
+    : ASTNode(error) {}
 
     Expression() = default;
 
@@ -120,8 +121,8 @@ public:
 class IntegerLiteral : public Expression
 {
 public:
-    IntegerLiteral(Error const& tag, ErrorMessage const& message)
-    : Expression(tag, message) {}
+    IntegerLiteral(ErrorList const& error)
+    : Expression(error) {}
 
     IntegerLiteral(int value)
     : m_value(value) {}
@@ -143,8 +144,8 @@ private:
 class StringLiteral : public Expression
 {
 public:
-    StringLiteral(Error const& tag, ErrorMessage const& message)
-    : Expression(tag, message) {}
+    StringLiteral(ErrorList const& error)
+    : Expression(error) {}
 
     StringLiteral(std::string const& value)
     : m_value(value) {}
@@ -166,8 +167,8 @@ private:
 class Identifier : public Expression
 {
 public:
-    Identifier(Error const& tag, ErrorMessage const& message)
-    : Expression(tag, message) {}
+    Identifier(ErrorList const& error)
+    : Expression(error) {}
 
     Identifier(std::string const& name)
     : m_name(name) {}
@@ -198,8 +199,8 @@ public:
         Undefined
     };
 
-    SpecialValue(Error const& tag, ErrorMessage const& message)
-    : Expression(tag, message) {}
+    SpecialValue(ErrorList const& error)
+    : Expression(error) {}
 
     SpecialValue(Type type)
     : m_type(type) {}
@@ -221,8 +222,8 @@ private:
 class MemberExpression : public Expression
 {
 public:
-    MemberExpression(Error const& tag, ErrorMessage const& message)
-    : Expression(tag, message) {}
+    MemberExpression(ErrorList const& error)
+    : Expression(error) {}
 
     MemberExpression(std::shared_ptr<Expression> expression, std::string const& name)
     : m_expression(expression), m_name(name) {}
@@ -247,8 +248,8 @@ private:
 class FunctionCall : public Expression
 {
 public:
-    FunctionCall(Error const& tag, ErrorMessage const& message)
-    : Expression(tag, message) {}
+    FunctionCall(ErrorList const& error)
+    : Expression(error) {}
 
     FunctionCall(std::shared_ptr<Expression> callable, std::vector<std::shared_ptr<Expression>> const& arguments)
     : m_callable(callable), m_arguments(std::move(arguments)) {}
@@ -286,8 +287,8 @@ public:
         PostfixDecrement,   // --
     };
 
-    UnaryExpression(Error const& tag, ErrorMessage const& message)
-    : Expression(tag, message) {}
+    UnaryExpression(ErrorList const& error)
+    : Expression(error) {}
 
     UnaryExpression(std::shared_ptr<Expression> expression, Operation operation)
     : m_expression(expression), m_operation(operation) {}
@@ -310,8 +311,8 @@ private:
 class BinaryExpression : public Expression
 {
 public:
-    BinaryExpression(Error const& tag, ErrorMessage const& message)
-    : Expression(tag, message) {}
+    BinaryExpression(ErrorList const& error)
+    : Expression(error) {}
 
     virtual std::string to_string() const override
     {
@@ -343,8 +344,8 @@ public:
         Modulo,     // %=
     };
 
-    AssignmentExpression(Error const& tag, ErrorMessage const& message)
-    : BinaryExpression(tag, message) {}
+    AssignmentExpression(ErrorList const& error)
+    : BinaryExpression(error) {}
 
     AssignmentExpression(std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs, Operation operation)
     : BinaryExpression(lhs, rhs), m_operation(operation) {}
@@ -399,8 +400,8 @@ public:
 
     };
 
-    NormalBinaryExpression(Error const& tag, ErrorMessage const& message)
-    : BinaryExpression(tag, message) {}
+    NormalBinaryExpression(ErrorList const& error)
+    : BinaryExpression(error) {}
 
     NormalBinaryExpression(std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs, Operation operation)
     : BinaryExpression(lhs, rhs), m_operation(operation) {}
@@ -443,8 +444,8 @@ private:
 class Statement : public ASTNode
 {
 public:
-    Statement(Error const& tag, ErrorMessage const& message)
-    : ASTNode(tag, message) {}
+    Statement(ErrorList const& error)
+    : ASTNode(error) {}
 
     Statement() = default;
 
@@ -454,11 +455,8 @@ public:
 class ExpressionStatement : public Statement
 {
 public:
-    ExpressionStatement(Error const& tag, ErrorMessage const& message)
-    : Statement(tag, message)
-    {
-
-    }
+    ExpressionStatement(ErrorList const& error)
+    : Statement(error) {}
 
     ExpressionStatement(std::shared_ptr<Expression> expression)
     : m_expression(expression) { assert(expression); }
@@ -480,8 +478,8 @@ private:
 class BlockStatement : public ASTGroupNode<Statement>, public Statement
 {
 public:
-    BlockStatement(Error const& tag, ErrorMessage const& message)
-    : ASTGroupNode<Statement>(tag, message) {}
+    BlockStatement(ErrorList const& error)
+    : Statement(error) {}
 
     BlockStatement() = default;
 
@@ -492,8 +490,8 @@ public:
 class IfStatement : public Statement
 {
 public:
-    IfStatement(Error const& tag, ErrorMessage const& message)
-    : Statement(tag, message) {}
+    IfStatement(ErrorList const& error)
+    : Statement(error) {}
 
     // TODO: else
     IfStatement(std::shared_ptr<Expression> condition, std::shared_ptr<Statement> true_statement)
@@ -516,15 +514,15 @@ class Declaration : public Statement
 public:
     Declaration() = default;
 
-    Declaration(Error const& tag, ErrorMessage const& message)
-    : Statement(tag, message) {}
+    Declaration(ErrorList const& error)
+    : Statement(error) {}
 };
 
 class VariableDeclaration : public Declaration
 {
 public:
-    VariableDeclaration(Error const& tag, ErrorMessage const& message)
-    : Declaration(tag, message) {}
+    VariableDeclaration(ErrorList const& error)
+    : Declaration(error) {}
 
     VariableDeclaration(std::string const& name, std::shared_ptr<Expression> initializer)
     : m_name(name), m_initializer(initializer) {}
@@ -539,8 +537,8 @@ private:
 class Program : public ASTGroupNode<Statement>
 {
 public:
-    Program(Error const& tag, ErrorMessage const& message)
-    : ASTGroupNode<Statement>(tag, message) {}
+    Program(ErrorList const& error)
+    : ASTGroupNode<Statement>(error) {}
 
     Program() = default;
 

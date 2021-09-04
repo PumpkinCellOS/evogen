@@ -37,7 +37,7 @@ std::shared_ptr<Expression> EVOParser::parse_primary_expression()
                     set_offset(off);
                     literal = parse_identifier();
                     if(literal->is_error())
-                        return std::make_shared<SpecialValue>(ASTNode::Error(location()), "Expected primary expression");
+                        return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Expected primary expression"));
                 }
             }
         }
@@ -50,7 +50,7 @@ std::shared_ptr<Expression> EVOParser::parse_primary_expression()
     
     auto paren_close = consume_of_type(Token::ParenClose);
     if(!paren_close)
-        return std::make_shared<Expression>(ASTNode::Error(location()), "Unmatched '('");
+        return std::make_shared<Expression>(ASTNode::Error(location(), "Unmatched '('"));
 
     return expression;
 }
@@ -59,7 +59,7 @@ std::shared_ptr<Expression> EVOParser::parse_integer_literal()
 {
     auto name = consume_of_type(Token::Number);
     if(!name)
-        return std::make_shared<SpecialValue>(ASTNode::Error(location()), "Invalid literal");
+        return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Invalid literal"));
 
     try
     {
@@ -67,7 +67,7 @@ std::shared_ptr<Expression> EVOParser::parse_integer_literal()
     }
     catch(...)
     {
-        return std::make_shared<SpecialValue>(ASTNode::Error(location()), "Invalid integer literal");
+        return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Invalid integer literal"));
     }
 }
 
@@ -75,7 +75,7 @@ std::shared_ptr<Expression> EVOParser::parse_string_literal()
 {
     auto name = consume_of_type(Token::String);
     if(!name)
-        return std::make_shared<SpecialValue>(ASTNode::Error(location()), "Invalid literal");
+        return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Invalid literal"));
 
     return std::make_shared<StringLiteral>(name->value());
 }
@@ -84,7 +84,7 @@ std::shared_ptr<Expression> EVOParser::parse_identifier()
 {
     auto name = consume_of_type(Token::Name);
     if(!name)
-        return std::make_shared<SpecialValue>(ASTNode::Error(location()), "Invalid identifier");
+        return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Invalid identifier"));
 
     return std::make_shared<Identifier>(name->value());
 }
@@ -93,7 +93,7 @@ std::shared_ptr<Expression> EVOParser::parse_special_value()
 {
     auto name = consume_of_type(Token::Name);
     if(!name)
-        return std::make_shared<SpecialValue>(ASTNode::Error(location()), "Invalid special value");
+        return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Invalid special value"));
 
     if(name->value() == "this")
         return std::make_shared<SpecialValue>(SpecialValue::This);
@@ -106,7 +106,7 @@ std::shared_ptr<Expression> EVOParser::parse_special_value()
     if(name->value() == "undefined")
         return std::make_shared<SpecialValue>(SpecialValue::Undefined);
 
-    return std::make_shared<SpecialValue>(ASTNode::Error(location()), "Invalid special value");
+    return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Invalid special value"));
 }
 
 std::shared_ptr<Expression> EVOParser::parse_member_name(std::shared_ptr<Expression> lhs)
@@ -117,7 +117,7 @@ std::shared_ptr<Expression> EVOParser::parse_member_name(std::shared_ptr<Express
 
     auto member_name = consume_of_type(Token::Name);
     if(!member_name)
-        return std::make_shared<MemberExpression>(ASTNode::Error(location()), "Expected name in member expression");
+        return std::make_shared<MemberExpression>(ASTNode::Error(location(), "Expected name in member expression"));
 
     return std::make_shared<MemberExpression>(lhs, member_name->value());
 }
@@ -148,7 +148,7 @@ std::shared_ptr<Expression> EVOParser::parse_argument_list(std::shared_ptr<Expre
         
         auto paren_close = consume_of_type(Token::ParenClose);
         if(!paren_close)
-            return std::make_shared<FunctionCall>(ASTNode::Error(location()), "Unmatched '('");
+            return std::make_shared<FunctionCall>(ASTNode::Error(location(), "Unmatched '('"));
     }
 
     return std::make_shared<FunctionCall>(lhs, arguments);
@@ -227,7 +227,7 @@ std::shared_ptr<Expression> EVOParser::parse_unary_expression()
     else if(op->value() == "--")
         operation = UnaryExpression::Decrement;
     else
-        return std::make_shared<UnaryExpression>(ASTNode::Error(location()), "Invalid unary expression");
+        return std::make_shared<UnaryExpression>(ASTNode::Error(location(), "Invalid unary expression"));
     
     return std::make_shared<UnaryExpression>(lhs, operation);
 }
@@ -471,17 +471,17 @@ std::shared_ptr<VariableDeclaration> EVOParser::parse_variable_declaration()
     
     auto name = consume_of_type(Token::Name);
     if(!name)
-        return std::make_shared<VariableDeclaration>(ASTNode::Error(location()), "Expected variable name");
+        return std::make_shared<VariableDeclaration>(ASTNode::Error(location(), "Expected variable name"));
     
     auto equal = consume_of_type(Token::AssignmentOperator);
     if(!equal)
         return std::make_shared<VariableDeclaration>(name->value(), nullptr);
     if(equal->value() != "=")
-        return std::make_shared<VariableDeclaration>(ASTNode::Error(location()), "Invalid operator for initializer, expected '='");
+        return std::make_shared<VariableDeclaration>(ASTNode::Error(location(), "Invalid operator for initializer, expected '='"));
 
     auto initializer = parse_expression();
     if(initializer->is_error())
-        return std::make_shared<VariableDeclaration>(ASTNode::Error(location()), initializer->error_message());
+        return std::make_shared<VariableDeclaration>(initializer->errors());
     
     return std::make_shared<VariableDeclaration>(name->value(), initializer);
 }
@@ -490,7 +490,7 @@ std::shared_ptr<Statement> EVOParser::parse_expression_statement()
 {
     auto expression = parse_expression();
     if(expression->is_error())
-        return std::make_shared<ExpressionStatement>(ASTNode::Error(location()), expression->error_message());
+        return std::make_shared<ExpressionStatement>(expression->errors());
     
     return std::make_shared<ExpressionStatement>(expression);
 }
@@ -523,14 +523,14 @@ std::shared_ptr<Statement> EVOParser::parse_block_statement()
                 auto curly_close = consume_of_type(Token::CurlyClose);
                 if(curly_close)
                     return statement;
-                return std::make_shared<BlockStatement>(ASTNode::Error(location()), "Expected ';' after statement");
+                return std::make_shared<BlockStatement>(ASTNode::Error(location(), "Expected ';' after statement"));
             }
         }
     }
 
     auto curly_close = consume_of_type(Token::CurlyClose);
     if(!curly_close)
-        return std::make_shared<BlockStatement>(ASTNode::Error(location()), "Unclosed block statement");
+        return std::make_shared<BlockStatement>(ASTNode::Error(location(), "Unclosed block statement"));
 
     return statement;
 }
@@ -543,19 +543,19 @@ std::shared_ptr<Statement> EVOParser::parse_if_statement()
 
     auto paren_open = consume_of_type(Token::ParenOpen);
     if(!paren_open)
-        return std::make_shared<IfStatement>(ASTNode::Error(location()), "Expected '(' after 'if'");
+        return std::make_shared<IfStatement>(ASTNode::Error(location(), "Expected '(' after 'if'"));
 
     auto condition = parse_expression();
     if(condition->is_error())
-        return std::make_shared<ExpressionStatement>(ASTNode::Error(location()), condition->error_message());
+        return std::make_shared<ExpressionStatement>(condition->errors());
 
     auto paren_close = consume_of_type(Token::ParenClose);
     if(!paren_close)
-        return std::make_shared<IfStatement>(ASTNode::Error(location()), "Expected ')' after 'if' condition");
+        return std::make_shared<IfStatement>(ASTNode::Error(location(), "Expected ')' after 'if' condition"));
 
     auto true_statement = parse_statement();
     if(!true_statement || true_statement->is_error())
-        return std::make_shared<IfStatement>(ASTNode::Error(location()), "Expected statement");
+        return std::make_shared<IfStatement>(ASTNode::Error(location(), "Expected statement"));
 
     return std::make_shared<IfStatement>(condition, true_statement);
 }
@@ -591,7 +591,7 @@ std::shared_ptr<Statement> EVOParser::parse_statement()
 std::shared_ptr<Program> EVOParser::parse_program()
 {
     if(eof())
-        return std::make_shared<Program>(ASTNode::Error(location()), "Empty program");
+        return std::make_shared<Program>(ASTNode::Error(location(), "Empty program"));
 
     auto program = std::make_shared<Program>();
     while(!eof())
@@ -607,7 +607,7 @@ std::shared_ptr<Program> EVOParser::parse_program()
             auto semicolon = consume_of_type(Token::Semicolon);
             if(!semicolon && !eof())
                 // TODO: Fix error propagation here.
-                return std::make_shared<Program>(ASTNode::Error(location()), "Expected ';' after statement");
+                return std::make_shared<Program>(ASTNode::Error(location(), "Expected ';' after statement"));
         }
     }
     return program;

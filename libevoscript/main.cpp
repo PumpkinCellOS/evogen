@@ -76,8 +76,8 @@ bool run_code_from_stream(Runtime& rt, std::istream& input)
     auto program = parser.parse_program();
     if(program->is_error())
     {
-        std::cerr << "\e[31mSyntax Error at " << program->error().location << "\e[0m\n";
-        std::cerr << "    " << program->error_message();
+        std::cerr << "\e[31mSyntax Errors detected:\e[0m" << std::endl;
+        std::cerr << program->errors().display();
         return false;
     }
     std::cerr << *program << std::endl;

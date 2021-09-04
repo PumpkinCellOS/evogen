@@ -33,7 +33,7 @@ public:
         Invalid                 // (others)
     };
 
-    Token(Type type, std::string const& value, SourceLocation start = {}, SourceLocation end = {})
+    Token(Type type, std::string const& value, SourceLocation const& start = {}, SourceLocation const& end = {})
     : m_type(type), m_value(value), m_start(start), m_end(end) {}
 
     Type type() const { return m_type; }
@@ -88,7 +88,7 @@ public:
 
     SourceLocation location() const
     { 
-        return m_offset > m_tokens.size() ? m_tokens.back().end() : m_tokens[m_offset].start();
+        return m_offset >= m_tokens.size() ? m_tokens.back().end() : m_tokens[m_offset].start();
     }
 
 private:
