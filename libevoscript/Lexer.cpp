@@ -22,6 +22,7 @@ char Lexer::consume()
     else
         m_location.column++;
 
+    m_location.index++;
     return next;
 }
 

@@ -19,11 +19,11 @@ public:
 
     struct Error
     {
-        SourceLocation location;
+        SourceSpan location;
         std::string message;
 
         Error() = default;
-        Error(SourceLocation const& _location, std::string const& message_)
+        Error(SourceSpan const& _location, std::string const& message_)
         : location(std::move(_location)), message(std::move(message_)) {}
     };
 
@@ -49,7 +49,7 @@ public:
         {
             std::ostringstream out;
             for(auto& it: m_errors)
-                out << "    " << it.location << ": " << it.message << std::endl;
+                out << "    " << it.location.start << ": " << it.message << std::endl;
             return out.str();
         }
     private:

@@ -86,9 +86,10 @@ public:
     size_t offset() const { return m_offset; }
     void set_offset(size_t offset) { m_offset = offset; }
 
-    SourceLocation location() const
+    SourceSpan location() const
     { 
-        return m_offset >= m_tokens.size() ? m_tokens.back().end() : m_tokens[m_offset].start();
+        auto* token = peek();
+        return token ? SourceSpan{token->start(), token->value().size()} : SourceSpan{m_tokens.back().end(), 1};
     }
 
 private:

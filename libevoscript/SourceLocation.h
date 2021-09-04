@@ -10,6 +10,13 @@ struct SourceLocation
 {
     size_t line = 0;
     size_t column = 0;
+    size_t index = 0;
+};
+
+struct SourceSpan
+{
+    SourceLocation start;
+    size_t size = 0;
 };
 
 std::ostream& operator<<(std::ostream& stream, SourceLocation const& node);
