@@ -20,6 +20,8 @@ public:
     virtual std::string dump_string() const { return repl_string(); }
     // function repl_string() : string
     virtual std::string repl_string() const { return type_name() + " {}"; }
+    // function to_string() : string
+    virtual std::string to_string() const { return "[object " + type_name() + "]"; }
     // function call(container: Object, arguments: Array) : Value
     virtual Value call(Runtime&, Object& container, std::vector<Value> const& arguments);
     // function to_primitive() : Value

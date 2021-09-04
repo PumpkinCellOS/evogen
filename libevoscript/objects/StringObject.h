@@ -15,13 +15,11 @@ public:
     virtual std::string type_name() const override { return "String"; }
     virtual std::string dump_string() const override { return "StringObject(" + m_string + ")"; }
     virtual std::string repl_string() const override { return "\"" + m_string + "\""; }
+    virtual std::string to_string() const override { return m_string; }
     virtual Value to_primitive(Runtime&, Value::Type) const override;
     virtual Value operator_add(Runtime& rt, Value const& rhs) const override;
 
 private:
-    // string string() const
-    static Value raw_string(Runtime&, StringObject const& container, std::vector<Value> const& args);
-
     // int length() const
     static Value length(Runtime&, StringObject const& container, std::vector<Value> const& args);
 

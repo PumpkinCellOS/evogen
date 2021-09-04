@@ -1,6 +1,7 @@
 #include <libevoscript/AbstractOperations.h>
 
 #include <libevoscript/objects/Object.h>
+#include <libevoscript/objects/StringObject.h>
 
 namespace evo::script::abstract
 {
@@ -29,7 +30,7 @@ Value add(Runtime& rt, Value const& lhs, Value const& rhs)
     {
         auto lhs_int = real_lhs.to_string();
         auto rhs_int = real_rhs.to_string();
-        return Value::new_string(lhs_int + rhs_int);
+        return Value::new_object(std::make_shared<StringObject>(lhs_int + rhs_int));
     }
 }
 
@@ -163,12 +164,11 @@ CompareResult compare(Runtime& rt, Value const& lhs, Value const& rhs)
     
     if(real_lhs.is_int())
         return compare_primitive(real_lhs.get_int(), real_rhs.get_int());
-    else if(real_lhs.is_string())
-        return compare_primitive(real_lhs.get_string(), real_rhs.get_string());
     else if(real_lhs.is_bool())
         return real_lhs.get_bool() == real_rhs.get_bool() ? CompareResult::Equal : CompareResult::Unknown;
     else
     {
+        // TODO: Object compare
         rt.throw_exception("Cannot compare values of type " + real_lhs.type_string());
         return CompareResult::Unknown;
     }

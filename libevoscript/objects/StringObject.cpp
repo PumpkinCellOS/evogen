@@ -8,7 +8,6 @@ namespace evo::script
 
 Value StringObject::get(std::string const& member)
 {
-    NATIVE_FUNCTION(StringObject, "raw_string", raw_string);
     NATIVE_FUNCTION(StringObject, "length", length);
     NATIVE_FUNCTION(StringObject, "concat", concat);
     NATIVE_FUNCTION(StringObject, "substring", substring);
@@ -18,21 +17,12 @@ Value StringObject::get(std::string const& member)
 
 Value StringObject::to_primitive(Runtime& rt, Value::Type type) const
 {
-    if(type == Value::Type::String)
-        return raw_string(rt, *this, {});
-
-    // TODO: Int conversions?
     return {};
 }
 
 Value StringObject::operator_add(Runtime& rt, Value const& rhs) const
 {
-    return Value::new_object(std::make_shared<StringObject>(m_string + rhs.to_string()));
-}
-
-Value StringObject::raw_string(Runtime&, StringObject const& container, std::vector<Value> const& args)
-{
-    return Value::new_string(container.m_string);
+    return concat(rt, *this, {rhs});
 }
 
 Value StringObject::length(Runtime&, StringObject const& container, std::vector<Value> const& args)
@@ -42,12 +32,11 @@ Value StringObject::length(Runtime&, StringObject const& container, std::vector<
 
 Value StringObject::concat(Runtime& rt, StringObject const& container, std::vector<Value> const& args)
 {
-    Value result = Value::new_string(container.m_string);
+    std::string result = container.m_string;
     for(auto& arg: args)
-    {
-        result = abstract::add(rt, result, arg);
-    }
-    return result;
+        result += arg.to_string();
+
+    return Value::new_object(std::make_shared<StringObject>(result));
 }
 
 Value StringObject::substring(Runtime& rt, StringObject const& container, std::vector<Value> const& args)
@@ -87,20 +76,13 @@ Value StringObject::substring(Runtime& rt, StringObject const& container, std::v
         return {};
     }
 
-    return Value::new_string(seq_length == -1 ? container.m_string.substr(start) : container.m_string.substr(start, seq_length));
+    return Value::new_object(std::make_shared<StringObject>(seq_length == -1 ? container.m_string.substr(start) : container.m_string.substr(start, seq_length)));
 }
 
 Value StringObject::append(Runtime& rt, StringObject& container, std::vector<Value> const& args)
 {
-    Value result = Value::new_string(container.m_string);
     for(auto& arg: args)
-    {
-        result = abstract::add(rt, result, arg);
-    }
-    auto result_string = result.to_string();
-    if(rt.has_exception())
-        return {};
-    container.m_string = std::move(result_string);
+        container.m_string.append(arg.to_string());
 
     // TODO: Return reference to this
     return Value::undefined();

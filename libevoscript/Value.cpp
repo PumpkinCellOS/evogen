@@ -23,8 +23,6 @@ std::string Value::type_to_string(Type type)
         return "undefined";
     case Type::Int:
         return "int";
-    case Type::String:
-        return "string";
     case Type::Bool:
         return "bool";
     case Type::Object:
@@ -48,16 +46,6 @@ int Value::to_int(Runtime& rt) const
         return 0;
     case Type::Int:
         return m_int_value;
-    case Type::String:
-        try
-        {
-            return std::stoi(m_string_value);
-        }
-        catch(...)
-        {
-            rt.throw_exception("Cannot convert string '" + m_string_value + "' to int");
-            return {};
-        }
     case Type::Bool:
         return m_bool_value ? 1 : 0;
     case Type::Reference:
@@ -79,8 +67,6 @@ bool Value::to_bool(Runtime& rt) const
         return true;
     case Type::Int:
         return m_int_value != 0;
-    case Type::String:
-        return m_string_value == "1" || m_string_value == "true";
     case Type::Bool:
         return m_bool_value;
     case Type::Reference:
@@ -101,8 +87,6 @@ std::shared_ptr<Object> Value::to_object(Runtime& rt) const
     case Type::Bool:
         rt.throw_exception("Cannot convert " + type_to_string(m_type) + " to object");
         return nullptr;
-    case Type::String:
-        return std::make_shared<StringObject>(m_string_value);
     case Type::Object:
         assert(m_object_value);
         return m_object_value;
@@ -125,8 +109,6 @@ std::string Value::to_string() const
         return "undefined";
     case Type::Int:
         return std::to_string(m_int_value);
-    case Type::String:
-        return m_string_value;
     case Type::Bool:
         return m_bool_value ? "true" : "false";
     case Type::Reference:
@@ -134,7 +116,7 @@ std::string Value::to_string() const
         return m_reference_value->value().to_string();
     case Type::Object:
         assert(m_object_value);
-        return "[object " + m_object_value->type_name() + "]";
+        return m_object_value->to_string();
     default: assert(false);
     }
 }
@@ -146,7 +128,6 @@ std::shared_ptr<MemoryValue> Value::to_reference(Runtime& rt) const
     case Type::Null:
     case Type::Undefined:
     case Type::Int:
-    case Type::String:
     case Type::Bool:
     case Type::Object:
         rt.throw_exception("Cannot bind " + type_to_string(m_type) + " to reference");
@@ -170,9 +151,6 @@ std::string Value::dump_string() const
         break;
     case Type::Int:
         oss << ": " << m_int_value;
-        break;
-    case Type::String:
-        oss << ": \"" << m_string_value << "\"";
         break;
     case Type::Bool:
         oss << ": " << (m_bool_value ? "true" : "false");
@@ -203,8 +181,6 @@ std::string Value::repl_string() const
         return "undefined";
     case Type::Int:
         return std::to_string(m_int_value);
-    case Type::String:
-        return "\"" + m_string_value + "\"";
     case Type::Bool:
         return m_bool_value ? "true" : "false";
     case Type::Reference:
@@ -247,9 +223,6 @@ void Value::assign_direct(Value const& other)
         break;
     case Type::Int:
         m_int_value = other.m_int_value;
-        break;
-    case Type::String:
-        m_string_value = other.m_string_value;
         break;
     case Type::Bool:
         m_bool_value = other.m_bool_value;

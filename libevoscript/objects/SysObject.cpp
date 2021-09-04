@@ -2,6 +2,7 @@
 
 #include <libevoscript/NativeFunction.h>
 #include <libevoscript/Runtime.h>
+#include <libevoscript/objects/StringObject.h>
 
 #include <iostream>
 
@@ -40,7 +41,7 @@ Value SysObject::read(Runtime& rt, SysObject&, std::vector<Value> const& args)
         rt.throw_exception("Failed to read from stream");
         return {};
     }
-    return Value::new_string(out);
+    return Value::new_object(std::make_shared<StringObject>(out));
 }
 
 Value SysObject::write(Runtime& rt, SysObject&, std::vector<Value> const& args)
