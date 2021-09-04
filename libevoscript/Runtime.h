@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libevoscript/CallStack.h>
 #include <libevoscript/ExecutionContext.h>
 #include <libevoscript/Value.h>
 #include <libevoscript/objects/GlobalObject.h>
@@ -10,6 +11,8 @@
 namespace evo::script
 {
 
+class Exception;
+
 class Runtime
 {
 public:
@@ -17,27 +20,29 @@ public:
     ~Runtime();
 
     void throw_exception(std::string const& message);
-    void clear_exception() { m_exception_message = ""; }
+    void clear_exception() { m_exception.reset(); }
 
-    bool has_exception() const { return !m_exception_message.empty(); }
-    std::string exception_message() const { return m_exception_message; }
+    bool has_exception() const { return !!m_exception; }
+    std::shared_ptr<Exception> exception() const { return m_exception; }
+
+    CallStack const& call_stack() const { return m_call_stack; }
+    CallStack& call_stack() { return m_call_stack; }
+
+    template<class T = Object>
+    std::shared_ptr<T> this_object() { return call_stack().current_execution_context().this_object<T>(); }
+
+    std::shared_ptr<LocalObject> local_scope_object() { return call_stack().current_execution_context().local_scope_object(); }
+    std::shared_ptr<GlobalObject> global_object() { return m_global_object; }
+    void print_backtrace() const;
 
     ExecutionContext& push_execution_context(std::string const& name, std::shared_ptr<Object> this_object);
     ExecutionContext& push_scope();
     ExecutionContext& current_execution_context();
     void pop_execution_context();
 
-    void print_backtrace();
-
-    template<class T = Object>
-    std::shared_ptr<T> this_object() { return current_execution_context().this_object<T>(); }
-
-    std::shared_ptr<LocalObject> local_scope_object() { return current_execution_context().local_scope_object(); }
-    std::shared_ptr<GlobalObject> global_object() { return m_global_object; }
-
 private:
-    std::string m_exception_message;
-    std::deque<ExecutionContext> m_execution_context_stack;
+    std::shared_ptr<Exception> m_exception;
+    CallStack m_call_stack;
     std::shared_ptr<GlobalObject> m_global_object;
     std::shared_ptr<MemoryValue> m_global_this;
 };

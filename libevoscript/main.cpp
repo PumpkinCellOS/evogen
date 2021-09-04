@@ -1,6 +1,7 @@
 #include <libevoscript/NativeFunction.h>
 #include <libevoscript/Value.h>
 #include <libevoscript/Lexer.h>
+#include <libevoscript/objects/Exception.h>
 #include <libevoscript/objects/MapObject.h>
 
 #include <fstream>
@@ -97,7 +98,7 @@ bool run_code_from_stream(Runtime& rt, std::istream& input)
     auto value = program->evaluate(rt);
     if(rt.has_exception())
     {
-        std::cerr << "\e[31mException: \e[0m" + rt.exception_message() << std::endl;
+        rt.exception()->print();
         rt.clear_exception();
         return false;
     }
