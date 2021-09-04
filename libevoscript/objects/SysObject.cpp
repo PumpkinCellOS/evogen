@@ -28,6 +28,7 @@ Value SysObject::get(std::string const& member)
         ::exit(exit_code);
         assert(false);
     });
+    NATIVE_FUNCTION(SysObject, "backtrace", backtrace);
     return Value::undefined();
 }
 
@@ -53,6 +54,12 @@ Value SysObject::write(Runtime& rt, SysObject&, std::vector<Value> const& args)
         }
     }
     std::cout << std::endl;
+    return Value::undefined();
+}
+
+Value SysObject::backtrace(Runtime& rt, SysObject&, std::vector<Value> const&)
+{
+    rt.print_backtrace();
     return Value::undefined();
 }
 

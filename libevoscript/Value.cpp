@@ -282,6 +282,14 @@ Value Value::call(Runtime& rt, std::vector<Value> const& arguments)
     return real_value.get_object()->call(rt, m_container ? *m_container : *real_value.get_object(), arguments);
 }
 
+std::string Value::name() const
+{
+    auto real_value = dereferenced();
+    if(!real_value.is_object())
+        return "?";
+    return real_value.get_object()->name();
+}
+
 std::ostream& operator<<(std::ostream& stream, Value const& value)
 {
     return stream << value.dump_string(); 

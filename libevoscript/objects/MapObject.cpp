@@ -8,12 +8,9 @@ namespace evo::script
 
 Value MapObject::get(std::string const& member)
 {
-    if(member == "length")
-    {
-        return Value::new_object(std::make_shared<NativeFunction<MapObject>>([](Runtime& rt, MapObject& container, std::vector<Value> const&)->Value {
-            return Value::new_int(container.m_values.size());
-        }));
-    }
+    NATIVE_FUNCTION(MapObject, "length", [](Runtime& rt, MapObject& container, std::vector<Value> const&)->Value {
+        return Value::new_int(container.m_values.size());
+    });
 
     auto it = m_values.find(member);
     if(it == m_values.end())

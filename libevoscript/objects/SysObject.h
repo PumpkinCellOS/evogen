@@ -19,6 +19,8 @@ private:
     // Write objects (using to_string) to stdout, space-separated.
     // function write(values... : Value) : undefined
     static Value write(Runtime& rt, SysObject& container, std::vector<Value> const& args);
+
+    static Value backtrace(Runtime& rt, SysObject& container, std::vector<Value> const& args);
 };
 
 }

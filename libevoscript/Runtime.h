@@ -22,10 +22,12 @@ public:
     bool has_exception() const { return !m_exception_message.empty(); }
     std::string exception_message() const { return m_exception_message; }
 
-    ExecutionContext& push_execution_context(std::shared_ptr<Object> this_object);
+    ExecutionContext& push_execution_context(std::string const& name, std::shared_ptr<Object> this_object);
     ExecutionContext& push_scope();
     ExecutionContext& current_execution_context();
     void pop_execution_context();
+
+    void print_backtrace();
 
     template<class T = Object>
     std::shared_ptr<T> this_object() { return current_execution_context().this_object<T>(); }
@@ -35,7 +37,7 @@ public:
 
 private:
     std::string m_exception_message;
-    std::stack<ExecutionContext> m_execution_context_stack;
+    std::deque<ExecutionContext> m_execution_context_stack;
     std::shared_ptr<GlobalObject> m_global_object;
     std::shared_ptr<MemoryValue> m_global_this;
 };

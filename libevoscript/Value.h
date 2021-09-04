@@ -81,6 +81,7 @@ public:
     Value dereferenced() const;
 
     Value call(Runtime&, std::vector<Value> const& arguments);
+    std::string name() const;
     std::shared_ptr<Object> container() const { return m_container; }
     void set_container(std::shared_ptr<Object> object) { m_container = object; }
 

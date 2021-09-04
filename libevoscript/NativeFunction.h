@@ -14,8 +14,8 @@ public:
     using ContainerType = T;
     using FunctionType = std::function<Value(Runtime&, ContainerType& container, std::vector<Value> const& args)>;
 
-    NativeFunction(FunctionType&& function)
-    : m_function(function) {}
+    NativeFunction(std::string const& name, FunctionType&& function)
+    : Function(name), m_function(function) {}
 
     static Value create_value(FunctionType&& function)
     {
@@ -40,10 +40,10 @@ private:
     FunctionType m_function;
 };
 
-#define NATIVE_FUNCTION(ContainerType, script_name, internal_name)                                      \
-    do {                                                                                                \
-        if(member == script_name)                                                                        \
-            return Value::new_object(std::make_shared<NativeFunction<ContainerType>>(internal_name));   \
+#define NATIVE_FUNCTION(ContainerType, script_name, internal_name)                                                      \
+    do {                                                                                                                \
+        if(member == script_name)                                                                                       \
+            return Value::new_object(std::make_shared<NativeFunction<ContainerType>>(script_name, internal_name));      \
     } while(false)
 
 }

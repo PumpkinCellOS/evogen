@@ -22,7 +22,7 @@ Runtime::Runtime(std::shared_ptr<GlobalObject> global_object, std::shared_ptr<Me
         m_global_this = MemoryValue::create_object<MapObject>();
     }
 
-    auto& context = push_execution_context(m_global_this->value().to_object(*this));
+    auto& context = push_execution_context("<global scope>", m_global_this->value().to_object(*this));
     if(has_exception())
         return;
 
@@ -55,29 +55,38 @@ void Runtime::throw_exception(std::string const& message)
     std::cerr << "evoscript: VM EXCEPTION: " << message << std::endl;
 }
 
-ExecutionContext& Runtime::push_execution_context(std::shared_ptr<Object> this_object)
+ExecutionContext& Runtime::push_execution_context(std::string const& name, std::shared_ptr<Object> this_object)
 {
     if(!this_object)
     {
         assert(m_global_this->value().is_object());
         this_object = m_global_this->value().get_object();
     }
-    return m_execution_context_stack.emplace(this_object, nullptr);
+    return m_execution_context_stack.emplace_front(name, this_object, nullptr);
 }
 
 ExecutionContext& Runtime::push_scope()
 {
-    return m_execution_context_stack.emplace(this_object(), current_execution_context().local_scope_object());
+    return m_execution_context_stack.emplace_front("", this_object(), current_execution_context().local_scope_object());
 }
 
 ExecutionContext& Runtime::current_execution_context()
 {
-    return m_execution_context_stack.top();
+    return m_execution_context_stack.front();
 }
 
 void Runtime::pop_execution_context()
 {
-    m_execution_context_stack.pop();
+    m_execution_context_stack.pop_front();
+}
+
+void Runtime::print_backtrace()
+{
+    for(auto& it: m_execution_context_stack)
+    {
+        if(!it.parent_scope())
+            std::cerr << "    at " << it.name() << std::endl;
+    }
 }
 
 }

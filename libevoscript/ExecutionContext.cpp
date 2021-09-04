@@ -7,15 +7,14 @@
 namespace evo::script
 {
 
-ExecutionContext::ExecutionContext(std::shared_ptr<Object> this_object, std::shared_ptr<LocalObject> parent_scope)
+ExecutionContext::ExecutionContext(std::string const& name, std::shared_ptr<Object> this_object, std::shared_ptr<LocalObject> parent_scope)
+:  m_this(this_object), m_local_scope(std::make_shared<LocalObject>(parent_scope)), m_name(name)
 {
     assert(this_object);
-    m_this = this_object;
-    m_local_scope = std::make_shared<LocalObject>(parent_scope);
 }
 
-ScopedExecutionContext::ScopedExecutionContext(Runtime& rt, std::shared_ptr<Object> this_object)
-: m_rt(rt), m_context(rt.push_execution_context(this_object)) {}
+ScopedExecutionContext::ScopedExecutionContext(Runtime& rt, std::string const& name, std::shared_ptr<Object> this_object)
+: m_rt(rt), m_context(rt.push_execution_context(name, this_object)) {}
 
 ScopedExecutionContext::~ScopedExecutionContext()
 {

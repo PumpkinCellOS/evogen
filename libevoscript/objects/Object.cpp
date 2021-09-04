@@ -2,6 +2,7 @@
 
 #include <libevoscript/NativeFunction.h>
 #include <libevoscript/Runtime.h>
+#include <libevoscript/objects/StringObject.h>
 
 #include <sstream>
 
@@ -20,8 +21,9 @@ Value Object::operator_add(Runtime& rt, Value const& rhs) const
     return {};
 }
 
-Value Function::get(std::string const&)
+Value Function::get(std::string const& member)
 {
+    NATIVE_OBJECT(object, "name", std::make_shared<StringObject>(m_name));
     return Value::undefined();
 }
 

@@ -26,14 +26,23 @@ public:
     virtual Value to_primitive(Runtime&, Value::Type) const { return {}; }
     // function operator+(rhs: Value) : Value
     virtual Value operator_add(Runtime& rt, Value const& rhs) const;
+    // function name(): Value // this is already done for Function
+    virtual std::string name() const { return "object"; }
 };
 
 class Function : public Object
 {
 public:
+    Function(std::string const& name)
+    : m_name(name) {}
+
     virtual Value get(std::string const& member) override;
     virtual std::string type_name() const override { return "Function"; }
-    virtual std::string repl_string() const override { return "function() {}"; }
+    virtual std::string repl_string() const override { return "function " + m_name + "()"; }
+    virtual std::string name() const override { return m_name; }
+
+private:
+    std::string m_name;
 };
 
 #define NATIVE_OBJECT(type, script_name, internal_name) \
