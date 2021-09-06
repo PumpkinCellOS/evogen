@@ -60,6 +60,8 @@ public:
         return absolute - m_position;
     }
 
+    Vector<int> value() const { return m_position; }
+
 private:
     static std::string coord_to_string(int value)
     {
