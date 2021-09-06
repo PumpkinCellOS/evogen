@@ -20,9 +20,19 @@ public:
         return {x+other.x, y+other.y, z+other.z};
     }
 
+    Vector& operator+=(Vector const& other) 
+    {
+        *this = *this + other;
+    }
+
     Vector operator-(Vector const& other) const
     {
         return {x-other.x, y-other.y, z-other.z};
+    }
+
+    Vector& operator-=(Vector const& other) 
+    {
+        *this = *this - other;
     }
 
     Vector operator*(double value) const
