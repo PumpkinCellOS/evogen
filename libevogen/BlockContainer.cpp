@@ -111,14 +111,14 @@ void BlockContainer::place_structure(Structure const& structure, Vector<int> con
 
 void BlockContainer::load_markers_from_image(Image const& image, int y, Vector<int> const& offset)
 {
-    assert(image.channels() == 4);
+    assert(image.channels() >= 3);
     std::cerr << "Loading markers from image " << image.to_string() << std::endl;
     for(int x = 0; x < image.size().x; x++)
     {
         for(int z = 0; z < image.size().y; z++)
         {
             auto pixel = image.pixel({x, z});
-            if(pixel.a >= 128)
+            if((image.channels() == 4 && pixel.a >= 128) || image.channels() == 3)
             {
                 BlockDescriptor descriptor{BlockDescriptor::Marker, {}, marker_index_from_color(pixel)};
                 set_block_descriptor_at({x + offset.x, y + offset.y, z + offset.z}, descriptor);
