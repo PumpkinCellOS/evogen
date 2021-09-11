@@ -1,6 +1,7 @@
 #pragma once
 
 #include <compare>
+#include <evoscript/EvalResult.h>
 #include <evoscript/SourceLocation.h>
 #include <evoscript/Value.h>
 
@@ -54,7 +55,7 @@ public:
     ASTNode() = default;
     ASTNode(ASTNode const&) = delete;
 
-    virtual Value evaluate(Runtime&) const = 0;
+    virtual EvalResult evaluate(Runtime&) const = 0;
 
     bool is_error() const { return !m_errors.empty(); }
     ErrorList errors() const { return m_errors; }
@@ -107,7 +108,7 @@ public:
 
     Expression() = default;
 
-    virtual Value evaluate(Runtime&) const override { return {}; }
+    virtual EvalResult evaluate(Runtime&) const override { return {}; }
 };
 
 class IntegerLiteral : public Expression
@@ -119,7 +120,7 @@ public:
     IntegerLiteral(int value)
     : m_value(value) {}
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
 
     virtual std::string to_string() const override
     {
@@ -142,7 +143,7 @@ public:
     StringLiteral(std::string const& value)
     : m_value(value) {}
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
 
     virtual std::string to_string() const override
     {
@@ -165,7 +166,7 @@ public:
     Identifier(std::string const& name)
     : m_name(name) {}
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
 
     virtual std::string to_string() const override
     {
@@ -198,7 +199,7 @@ public:
     SpecialValue(Type type)
     : m_type(type) {}
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
 
     virtual std::string to_string() const override
     {
@@ -221,7 +222,7 @@ public:
     MemberExpression(std::shared_ptr<Expression> expression, std::string const& name)
     : m_expression(expression), m_name(name) {}
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
 
     std::shared_ptr<Expression> this_expression() const { return m_expression; }
 
@@ -247,7 +248,7 @@ public:
     FunctionCall(std::shared_ptr<Expression> callable, std::vector<std::shared_ptr<Expression>> const& arguments)
     : m_callable(callable), m_arguments(std::move(arguments)) {}
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
 
     virtual std::string to_string() const override
     {
@@ -286,7 +287,7 @@ public:
     UnaryExpression(std::shared_ptr<Expression> expression, Operation operation)
     : m_expression(expression), m_operation(operation) {}
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
 
     virtual std::string to_string() const override
     {
@@ -343,7 +344,7 @@ public:
     AssignmentExpression(std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs, Operation operation)
     : BinaryExpression(lhs, rhs), m_operation(operation) {}
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
 
     static std::string operation_string(Operation op)
     {
@@ -399,7 +400,7 @@ public:
     NormalBinaryExpression(std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs, Operation operation)
     : BinaryExpression(lhs, rhs), m_operation(operation) {}
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
 
     static std::string operation_string(Operation op)
     {
@@ -445,7 +446,7 @@ public:
     FunctionExpression(std::string const& name, std::shared_ptr<BlockStatement> body)
     : m_name(name), m_body(body) {}
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
     virtual std::string to_string() const override;
 
     std::string name() const { return m_name; }
@@ -477,7 +478,7 @@ public:
     ExpressionStatement(std::shared_ptr<Expression> expression)
     : m_expression(expression) { assert(expression); }
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
 
     virtual std::string to_string() const override
     {
@@ -499,7 +500,7 @@ public:
 
     BlockStatement() = default;
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
     virtual bool requires_semicolon() const override { return false; }
 
     virtual std::string to_string() const override
@@ -518,7 +519,7 @@ public:
     IfStatement(std::shared_ptr<Expression> condition, std::shared_ptr<Statement> true_statement)
     : m_condition(condition), m_true_statement(true_statement) {}
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
     virtual bool requires_semicolon() const override
     {
         assert(m_true_statement);
@@ -548,7 +549,7 @@ public:
     VariableDeclaration(std::string const& name, std::shared_ptr<Expression> initializer)
     : m_name(name), m_initializer(initializer) {}
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
 
 private:
     std::string m_name;
@@ -564,7 +565,7 @@ public:
     FunctionDeclaration(std::shared_ptr<FunctionExpression> expression)
     : m_expression(expression) {}
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
 
 private:
     std::shared_ptr<FunctionExpression> m_expression;
@@ -578,7 +579,7 @@ public:
 
     Program() = default;
 
-    virtual Value evaluate(Runtime&) const override;
+    virtual EvalResult evaluate(Runtime&) const override;
 };
 
 std::ostream& operator<<(std::ostream& stream, ASTNode& node);

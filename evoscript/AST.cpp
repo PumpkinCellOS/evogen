@@ -14,17 +14,17 @@
 namespace evo::script
 {
 
-Value IntegerLiteral::evaluate(Runtime&) const
+EvalResult IntegerLiteral::evaluate(Runtime&) const
 {
     return Value::new_int(m_value);
 }
 
-Value StringLiteral::evaluate(Runtime&) const
+EvalResult StringLiteral::evaluate(Runtime&) const
 {
     return Value::new_object(std::make_shared<StringObject>(m_value));
 }
 
-Value Identifier::evaluate(Runtime& rt) const
+EvalResult Identifier::evaluate(Runtime& rt) const
 {
     auto local_scope_object = rt.current_execution_context().local_scope_object();
     auto value = local_scope_object->get(m_name);
@@ -64,7 +64,7 @@ Value Identifier::evaluate(Runtime& rt) const
     return new_value;
 }
 
-Value SpecialValue::evaluate(Runtime& rt) const
+EvalResult SpecialValue::evaluate(Runtime& rt) const
 {
     switch(m_type)
     {
@@ -85,9 +85,9 @@ Value SpecialValue::evaluate(Runtime& rt) const
     }
 }
 
-Value MemberExpression::evaluate(Runtime& rt) const
+EvalResult MemberExpression::evaluate(Runtime& rt) const
 {
-    auto value = m_expression->evaluate(rt);
+    Value value = m_expression->evaluate(rt);
     if(rt.has_exception())
         return {}; // Error evaluating LHS
 
@@ -104,16 +104,16 @@ Value MemberExpression::evaluate(Runtime& rt) const
     return member;
 }
 
-Value FunctionCall::evaluate(Runtime& rt) const
+EvalResult FunctionCall::evaluate(Runtime& rt) const
 {
-    auto callable = m_callable->evaluate(rt);
+    Value callable = m_callable->evaluate(rt);
     if(rt.has_exception())
         return {}; // failed to evaluate callable
     
     std::vector<Value> arguments;
     for(auto& expr: m_arguments)
     {
-        auto value = expr->evaluate(rt);
+        Value value = expr->evaluate(rt);
         if(rt.has_exception())
             return {}; // failed to evaluate argument;
 
@@ -123,7 +123,7 @@ Value FunctionCall::evaluate(Runtime& rt) const
     return callable.call(rt, arguments);
 }
 
-Value UnaryExpression::evaluate(Runtime& rt) const
+EvalResult UnaryExpression::evaluate(Runtime& rt) const
 {
     auto value = m_expression->evaluate(rt);
     if(rt.has_exception())
@@ -163,13 +163,13 @@ Value UnaryExpression::evaluate(Runtime& rt) const
     return result;
 }
 
-Value AssignmentExpression::evaluate(Runtime& rt) const
+EvalResult AssignmentExpression::evaluate(Runtime& rt) const
 {
-    auto lhs = m_lhs->evaluate(rt);
+    Value lhs = m_lhs->evaluate(rt);
     if(rt.has_exception())
         return {}; // Error evaluating LHS
     
-    auto rhs = m_rhs->evaluate(rt);
+    Value rhs = m_rhs->evaluate(rt);
     if(rt.has_exception())
         return {}; // Error evaluating RHS
 
@@ -214,13 +214,13 @@ Value AssignmentExpression::evaluate(Runtime& rt) const
     return Value::new_reference(reference);
 }
 
-Value NormalBinaryExpression::evaluate(Runtime& rt) const
+EvalResult NormalBinaryExpression::evaluate(Runtime& rt) const
 {
-    auto lhs = m_lhs->evaluate(rt);
+    Value lhs = m_lhs->evaluate(rt);
     if(rt.has_exception())
         return {}; // Error evaluating LHS
     
-    auto rhs = m_rhs->evaluate(rt);
+    Value rhs = m_rhs->evaluate(rt);
     if(rt.has_exception())
         return {}; // Error evaluating RHS
 
@@ -291,7 +291,7 @@ Value NormalBinaryExpression::evaluate(Runtime& rt) const
     return result;
 }
 
-Value FunctionExpression::evaluate(Runtime& rt) const
+EvalResult FunctionExpression::evaluate(Runtime& rt) const
 {
     return Value::new_object(std::make_shared<ASTFunction>(m_name, m_body));
 }
@@ -304,12 +304,12 @@ std::string FunctionExpression::to_string() const
     return "FunctionExpression(" + m_name + " {" + m_body->to_string() + "})";
 }
 
-Value ExpressionStatement::evaluate(Runtime& rt) const
+EvalResult ExpressionStatement::evaluate(Runtime& rt) const
 {
     return m_expression->evaluate(rt);
 }
 
-Value BlockStatement::evaluate(Runtime& rt) const
+EvalResult BlockStatement::evaluate(Runtime& rt) const
 {
     // TODO: Add some "inheritance" mechanism for block statement nodes
     Scope scope(rt);
@@ -323,9 +323,9 @@ Value BlockStatement::evaluate(Runtime& rt) const
     return val;
 }
 
-Value IfStatement::evaluate(Runtime& rt) const
+EvalResult IfStatement::evaluate(Runtime& rt) const
 {
-    auto condition = m_condition->evaluate(rt);
+    Value condition = m_condition->evaluate(rt);
     if(rt.has_exception())
         return {};
     
@@ -337,7 +337,7 @@ Value IfStatement::evaluate(Runtime& rt) const
         return Value::undefined();
 }
 
-Value VariableDeclaration::evaluate(Runtime& rt) const
+EvalResult VariableDeclaration::evaluate(Runtime& rt) const
 {
     // TODO: Don't allow redefinition in the same scope
     auto local_scope = rt.local_scope_object();
@@ -357,7 +357,7 @@ Value VariableDeclaration::evaluate(Runtime& rt) const
     return Value::new_reference(memory_value);
 }
 
-Value FunctionDeclaration::evaluate(Runtime& rt) const
+EvalResult FunctionDeclaration::evaluate(Runtime& rt) const
 {
     // TODO: Don't allow redefinition in the same scope
     auto result = m_expression->evaluate(rt);
@@ -365,12 +365,12 @@ Value FunctionDeclaration::evaluate(Runtime& rt) const
         return {};
 
     // HACK: This should have its AO
-    Identifier(m_expression->name()).evaluate(rt).assign(rt, result);
+    Identifier(m_expression->name()).evaluate(rt).value().assign(rt, result);
 
     return result;
 }
 
-Value Program::evaluate(Runtime& rt) const
+EvalResult Program::evaluate(Runtime& rt) const
 {
     Value val;
     for(auto& it: m_nodes)

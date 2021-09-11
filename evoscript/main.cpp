@@ -105,7 +105,7 @@ bool run_code_from_stream(Runtime& rt, std::istream& input)
     else
     {
         // TODO: Do not print escape sequences if not running in tty
-        value.repl_print(std::cout, true);
+        value.value().repl_print(std::cout, true);
         std::cout << std::endl;
     }
     return true;
