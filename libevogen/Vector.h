@@ -22,7 +22,7 @@ public:
 
     Vector& operator+=(Vector const& other) 
     {
-        *this = *this + other;
+        return *this = *this + other;
     }
 
     Vector operator-(Vector const& other) const
@@ -32,7 +32,7 @@ public:
 
     Vector& operator-=(Vector const& other) 
     {
-        *this = *this - other;
+        return *this = *this - other;
     }
 
     Vector operator*(double value) const
