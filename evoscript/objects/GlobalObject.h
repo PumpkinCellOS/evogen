@@ -10,11 +10,6 @@ class GlobalObject : public Object
 {
 public:
     GlobalObject();
-
-    virtual Value get(std::string const& member) override;
-
-private:
-    std::shared_ptr<SysObject> m_sys;
 };
 
 }
