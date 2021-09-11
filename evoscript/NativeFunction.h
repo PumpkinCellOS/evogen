@@ -46,4 +46,7 @@ private:
             return Value::new_object(std::make_shared<NativeFunction<ContainerType>>(script_name, internal_name));      \
     } while(false)
 
+#define DEFINE_NATIVE_FUNCTION(ContainerType, script_name, internal_name) \
+    define_read_only_object_property<NativeFunction<ContainerType>>(script_name, script_name, internal_name)
+
 }
