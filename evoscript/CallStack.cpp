@@ -1,5 +1,7 @@
 #include <evoscript/CallStack.h>
 
+#include <evoscript/EscapeSequences.h>
+
 #include <iostream>
 
 namespace evo::script
@@ -7,10 +9,11 @@ namespace evo::script
 
 void CallStack::print(std::ostream& stream) const
 {
+    using namespace escapes;
     for(auto& it: m_call_stack)
     {
         if(!it.parent_scope())
-            stream << "    at " << it.name() << std::endl;
+            stream << "    at " << name(it.name()) << std::endl;
     }
 }
 

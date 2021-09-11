@@ -105,9 +105,8 @@ bool run_code_from_stream(Runtime& rt, std::istream& input)
     else
     {
         // TODO: Do not print escape sequences if not running in tty
-        std::cout << "\e[1m";
         value.repl_print(std::cout, true);
-        std::cout << "\e[0m" << std::endl;
+        std::cout << std::endl;
     }
     return true;
 }

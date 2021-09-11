@@ -67,7 +67,7 @@ public:
     Function(std::string const& name);
 
     virtual std::string type_name() const override { return "Function"; }
-    virtual void repl_print(std::ostream& output, bool print_members) const override { output << "function " << m_name << "()"; }
+    virtual void repl_print(std::ostream& output, bool print_members) const override;
     virtual std::string name() const override { return m_name; }
 
 private:

@@ -1,5 +1,6 @@
 #include <evoscript/Value.h>
 
+#include <evoscript/EscapeSequences.h>
 #include <evoscript/NativeFunction.h>
 #include <evoscript/Runtime.h>
 #include <evoscript/objects/Object.h>
@@ -184,22 +185,23 @@ std::string Value::dump_string() const
 
 void Value::repl_print(std::ostream& output, bool print_members) const
 {
+    using namespace escapes;
     switch(m_type)
     {
     case Type::Invalid:
-        output << "<invalid>";
+        output << error("<invalid>") << sgr_reset();
         break;
     case Type::Null:
-        output << "null";
+        output << constant("null") << sgr_reset();
         break;
     case Type::Undefined:
-        output << "undefined";
+        output << constant("undefined") << sgr_reset();
         break;
     case Type::Int:
-        output << std::to_string(m_int_value);
+        output << literal(std::to_string(m_int_value)) << sgr_reset();
         break;
     case Type::Bool:
-        output << (m_bool_value ? "true" : "false");
+        output << constant(m_bool_value ? "true" : "false") << sgr_reset();
         break;
     case Type::Reference:
         assert(m_reference_value);

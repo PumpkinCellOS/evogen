@@ -1,5 +1,6 @@
 #include <evoscript/objects/Exception.h>
 
+#include <evoscript/EscapeSequences.h>
 #include <evoscript/NativeFunction.h>
 #include <evoscript/objects/StringObject.h>
 #include <iostream>
@@ -17,7 +18,8 @@ Exception::Exception(Runtime& rt, std::string const& message)
 
 void Exception::repl_print(std::ostream& output, bool detailed) const
 {
-    output << "\e[1m" << type_name() << "\e[0m: " << m_message << std::endl;
+    using namespace escapes;
+    output << "\e[1m" << error(type_name()) << "\e[0m: " << m_message << std::endl;
     if(detailed)
         m_call_stack.print(output);
 }

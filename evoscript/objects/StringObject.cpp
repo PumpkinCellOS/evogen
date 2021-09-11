@@ -1,6 +1,7 @@
 #include <evoscript/objects/StringObject.h>
 
 #include <evoscript/AbstractOperations.h>
+#include <evoscript/EscapeSequences.h>
 #include <evoscript/NativeFunction.h>
 
 namespace evo::script
@@ -18,7 +19,8 @@ Value StringObject::get(std::string const& member)
 void StringObject::repl_print(std::ostream& output, bool) const
 {
     // TODO: Escape this string
-    output << "\"" << m_string << "\"";
+    using namespace escapes;
+    output << literal("\"" + m_string + "\"");
 }
 
 Value StringObject::to_primitive(Runtime& rt, Value::Type type) const

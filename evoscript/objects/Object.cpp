@@ -1,5 +1,6 @@
 #include <evoscript/objects/Object.h>
 
+#include <evoscript/EscapeSequences.h>
 #include <evoscript/NativeFunction.h>
 #include <evoscript/Runtime.h>
 #include <evoscript/objects/StringObject.h>
@@ -24,7 +25,8 @@ Value Object::get(std::string const& member)
 
 void Object::repl_print(std::ostream& output, bool print_members) const
 {
-    output << type_name() << " { ";
+    using namespace escapes;
+    output << type(type_name()) << " {";
     if(print_members)
     {
         if(!m_values.empty())
@@ -33,11 +35,11 @@ void Object::repl_print(std::ostream& output, bool print_members) const
         for(auto& value: m_values)
         {
             if(value.second->value().is_object() && value.second->value().get_object().get() == this)
-                output << "    " << value.first << ": <recursive reference>";
+                output << "    " << literal(value.first) << ": " << constant("<recursive reference>");
             else
             {
                 // TODO: Use dump_string if called from dump_string
-                output << "    " << value.first << ": ";
+                output << "    " << literal(value.first) << ": ";
                 value.second->repl_print(output, false);
             }
 
@@ -81,6 +83,12 @@ Function::Function(std::string const& name)
 : m_name(name)
 {
     DEFINE_NATIVE_OBJECT(object, "name", std::make_shared<StringObject>(m_name));
+}
+
+void Function::repl_print(std::ostream& output, bool print_members) const
+{
+    using namespace escapes;
+    output << keyword("function") << " " << escapes::name(m_name) << "()";
 }
 
 }
