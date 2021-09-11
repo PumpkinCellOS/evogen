@@ -10,10 +10,8 @@ namespace evo::script
 class Exception : public Object
 {
 public:
-    Exception(Runtime& rt, std::string const& message)
-    : m_call_stack(rt.call_stack()), m_message(message) {}
+    Exception(Runtime& rt, std::string const& message);
 
-    virtual Value get(std::string const& member) override;
     virtual void print();
     virtual std::string type_name() const override { return "Exception"; }
 

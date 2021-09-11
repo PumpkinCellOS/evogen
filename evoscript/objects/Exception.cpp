@@ -7,11 +7,11 @@
 namespace evo::script
 {
 
-Value Exception::get(std::string const& member)
+Exception::Exception(Runtime& rt, std::string const& message)
+: m_call_stack(rt.call_stack()), m_message(message)
 {
-    NATIVE_FUNCTION(Exception, "print", print_);
-    NATIVE_OBJECT(object, "message", std::make_shared<StringObject>(m_message));
-    return Value::undefined();
+    DEFINE_NATIVE_FUNCTION(Exception, "print", print_);
+    DEFINE_NATIVE_OBJECT(object, "message", std::make_shared<StringObject>(m_message));
 }
 
 void Exception::print()
