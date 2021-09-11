@@ -68,6 +68,8 @@ Value SpecialValue::evaluate(Runtime& rt) const
     {
     case This:
         return Value::new_reference(MemoryValue::create_existing_object(rt.current_execution_context().this_object()));
+    case Global:
+        return Value::new_reference(MemoryValue::create_existing_object(rt.global_object()));
     case Null:
         return Value::null();
     case True:

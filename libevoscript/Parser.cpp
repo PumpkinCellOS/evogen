@@ -97,6 +97,8 @@ std::shared_ptr<Expression> EVOParser::parse_special_value()
 
     if(name->value() == "this")
         return std::make_shared<SpecialValue>(SpecialValue::This);
+    if(name->value() == "global")
+        return std::make_shared<SpecialValue>(SpecialValue::Global);
     if(name->value() == "null")
         return std::make_shared<SpecialValue>(SpecialValue::Null);
     if(name->value() == "true")

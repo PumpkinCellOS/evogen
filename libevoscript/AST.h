@@ -186,6 +186,7 @@ public:
     enum Type
     {
         This,
+        Global,
         Null,
         True,
         False,
