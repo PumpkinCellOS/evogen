@@ -25,6 +25,19 @@ void StringObject::repl_print(std::ostream& output, bool) const
 
 Value StringObject::to_primitive(Runtime& rt, Value::Type type) const
 {
+    if(type == Value::Type::Int)
+    {
+        try
+        {
+            auto as_int = std::stoi(m_string);
+            return Value::new_int(as_int);
+        }
+        catch(...)
+        {
+            rt.throw_exception("Cannot convert '" + m_string + "' to int");
+            return {};
+        }
+    }
     return {};
 }
 

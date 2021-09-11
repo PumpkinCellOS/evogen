@@ -41,10 +41,10 @@ int Value::to_int(Runtime& rt) const
     {
     case Type::Null:
     case Type::Undefined:
-    case Type::Object:
-        // TODO: Allow conversion from objects
-        rt.throw_exception("Cannot convert " + type_to_string(m_type) + " to int");
         return 0;
+    case Type::Object:
+        assert(m_object_value);
+        return m_object_value->to_primitive(rt, Value::Type::Int).to_int(rt);
     case Type::Int:
         return m_int_value;
     case Type::Bool:
