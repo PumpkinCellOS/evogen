@@ -2,6 +2,8 @@
 
 #include <evoscript/AbstractOperations.h>
 #include <evoscript/ExecutionContext.h>
+#include <evoscript/NativeFunction.h>
+#include <evoscript/objects/ASTFunction.h>
 #include <evoscript/objects/Object.h>
 #include <evoscript/objects/StringObject.h>
 
@@ -289,6 +291,19 @@ Value NormalBinaryExpression::evaluate(Runtime& rt) const
     return result;
 }
 
+Value FunctionExpression::evaluate(Runtime& rt) const
+{
+    return Value::new_object(std::make_shared<ASTFunction>(m_name, m_body));
+}
+
+std::string FunctionExpression::to_string() const
+{
+    if(is_error())
+        return ASTNode::to_string();
+
+    return "FunctionExpression(" + m_name + " {" + m_body->to_string() + "})";
+}
+
 Value ExpressionStatement::evaluate(Runtime& rt) const
 {
     return m_expression->evaluate(rt);
@@ -324,6 +339,7 @@ Value IfStatement::evaluate(Runtime& rt) const
 
 Value VariableDeclaration::evaluate(Runtime& rt) const
 {
+    // TODO: Don't allow redefinition in the same scope
     auto local_scope = rt.local_scope_object();
     Value init_value;
     if(m_initializer)
@@ -339,6 +355,19 @@ Value VariableDeclaration::evaluate(Runtime& rt) const
         memory_value->value() = init_value;
     }
     return Value::new_reference(memory_value);
+}
+
+Value FunctionDeclaration::evaluate(Runtime& rt) const
+{
+    // TODO: Don't allow redefinition in the same scope
+    auto result = m_expression->evaluate(rt);
+    if(rt.has_exception())
+        return {};
+
+    // HACK: This should have its AO
+    Identifier(m_expression->name()).evaluate(rt).assign(rt, result);
+
+    return result;
 }
 
 Value Program::evaluate(Runtime& rt) const

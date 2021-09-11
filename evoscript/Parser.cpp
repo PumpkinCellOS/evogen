@@ -16,28 +16,33 @@ std::shared_ptr<Expression> EVOParser::parse_expression()
     return parse_assignment_expression();
 }
 
-// ( expression ) | integer_literal | string_literal | identifier | special_value
+// ( expression ) | function_expression | integer_literal | string_literal | identifier | special_value
 std::shared_ptr<Expression> EVOParser::parse_primary_expression()
 {
     auto paren_open = consume_of_type(Token::ParenOpen);
     if(!paren_open)
     {
         size_t off = offset();
-        auto literal = parse_integer_literal();
-        if(literal->is_error())
+        std::shared_ptr<Expression> literal = parse_function_expression();
+        if(!literal)
         {
             set_offset(off);
-            literal = parse_string_literal();
+            literal = parse_integer_literal();
             if(literal->is_error())
             {
                 set_offset(off);
-                literal = parse_special_value();
+                literal = parse_string_literal();
                 if(literal->is_error())
                 {
                     set_offset(off);
-                    literal = parse_identifier();
+                    literal = parse_special_value();
                     if(literal->is_error())
-                        return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Expected primary expression"));
+                    {
+                        set_offset(off);
+                        literal = parse_identifier();
+                        if(literal->is_error())
+                            return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Expected primary expression"));
+                    }
                 }
             }
         }
@@ -53,6 +58,36 @@ std::shared_ptr<Expression> EVOParser::parse_primary_expression()
         return std::make_shared<Expression>(ASTNode::Error(location(), "Unmatched '('"));
 
     return expression;
+}
+
+std::shared_ptr<FunctionExpression> EVOParser::parse_function_expression()
+{
+    auto function_keyword = consume_of_type(Token::Name);
+    if(!function_keyword || function_keyword->value() != "function")
+        return {};
+
+    auto name = consume_of_type(Token::Name);
+    std::string function_name;
+    if(name)
+        function_name = name->value();
+
+    auto paren_open = consume_of_type(Token::ParenOpen);
+    if(!paren_open)
+        return std::make_shared<FunctionExpression>(ASTNode::Error(location(), "Expected '('"));
+
+    // TODO: Arguments / formal parameters
+
+    auto paren_close = consume_of_type(Token::ParenClose);
+    if(!paren_close)
+        return std::make_shared<FunctionExpression>(ASTNode::Error(location(), "Expected '('"));
+
+    auto body = parse_block_statement();
+    if(!body)
+        return std::make_shared<FunctionExpression>(ASTNode::Error(location(), "Expected function body"));
+    if(body->ASTGroupNode::is_error())
+        return std::make_shared<FunctionExpression>(body->ASTGroupNode::errors());
+
+    return std::make_shared<FunctionExpression>(function_name, body);
 }
 
 std::shared_ptr<Expression> EVOParser::parse_integer_literal()
@@ -460,7 +495,12 @@ std::shared_ptr<Declaration> EVOParser::parse_declaration()
     if(!declaration)
     {
         set_offset(off);
-        return {};
+        declaration = parse_function_declaration();
+        if(!declaration)
+        {
+            set_offset(off);
+            return {};
+        }
     }
     return declaration;
 }
@@ -489,6 +529,16 @@ std::shared_ptr<VariableDeclaration> EVOParser::parse_variable_declaration()
     return std::make_shared<VariableDeclaration>(name->value(), initializer);
 }
 
+std::shared_ptr<FunctionDeclaration> EVOParser::parse_function_declaration()
+{
+    std::shared_ptr<FunctionExpression> expression = parse_function_expression();
+    if(!expression)
+        return {};
+    if(expression->is_error())
+        return std::make_shared<FunctionDeclaration>(expression->errors());
+    return std::make_shared<FunctionDeclaration>(expression);
+}
+
 std::shared_ptr<Statement> EVOParser::parse_expression_statement()
 {
     auto expression = parse_expression();
@@ -498,7 +548,7 @@ std::shared_ptr<Statement> EVOParser::parse_expression_statement()
     return std::make_shared<ExpressionStatement>(expression);
 }
 
-std::shared_ptr<Statement> EVOParser::parse_block_statement()
+std::shared_ptr<BlockStatement> EVOParser::parse_block_statement()
 {
     auto curly_open = consume_of_type(Token::CurlyOpen);
     if(!curly_open)
@@ -566,7 +616,7 @@ std::shared_ptr<Statement> EVOParser::parse_if_statement()
 std::shared_ptr<Statement> EVOParser::parse_statement()
 {
     size_t off = offset();
-    auto statement = parse_block_statement();
+    std::shared_ptr<Statement> statement = parse_block_statement();
     if(!statement)
     {
         set_offset(off);

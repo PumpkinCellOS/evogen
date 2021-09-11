@@ -1,7 +1,6 @@
 #pragma once
 
 #include <compare>
-#include <evoscript/Runtime.h>
 #include <evoscript/SourceLocation.h>
 #include <evoscript/Value.h>
 
@@ -435,6 +434,29 @@ private:
     Operation m_operation;
 };
 
+class BlockStatement;
+
+class FunctionExpression : public Expression
+{
+public:
+    FunctionExpression(ErrorList const& error)
+    : Expression(error) {}
+
+    FunctionExpression(std::string const& name, std::shared_ptr<BlockStatement> body)
+    : m_name(name), m_body(body) {}
+
+    virtual Value evaluate(Runtime&) const override;
+    virtual std::string to_string() const override;
+
+    std::string name() const { return m_name; }
+
+    virtual bool requires_semicolon() const { return false; }
+
+private:
+    std::string m_name;
+    std::shared_ptr<BlockStatement> m_body;
+};
+
 class Statement : public ASTNode
 {
 public:
@@ -479,6 +501,11 @@ public:
 
     virtual Value evaluate(Runtime&) const override;
     virtual bool requires_semicolon() const override { return false; }
+
+    virtual std::string to_string() const override
+    {
+        return "BlockStatement { TODO }";
+    }
 };
 
 class IfStatement : public Statement
@@ -526,6 +553,21 @@ public:
 private:
     std::string m_name;
     std::shared_ptr<Expression> m_initializer;
+};
+
+class FunctionDeclaration : public Declaration
+{
+public:
+    FunctionDeclaration(ErrorList const& error)
+    : Declaration(error) {}
+
+    FunctionDeclaration(std::shared_ptr<FunctionExpression> expression)
+    : m_expression(expression) {}
+
+    virtual Value evaluate(Runtime&) const override;
+
+private:
+    std::shared_ptr<FunctionExpression> m_expression;
 };
 
 class Program : public ASTGroupNode<Statement>
