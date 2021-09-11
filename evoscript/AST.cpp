@@ -293,7 +293,7 @@ EvalResult NormalBinaryExpression::evaluate(Runtime& rt) const
 
 EvalResult FunctionExpression::evaluate(Runtime& rt) const
 {
-    return Value::new_object(std::make_shared<ASTFunction>(m_name, m_body));
+    return Value::new_object(std::make_shared<ASTFunction>(m_name, m_body, m_arg_names));
 }
 
 std::string FunctionExpression::to_string() const

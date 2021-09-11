@@ -75,11 +75,29 @@ std::shared_ptr<FunctionExpression> EVOParser::parse_function_expression()
     if(!paren_open)
         return std::make_shared<FunctionExpression>(ASTNode::Error(location(), "Expected '('"));
 
-    // TODO: Arguments / formal parameters
+    // Arguments / formal parameters
+    std::vector<std::string> arg_names;
 
     auto paren_close = consume_of_type(Token::ParenClose);
     if(!paren_close)
-        return std::make_shared<FunctionExpression>(ASTNode::Error(location(), "Expected '('"));
+    {
+        while(true)
+        {
+            // TODO: Default values
+            auto name = consume_of_type(Token::Name);
+            if(!name)
+                return std::make_shared<FunctionExpression>(ASTNode::Error(location(), "Expected argument name"));
+            arg_names.push_back(name->value());
+
+            auto comma = consume_of_type(Token::Comma);
+            if(!comma)
+                break;
+        }
+        
+        paren_close = consume_of_type(Token::ParenClose);
+        if(!paren_close)
+            return std::make_shared<FunctionExpression>(ASTNode::Error(location(), "Unmatched '('"));
+    }
 
     auto body = parse_block_statement();
     if(!body)
@@ -87,7 +105,7 @@ std::shared_ptr<FunctionExpression> EVOParser::parse_function_expression()
     if(body->ASTGroupNode::is_error())
         return std::make_shared<FunctionExpression>(body->ASTGroupNode::errors());
 
-    return std::make_shared<FunctionExpression>(function_name, body);
+    return std::make_shared<FunctionExpression>(function_name, body, arg_names);
 }
 
 std::shared_ptr<Expression> EVOParser::parse_integer_literal()
