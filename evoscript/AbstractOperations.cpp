@@ -193,7 +193,7 @@ Value postfix_decrement(Runtime& rt, Value const& value)
 
 Value prefix_increment(Runtime& rt, Value const& value)
 {
-    auto reference = value.to_reference(rt);
+    auto reference = value.to_writable_reference(rt);
     if(rt.has_exception())
         return {};
 
@@ -201,13 +201,16 @@ Value prefix_increment(Runtime& rt, Value const& value)
     if(rt.has_exception())
         return {};
 
-    reference->value().assign(Value::new_int(value_int + 1));
+    reference->value().assign(rt, Value::new_int(value_int + 1));
+    if(rt.has_exception())
+        return {};
+
     return value;
 }
 
 Value prefix_decrement(Runtime& rt, Value const& value)
 {
-    auto reference = value.to_reference(rt);
+    auto reference = value.to_writable_reference(rt);
     if(rt.has_exception())
         return {};
 
@@ -215,7 +218,10 @@ Value prefix_decrement(Runtime& rt, Value const& value)
     if(rt.has_exception())
         return {};
 
-    reference->value().assign(Value::new_int(value_int - 1));
+    reference->value().assign(rt, Value::new_int(value_int - 1));
+    if(rt.has_exception())
+        return {};
+
     return value;
 }
 

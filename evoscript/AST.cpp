@@ -171,7 +171,7 @@ Value AssignmentExpression::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {}; // Error evaluating RHS
 
-    auto reference = lhs.to_reference(rt);
+    auto reference = lhs.to_writable_reference(rt);
     if(rt.has_exception())
         return {}; // LHS is not a reference
 
@@ -205,7 +205,10 @@ Value AssignmentExpression::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {};
 
-    lhs_value.assign(result);
+    lhs_value.assign(rt, result);
+    if(rt.has_exception())
+        return {};
+
     return Value::new_reference(reference);
 }
 

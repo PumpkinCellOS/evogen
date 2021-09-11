@@ -55,6 +55,7 @@ public:
     std::string to_string() const;
     std::shared_ptr<Object> to_object(Runtime&) const;
     std::shared_ptr<MemoryValue> to_reference(Runtime&) const;
+    std::shared_ptr<MemoryValue> to_writable_reference(Runtime&) const;
 
     std::string dump_string() const;
     std::string repl_string() const;
@@ -70,7 +71,7 @@ public:
     std::shared_ptr<Object> const& get_object() const { return m_object_value; }
     std::shared_ptr<MemoryValue> const& get_reference() const { return m_reference_value; }
 
-    void assign(Value const& other);
+    void assign(Runtime& rt, Value const& other);
     void assign_direct(Value const& other);
 
     Value dereferenced() const;

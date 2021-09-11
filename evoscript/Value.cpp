@@ -131,12 +131,25 @@ std::shared_ptr<MemoryValue> Value::to_reference(Runtime& rt) const
     case Type::Bool:
     case Type::Object:
         rt.throw_exception("Cannot bind " + type_to_string(m_type) + " to reference");
-        return nullptr;
+        return {};
     case Type::Reference:
         assert(m_reference_value);
         return m_reference_value;
     default: assert(false);
     }
+}
+
+std::shared_ptr<MemoryValue> Value::to_writable_reference(Runtime& rt) const
+{
+    auto value = to_reference(rt);
+    if(!value)
+        return value;
+    if(value->is_read_only())
+    {
+        rt.throw_exception("Cannot create writable reference for read-only object");
+        return {};
+    }
+    return value;
 }
 
 std::string Value::dump_string() const
@@ -193,12 +206,18 @@ std::string Value::repl_string() const
     }
 }
 
-void Value::assign(Value const& other)
+void Value::assign(Runtime& rt, Value const& other)
 {
     if(is_reference())
     {
         assert(m_reference_value);
-        get_reference()->value().assign(other);
+        auto memory_value = get_reference();
+        if(memory_value->is_read_only())
+        {
+            rt.throw_exception("Cannot assign to read-only object");
+            return;
+        }
+        memory_value->value().assign(rt, other);
         return;
     }
 
