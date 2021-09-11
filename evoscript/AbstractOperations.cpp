@@ -11,24 +11,23 @@ Value add(Runtime& rt, Value const& lhs, Value const& rhs)
 {
     auto real_lhs = lhs.dereferenced();
     auto real_rhs = rhs.dereferenced();
-    if(real_lhs.is_int())
-    {
-        auto lhs_int = real_lhs.to_int(rt);
-        if(rt.has_exception())
-            return {};
+    
+    auto lhs_int = real_lhs.to_int(rt);
+    auto rhs_int = real_rhs.to_int(rt);
 
-        auto rhs_int = real_rhs.to_int(rt);
-        if(rt.has_exception())
-            return {};
-
+    // Both arguments are convertible to ints
+    if(!rt.has_exception())
         return Value::new_int(lhs_int + rhs_int);
-    }
-    else if(real_lhs.is_object())
+
+    // LHS is object
+    rt.clear_exception();
+    if(real_lhs.is_object())
     {
         return real_lhs.get_object()->operator_add(rt, real_rhs);
     }
     else
     {
+        // Unknown case, treat as strings.
         auto lhs_int = real_lhs.to_string();
         auto rhs_int = real_rhs.to_string();
         return Value::new_object(std::make_shared<StringObject>(lhs_int + rhs_int));
