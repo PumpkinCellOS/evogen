@@ -64,7 +64,7 @@ CompareResult Object::operator_compare(Runtime& rt, Value const& rhs) const
 Function::Function(std::string const& name)
 : m_name(name)
 {
-    DEFINE_READ_ONLY_NATIVE_OBJECT(object, "name", std::make_shared<StringObject>(m_name));
+    DEFINE_NATIVE_OBJECT(object, "name", std::make_shared<StringObject>(m_name));
 }
 
 }

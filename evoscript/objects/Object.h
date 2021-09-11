@@ -78,10 +78,10 @@ private:
             return Value::new_##type(internal_name);    \
     } while(false)
 
-#define DEFINE_NATIVE_OBJECT(type, script_name, internal_name) \
+#define DEFINE_WRITABLE_NATIVE_OBJECT(type, script_name, internal_name) \
     add_object_property(script_name, std::make_shared<MemoryValue>(Value::new_##type(internal_name)));
 
-#define DEFINE_READ_ONLY_NATIVE_OBJECT(type, script_name, internal_name)                     \
+#define DEFINE_NATIVE_OBJECT(type, script_name, internal_name)                     \
     do {                                                                                     \
         auto memory_value = std::make_shared<MemoryValue>(Value::new_##type(internal_name)); \
         memory_value->set_read_only(true);                                                   \
