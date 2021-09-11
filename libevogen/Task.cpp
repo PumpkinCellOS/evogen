@@ -22,6 +22,9 @@ void FillBlocksTask::generate_code(Generator const& generator) const
 
 void MoveTurtleTask::generate_code(Generator const& generator) const
 {
+    // FIXME: This is not the most elegant way to do this.
+    m_turtle.move(m_position.value());
+    *generator.stream() << "# turtle pos = " << m_turtle.position().to_string() << std::endl;
     *generator.stream() << m_turtle.to_execute_as() << " at @s run tp @s "
                         << m_position.to_command_format() << std::endl;
     // DEBUG

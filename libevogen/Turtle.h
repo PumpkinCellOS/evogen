@@ -12,7 +12,7 @@ class Turtle
 {
 public:
     Turtle(Vector<int> start_position, std::string custom_name = "evoTurtle")
-    : m_start_position(start_position), m_custom_name(custom_name) {}
+    : m_start_position(start_position), m_current_position(start_position), m_custom_name(custom_name) {}
 
     Vector<int> start_position() const { return m_start_position; }
 
@@ -27,8 +27,12 @@ public:
     // Use for filling, when you need to execute command once
     std::string to_execute_at() const { return "execute at " + to_strict_selector(); }
 
+    void move(Vector<int> const& vector) { m_current_position += vector; }
+    Vector<int> position() const { return m_current_position; }
+
 private:
     Vector<int> m_start_position;
+    Vector<int> m_current_position;
     std::string m_custom_name;
 };
 
