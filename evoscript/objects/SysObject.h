@@ -8,7 +8,7 @@ namespace evo::script
 class SysObject : public Object
 {
 public:
-    virtual Value get(std::string const& member) override;
+    SysObject();
     virtual std::string type_name() const override { return "SysObject"; }
 
 private:
