@@ -1,10 +1,10 @@
-#include <libevogen/Block.h>
-#include <libevogen/Generator.h>
-#include <libevogen/Image.h>
-#include <libevogen/Structure.h>
-#include <libevogen/Task.h>
-#include <libevogen/VanillaBlock.h>
-#include <libevogen/World.h>
+#include <evogen/Block.h>
+#include <evogen/Generator.h>
+#include <evogen/Image.h>
+#include <evogen/Structure.h>
+#include <evogen/Task.h>
+#include <evogen/VanillaBlock.h>
+#include <evogen/World.h>
 
 int main()
 {

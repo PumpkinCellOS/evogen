@@ -1,4 +1,4 @@
-#include <libevoscript/Parser.h>
+#include <evoscript/Parser.h>
 #include <iostream>
 
 using namespace evo::script;

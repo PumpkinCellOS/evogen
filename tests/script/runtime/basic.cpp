@@ -1,5 +1,5 @@
-#include <libevoscript/AST.h>
-#include <libevoscript/Runtime.h>
+#include <evoscript/AST.h>
+#include <evoscript/Runtime.h>
 
 #include <iostream>
 
