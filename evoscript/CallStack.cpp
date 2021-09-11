@@ -5,12 +5,12 @@
 namespace evo::script
 {
 
-void CallStack::print() const
+void CallStack::print(std::ostream& stream) const
 {
     for(auto& it: m_call_stack)
     {
         if(!it.parent_scope())
-            std::cerr << "    at " << it.name() << std::endl;
+            stream << "    at " << it.name() << std::endl;
     }
 }
 

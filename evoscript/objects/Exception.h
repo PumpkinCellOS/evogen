@@ -12,7 +12,7 @@ class Exception : public Object
 public:
     Exception(Runtime& rt, std::string const& message);
 
-    virtual void print();
+    virtual void repl_print(std::ostream& output, bool) const override;
     virtual std::string type_name() const override { return "Exception"; }
 
 private:

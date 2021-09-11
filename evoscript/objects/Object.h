@@ -3,6 +3,8 @@
 #include <evoscript/AbstractOperations.h>
 #include <evoscript/Value.h>
 
+#include <sstream>
+
 namespace evo::script
 {
 
@@ -18,9 +20,9 @@ public:
     // function type() : string
     virtual std::string type_name() const { return "Object"; }
     // function dump_string() : string
-    virtual std::string dump_string() const { return repl_string(); }
-    // function repl_string() : string
-    virtual std::string repl_string() const;
+    virtual std::string dump_string() const { std::ostringstream oss; repl_print(oss, true); return oss.str(); }
+    // function repl_print() : string
+    virtual void repl_print(std::ostream& output, bool print_members) const;
     // function to_string() : string
     virtual std::string to_string() const { return "[object " + type_name() + "]"; }
     // function call(container: Object, arguments: Array) : Value
@@ -65,7 +67,7 @@ public:
     Function(std::string const& name);
 
     virtual std::string type_name() const override { return "Function"; }
-    virtual std::string repl_string() const override { return "function " + m_name + "()"; }
+    virtual void repl_print(std::ostream& output, bool print_members) const override { output << "function " << m_name << "()"; }
     virtual std::string name() const override { return m_name; }
 
 private:

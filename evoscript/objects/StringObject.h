@@ -14,7 +14,7 @@ public:
     virtual Value get(std::string const& member) override;
     virtual std::string type_name() const override { return "String"; }
     virtual std::string dump_string() const override { return "StringObject(" + m_string + ")"; }
-    virtual std::string repl_string() const override { return "\"" + m_string + "\""; }
+    virtual void repl_print(std::ostream& output, bool) const override;
     virtual std::string to_string() const override { return m_string; }
     virtual Value to_primitive(Runtime&, Value::Type) const override;
     virtual Value operator_add(Runtime& rt, Value const& rhs) const override;

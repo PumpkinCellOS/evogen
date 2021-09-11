@@ -22,25 +22,33 @@ Value Object::get(std::string const& member)
     return Value::new_reference(it->second);
 }
 
-std::string Object::repl_string() const
+void Object::repl_print(std::ostream& output, bool print_members) const
 {
-    std::ostringstream oss;
-    oss << type_name() << " { ";
-    size_t counter = 0;
-    for(auto& value: m_values)
+    output << type_name() << " { ";
+    if(print_members)
     {
-        if(value.second->value().is_object() && value.second->value().get_object().get() == this)
-            oss << value.first << ": <recursive reference>";
-        else
-            // TODO: Use dump_string if called from dump_string
-            oss << value.first << ": " << value.second->repl_string();
+        if(!m_values.empty())
+            output << std::endl;
+        size_t counter = 0;
+        for(auto& value: m_values)
+        {
+            if(value.second->value().is_object() && value.second->value().get_object().get() == this)
+                output << "    " << value.first << ": <recursive reference>";
+            else
+            {
+                // TODO: Use dump_string if called from dump_string
+                output << "    " << value.first << ": ";
+                value.second->repl_print(output, false);
+            }
 
-        if(counter < m_values.size() - 1)
-            oss << ", ";
-        counter++;
+            if(counter < m_values.size() - 1)
+                output << std::endl;
+            counter++;
+        }
+        if(!m_values.empty())
+            output << std::endl;
     }
-    oss << " }";
-    return oss.str();
+    output << "}";
 }
 
 Value Object::call(Runtime& rt, Object&, std::vector<Value> const&)
@@ -51,13 +59,21 @@ Value Object::call(Runtime& rt, Object&, std::vector<Value> const&)
 
 Value Object::operator_add(Runtime& rt, Value const& rhs) const
 {
-    rt.throw_exception("Cannot call operator+ on object lhs=" + repl_string() + " with rhs=" + rhs.repl_string());
+    std::ostringstream oss_lhs;
+    repl_print(oss_lhs, true);
+    std::ostringstream oss_rhs;
+    repl_print(oss_rhs, true);
+    rt.throw_exception("Cannot call operator+ on object lhs=" + oss_lhs.str() + " with rhs=" + oss_rhs.str());
     return {};
 }
 
 CompareResult Object::operator_compare(Runtime& rt, Value const& rhs) const
 {
-    rt.throw_exception("Cannot call operator<> on object lhs=" + repl_string() + " with rhs=" + rhs.repl_string());
+    std::ostringstream oss_lhs;
+    repl_print(oss_lhs, true);
+    std::ostringstream oss_rhs;
+    repl_print(oss_rhs, true);
+    rt.throw_exception("Cannot call operator<> on object lhs=" + oss_lhs.str() + " with rhs=" + oss_rhs.str());
     return {};
 }
 

@@ -98,14 +98,16 @@ bool run_code_from_stream(Runtime& rt, std::istream& input)
     auto value = program->evaluate(rt);
     if(rt.has_exception())
     {
-        rt.exception()->print();
+        rt.exception()->repl_print(std::cerr, true);
         rt.clear_exception();
         return false;
     }
     else
     {
         // TODO: Do not print escape sequences if not running in tty
-        std::cout << "\e[1m" << value.repl_string() << "\e[0m" << std::endl;
+        std::cout << "\e[1m";
+        value.repl_print(std::cout, true);
+        std::cout << "\e[0m" << std::endl;
     }
     return true;
 }

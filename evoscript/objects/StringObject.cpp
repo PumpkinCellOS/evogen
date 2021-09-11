@@ -15,6 +15,12 @@ Value StringObject::get(std::string const& member)
     return Value::undefined();
 }
 
+void StringObject::repl_print(std::ostream& output, bool) const
+{
+    // TODO: Escape this string
+    output << "\"" << m_string << "\"";
+}
+
 Value StringObject::to_primitive(Runtime& rt, Value::Type type) const
 {
     return {};

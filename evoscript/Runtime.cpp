@@ -59,7 +59,7 @@ void Runtime::throw_exception(std::string const& message)
 void Runtime::print_backtrace() const
 {
     std::cerr << "Backtrace:" << std::endl;
-    m_call_stack.print();
+    m_call_stack.print(std::cerr);
 }
 
 ExecutionContext& Runtime::push_execution_context(std::string const& name, std::shared_ptr<Object> this_object)

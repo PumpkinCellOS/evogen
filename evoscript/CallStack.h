@@ -14,7 +14,7 @@ public:
     ExecutionContext& push_scope(std::shared_ptr<Object> this_object);
     ExecutionContext& current_execution_context();
     void pop_execution_context();
-    void print() const;
+    void print(std::ostream& stream) const;
 
 private:
     std::deque<ExecutionContext> m_call_stack;

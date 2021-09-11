@@ -182,26 +182,33 @@ std::string Value::dump_string() const
     return oss.str();
 }
 
-std::string Value::repl_string() const
+void Value::repl_print(std::ostream& output, bool print_members) const
 {
     switch(m_type)
     {
     case Type::Invalid:
-        return "<invalid>";
+        output << "<invalid>";
+        break;
     case Type::Null:
-        return "null";
+        output << "null";
+        break;
     case Type::Undefined:
-        return "undefined";
+        output << "undefined";
+        break;
     case Type::Int:
-        return std::to_string(m_int_value);
+        output << std::to_string(m_int_value);
+        break;
     case Type::Bool:
-        return m_bool_value ? "true" : "false";
+        output << (m_bool_value ? "true" : "false");
+        break;
     case Type::Reference:
         assert(m_reference_value);
-        return m_reference_value->value().repl_string();
+        m_reference_value->value().repl_print(output, print_members);
+        break;
     case Type::Object:
         assert(m_object_value);
-        return m_object_value->repl_string();
+        m_object_value->repl_print(output, print_members);
+        break;
     default: assert(false);
     }
 }
@@ -306,9 +313,9 @@ std::string MemoryValue::dump_string() const
     return oss.str();
 }
 
-std::string MemoryValue::repl_string() const
+void MemoryValue::repl_print(std::ostream& output, bool print_members) const
 {
-    return m_value.repl_string();
+    m_value.repl_print(output, print_members);
 }
 
 std::ostream& operator<<(std::ostream& stream, MemoryValue const& value)

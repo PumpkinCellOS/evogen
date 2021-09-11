@@ -58,7 +58,7 @@ public:
     std::shared_ptr<MemoryValue> to_writable_reference(Runtime&) const;
 
     std::string dump_string() const;
-    std::string repl_string() const;
+    void repl_print(std::ostream& output, bool print_members) const;
 
     // This is type-unsafe and should be used only internally / by Runtime!
     int& get_int() { return m_int_value; }
@@ -162,7 +162,7 @@ public:
     void set_read_only(bool read_only) { m_read_only = read_only; }
 
     std::string dump_string() const;
-    std::string repl_string() const;
+    void repl_print(std::ostream& output, bool print_members) const;
 
 private:
     Value m_value { Value::null() };
