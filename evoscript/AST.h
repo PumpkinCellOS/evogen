@@ -531,6 +531,21 @@ private:
     std::shared_ptr<Statement> m_true_statement;
 };
 
+class ReturnStatement : public Statement
+{
+public:
+    ReturnStatement(ErrorList const& error)
+    : Statement(error) {}
+
+    ReturnStatement(std::shared_ptr<Expression> expression)
+    : m_expression(expression) {}
+
+    virtual EvalResult evaluate(Runtime&) const override;
+
+private:
+    std::shared_ptr<Expression> m_expression;
+};
+
 class Declaration : public Statement
 {
 public:

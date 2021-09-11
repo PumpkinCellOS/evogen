@@ -613,6 +613,19 @@ std::shared_ptr<Statement> EVOParser::parse_if_statement()
     return std::make_shared<IfStatement>(condition, true_statement);
 }
 
+std::shared_ptr<ReturnStatement> EVOParser::parse_return_statement()
+{
+    auto return_keyword = consume_of_type(Token::Name);
+    if(!return_keyword || return_keyword->value() != "return")
+        return {};
+
+    auto expression = parse_expression();
+    if(expression->is_error())
+        return std::make_shared<ReturnStatement>(nullptr);
+    
+    return std::make_shared<ReturnStatement>(expression);
+}
+
 std::shared_ptr<Statement> EVOParser::parse_statement()
 {
     size_t off = offset();
@@ -620,19 +633,24 @@ std::shared_ptr<Statement> EVOParser::parse_statement()
     if(!statement)
     {
         set_offset(off);
-        statement = parse_if_statement();
+        statement = parse_return_statement();
         if(!statement)
         {
             set_offset(off);
-            statement = parse_declaration();
+            statement = parse_if_statement();
             if(!statement)
             {
                 set_offset(off);
-                statement = parse_expression_statement();
-                if(!statement || statement->is_error())
+                statement = parse_declaration();
+                if(!statement)
                 {
                     set_offset(off);
-                    return statement;
+                    statement = parse_expression_statement();
+                    if(!statement || statement->is_error())
+                    {
+                        set_offset(off);
+                        return statement;
+                    }
                 }
             }
         }

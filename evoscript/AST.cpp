@@ -316,9 +316,12 @@ EvalResult BlockStatement::evaluate(Runtime& rt) const
     Value val = Value::undefined();
     for(auto& it: m_nodes)
     {
-        val = it->evaluate(rt);
+        auto result = it->evaluate(rt);
         if(rt.has_exception())
             return {};
+        if(result.is_abrupt())
+            return result;
+        val = result;
     }
     return val;
 }
@@ -335,6 +338,16 @@ EvalResult IfStatement::evaluate(Runtime& rt) const
     else
         // TODO: else statements
         return Value::undefined();
+}
+
+EvalResult ReturnStatement::evaluate(Runtime& rt) const
+{
+    if(!m_expression)
+        return EvalResult::return_(Value::undefined());
+    auto result = m_expression->evaluate(rt);
+    if(result.is_abrupt())
+        return result;
+    return EvalResult::return_(result);
 }
 
 EvalResult VariableDeclaration::evaluate(Runtime& rt) const
@@ -375,9 +388,15 @@ EvalResult Program::evaluate(Runtime& rt) const
     Value val;
     for(auto& it: m_nodes)
     {
-        val = it->evaluate(rt);
+        auto result = it->evaluate(rt);
         if(rt.has_exception())
             return {};
+        if(result.is_return())
+        {
+            rt.throw_exception("Cannot 'return' in global scope");
+            return {};
+        }
+        val = result;
     }
     return val;
 }
