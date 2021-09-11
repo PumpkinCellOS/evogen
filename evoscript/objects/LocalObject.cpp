@@ -23,25 +23,4 @@ std::shared_ptr<MemoryValue> LocalObject::allocate(std::string const& name)
     return m_values.insert(std::make_pair(name, MemoryValue::create_undefined())).first->second;
 }
 
-std::string LocalObject::repl_string() const
-{
-    std::ostringstream oss;
-    oss << "{ ";
-    size_t counter = 0;
-    for(auto& value: m_values)
-    {
-        if(value.second->value().is_object() && value.second->value().get_object().get() == this)
-            oss << value.first << ": <recursive reference>";
-        else
-            // TODO: Use dump_string if called from dump_string
-            oss << value.first << ": " << value.second->repl_string();
-
-        if(counter < m_values.size() - 1)
-            oss << ", ";
-        counter++;
-    }
-    oss << " }";
-    return oss.str();
-}
-
 }
