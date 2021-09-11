@@ -11,10 +11,6 @@ namespace evo::script
 
 Value Object::get(std::string const& member)
 {
-    NATIVE_FUNCTION(Object, "length", [](Runtime& rt, Object& container, std::vector<Value> const&)->Value {
-        return Value::new_int(container.m_values.size());
-    });
-
     auto it = m_values.find(member);
     if(it == m_values.end())
     {
@@ -65,10 +61,10 @@ CompareResult Object::operator_compare(Runtime& rt, Value const& rhs) const
     return {};
 }
 
-Value Function::get(std::string const& member)
+Function::Function(std::string const& name)
+: m_name(name)
 {
-    NATIVE_OBJECT(object, "name", std::make_shared<StringObject>(m_name));
-    return Value::undefined();
+    DEFINE_READ_ONLY_NATIVE_OBJECT(object, "name", std::make_shared<StringObject>(m_name));
 }
 
 }

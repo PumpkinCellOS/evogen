@@ -34,6 +34,27 @@ public:
     // function name(): Value // this is already done for Function
     virtual std::string name() const { return ""; }
 
+protected:
+    void add_object_property(std::string const& name, std::shared_ptr<MemoryValue> memory_value)
+    {
+        m_values.insert(std::make_pair(name, memory_value));
+    }
+
+    template<class T, class... Args>
+    void define_object_property(std::string const& name, Args&&... args)
+    {
+        auto memory_value = MemoryValue::create_object<T>(std::forward<Args>(args)...);
+        add_object_property(name, memory_value);
+    }
+
+    template<class T, class... Args>
+    void define_read_only_object_property(std::string const& name, Args&&... args)
+    {
+        auto memory_value = MemoryValue::create_object<T>(std::forward<Args>(args)...);
+        memory_value->set_read_only(true);
+        add_object_property(name, memory_value);
+    }
+
 private:
     std::map<std::string, std::shared_ptr<MemoryValue>> m_values;
 };
@@ -41,10 +62,8 @@ private:
 class Function : public Object
 {
 public:
-    Function(std::string const& name)
-    : m_name(name) {}
+    Function(std::string const& name);
 
-    virtual Value get(std::string const& member) override;
     virtual std::string type_name() const override { return "Function"; }
     virtual std::string repl_string() const override { return "function " + m_name + "()"; }
     virtual std::string name() const override { return m_name; }
@@ -57,6 +76,16 @@ private:
     do {                                                \
         if(member == script_name)                       \
             return Value::new_##type(internal_name);    \
+    } while(false)
+
+#define DEFINE_NATIVE_OBJECT(type, script_name, internal_name) \
+    add_object_property(script_name, std::make_shared<MemoryValue>(Value::new_##type(internal_name)));
+
+#define DEFINE_READ_ONLY_NATIVE_OBJECT(type, script_name, internal_name)                     \
+    do {                                                                                     \
+        auto memory_value = std::make_shared<MemoryValue>(Value::new_##type(internal_name)); \
+        memory_value->set_read_only(true);                                                   \
+        add_object_property(script_name, memory_value);                                      \
     } while(false)
 
 }
