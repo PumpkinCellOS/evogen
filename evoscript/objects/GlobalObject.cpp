@@ -11,7 +11,7 @@ GlobalObject::GlobalObject()
 Value GlobalObject::get(std::string const& member)
 {
     NATIVE_OBJECT(object, "sys", m_sys);
-    return MapObject::get(member);
+    return Object::get(member);
 }
 
 }

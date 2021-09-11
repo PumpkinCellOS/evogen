@@ -2,7 +2,7 @@
 #include <evoscript/Runtime.h>
 
 #include <evoscript/objects/Exception.h>
-#include <evoscript/objects/MapObject.h>
+#include <evoscript/objects/Object.h>
 #include <evoscript/objects/Object.h>
 
 #include <iostream>
@@ -21,7 +21,7 @@ Runtime::Runtime(std::shared_ptr<GlobalObject> global_object, std::shared_ptr<Me
     if(!m_global_this)
     {
         std::cerr << "Creating new global this as it was not specified" << std::endl;
-        m_global_this = MemoryValue::create_object<MapObject>();
+        m_global_this = MemoryValue::create_object<Object>();
     }
 
     auto& context = m_call_stack.push_execution_context("<global scope>", m_global_this->value().to_object(*this));

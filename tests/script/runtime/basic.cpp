@@ -18,7 +18,7 @@ int main()
     std::cout << ref1->evaluate(runtime) << std::endl; // == reference to 1234
     std::cout << ref1->evaluate(runtime).to_string(runtime) << std::endl; // 1234
     std::cout << ref2->evaluate(runtime) << std::endl; // == reference to {testInt: 1234}
-    std::cout << ref2->evaluate(runtime).to_string(runtime) << std::endl; // [object MapObject]
+    std::cout << ref2->evaluate(runtime).to_string(runtime) << std::endl; // [object Object]
 
     // this.testInt = 4321
     auto assignment1 = std::make_shared<AssignmentExpression>(ref1, std::make_shared<IntegerLiteral>(4321));

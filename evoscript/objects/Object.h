@@ -12,7 +12,7 @@ class MemoryValue;
 class Object
 {
 public:
-    virtual Value get(std::string const& member) = 0;
+    virtual Value get(std::string const& member);
 
     // TODO: Make these definiable functions, e.g:
     // function type() : string
@@ -20,7 +20,7 @@ public:
     // function dump_string() : string
     virtual std::string dump_string() const { return repl_string(); }
     // function repl_string() : string
-    virtual std::string repl_string() const { return type_name() + " {}"; }
+    virtual std::string repl_string() const;
     // function to_string() : string
     virtual std::string to_string() const { return "[object " + type_name() + "]"; }
     // function call(container: Object, arguments: Array) : Value
@@ -33,6 +33,9 @@ public:
     virtual CompareResult operator_compare(Runtime& rt, Value const& rhs) const;
     // function name(): Value // this is already done for Function
     virtual std::string name() const { return ""; }
+
+private:
+    std::map<std::string, std::shared_ptr<MemoryValue>> m_values;
 };
 
 class Function : public Object

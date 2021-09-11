@@ -11,7 +11,6 @@ add_library(libevoscript
     "objects/Exception.cpp"
     "objects/GlobalObject.cpp"
     "objects/LocalObject.cpp"
-    "objects/MapObject.cpp"
     "objects/Object.cpp"
     "objects/StringObject.cpp"
     "objects/SysObject.cpp"

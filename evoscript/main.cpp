@@ -2,7 +2,7 @@
 #include <evoscript/Value.h>
 #include <evoscript/Lexer.h>
 #include <evoscript/objects/Exception.h>
-#include <evoscript/objects/MapObject.h>
+#include <evoscript/objects/Object.h>
 
 #include <fstream>
 #include <iostream>
