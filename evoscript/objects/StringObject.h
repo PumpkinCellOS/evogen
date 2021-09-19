@@ -12,6 +12,11 @@ public:
     StringObject(Runtime&, std::vector<Value> const& args)
     : StringObject(args.size() > 0 ? args[0].to_string() : "") {}
 
+    static Value create_value(std::string const& str)
+    {
+        return Value::new_object(std::make_shared<StringObject>(str));
+    }
+
     EVO_OBJECT("String")
 
     virtual std::string dump_string() const override { return "StringObject(" + m_string + ")"; }

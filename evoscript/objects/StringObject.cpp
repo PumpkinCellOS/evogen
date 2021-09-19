@@ -63,7 +63,7 @@ Value StringObject::concat(Runtime& rt, StringObject const& container, std::vect
     for(auto& arg: args)
         result += arg.to_string();
 
-    return Value::new_object(std::make_shared<StringObject>(result));
+    return StringObject::create_value(result);
 }
 
 Value StringObject::substring(Runtime& rt, StringObject const& container, std::vector<Value> const& args)
@@ -103,7 +103,7 @@ Value StringObject::substring(Runtime& rt, StringObject const& container, std::v
         return {};
     }
 
-    return Value::new_object(std::make_shared<StringObject>(seq_length == -1 ? container.m_string.substr(start) : container.m_string.substr(start, seq_length)));
+    return StringObject::create_value(seq_length == -1 ? container.m_string.substr(start) : container.m_string.substr(start, seq_length));
 }
 
 Value StringObject::append(Runtime& rt, StringObject& container, std::vector<Value> const& args)

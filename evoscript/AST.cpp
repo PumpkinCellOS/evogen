@@ -21,7 +21,7 @@ EvalResult IntegerLiteral::evaluate(Runtime&) const
 
 EvalResult StringLiteral::evaluate(Runtime&) const
 {
-    return Value::new_object(std::make_shared<StringObject>(m_value));
+    return StringObject::create_value(m_value);
 }
 
 EvalResult Identifier::evaluate(Runtime& rt) const
