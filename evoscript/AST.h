@@ -593,6 +593,27 @@ private:
     std::shared_ptr<Expression> m_expression;
 };
 
+class SimpleControlStatement : public Statement
+{
+public:
+    enum Operation
+    {
+        Break,
+        Continue
+    };
+
+    SimpleControlStatement(ErrorList const& error)
+    : Statement(error) {}
+
+    SimpleControlStatement(Operation op)
+    : m_operation(op) {}
+
+    virtual EvalResult evaluate(Runtime&) const override;
+
+private:
+    Operation m_operation;
+};
+
 class Declaration : public Statement
 {
 public:

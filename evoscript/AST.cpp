@@ -1,3 +1,4 @@
+#include "evoscript/EvalResult.h"
 #include <evoscript/AST.h>
 
 #include <evoscript/AbstractOperations.h>
@@ -382,7 +383,7 @@ EvalResult WhileStatement::evaluate(Runtime& rt) const
         auto result = m_statement->evaluate(rt);
         if(rt.has_exception())
             return {};
-        if(result.is_abrupt())
+        if(result.is_abrupt() && !result.is_continue())
             return result;
         result_value = result.value();
     }
@@ -397,6 +398,19 @@ EvalResult ReturnStatement::evaluate(Runtime& rt) const
     if(result.is_abrupt())
         return result;
     return EvalResult::return_(result);
+}
+
+EvalResult SimpleControlStatement::evaluate(Runtime&) const
+{
+    switch(m_operation)
+    {
+        case Break:
+            return EvalResult::break_(Value::undefined());
+        case Continue:
+            return EvalResult::continue_(Value::undefined());
+        default:
+            assert(false);
+    }
 }
 
 EvalResult VariableDeclaration::evaluate(Runtime& rt) const

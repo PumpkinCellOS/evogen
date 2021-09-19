@@ -119,13 +119,14 @@ public:
     std::shared_ptr<VariableDeclaration> parse_variable_declaration();
     std::shared_ptr<FunctionDeclaration> parse_function_declaration();
 
-    std::shared_ptr<Statement>       parse_statement();
-    std::shared_ptr<Statement>       parse_expression_statement();
-    std::shared_ptr<BlockStatement>  parse_block_statement();
-    std::shared_ptr<IfStatement>     parse_if_statement();
-    std::shared_ptr<WhileStatement>  parse_while_statement();
-    std::shared_ptr<ReturnStatement> parse_return_statement();
-    std::shared_ptr<Program>         parse_program();
+    std::shared_ptr<Statement>              parse_statement();
+    std::shared_ptr<Statement>              parse_expression_statement();
+    std::shared_ptr<BlockStatement>         parse_block_statement();
+    std::shared_ptr<IfStatement>            parse_if_statement();
+    std::shared_ptr<WhileStatement>         parse_while_statement();
+    std::shared_ptr<ReturnStatement>        parse_return_statement();
+    std::shared_ptr<SimpleControlStatement> parse_simple_control_statement();
+    std::shared_ptr<Program>                parse_program();
 
     // Postfix helpers
     std::shared_ptr<Expression> parse_member_name(std::shared_ptr<Expression> lhs); // .name

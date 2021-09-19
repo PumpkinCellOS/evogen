@@ -714,6 +714,19 @@ std::shared_ptr<ReturnStatement> EVOParser::parse_return_statement()
     return std::make_shared<ReturnStatement>(expression);
 }
 
+std::shared_ptr<SimpleControlStatement> EVOParser::parse_simple_control_statement()
+{
+    auto keyword = consume_of_type(Token::Name);
+    if(!keyword)
+        return {};
+
+    if(keyword->value() == "break")
+        return std::make_shared<SimpleControlStatement>(SimpleControlStatement::Break);
+    if(keyword->value() == "continue")
+        return std::make_shared<SimpleControlStatement>(SimpleControlStatement::Continue);
+    return {};
+}
+
 std::shared_ptr<Statement> EVOParser::parse_statement()
 {
     size_t off = offset();
@@ -721,27 +734,32 @@ std::shared_ptr<Statement> EVOParser::parse_statement()
     if(!statement)
     {
         set_offset(off);
-        statement = parse_return_statement();
+        statement = parse_simple_control_statement();
         if(!statement)
         {
             set_offset(off);
-            statement = parse_if_statement();
+            statement = parse_return_statement();
             if(!statement)
             {
                 set_offset(off);
-                statement = parse_while_statement();
+                statement = parse_if_statement();
                 if(!statement)
                 {
                     set_offset(off);
-                    statement = parse_declaration();
+                    statement = parse_while_statement();
                     if(!statement)
                     {
                         set_offset(off);
-                        statement = parse_expression_statement();
-                        if(!statement || statement->is_error())
+                        statement = parse_declaration();
+                        if(!statement)
                         {
                             set_offset(off);
-                            return statement;
+                            statement = parse_expression_statement();
+                            if(!statement || statement->is_error())
+                            {
+                                set_offset(off);
+                                return statement;
+                            }
                         }
                     }
                 }
