@@ -84,6 +84,9 @@ public:
     std::shared_ptr<Object> container() const { return m_container; }
     void set_container(std::shared_ptr<Object> object) { m_container = object; }
 
+    // TODO: Default version will probably not be optimal
+    bool operator==(Value const&) const = default;
+
 private:
     explicit Value(int value, std::shared_ptr<Object> container)
     : m_type(Type::Int), m_int_value(value), m_container(container) {}
