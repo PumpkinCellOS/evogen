@@ -15,40 +15,17 @@ Runtime::Runtime(std::shared_ptr<GlobalObject> global_object, std::shared_ptr<Me
 : m_global_object(global_object), m_global_this(global_this)
 {
     if(!m_global_object)
-    {
-        std::cerr << "Creating new global object as it was not specified" << std::endl;
         m_global_object = std::make_shared<GlobalObject>();
-    }
     if(!m_global_this)
-    {
-        std::cerr << "Creating new global this as it was not specified" << std::endl;
         m_global_this = MemoryValue::create_object<Object>();
-    }
 
-    auto& context = m_call_stack.push_execution_context("<global scope>", m_global_this->value().to_object(*this));
+    m_call_stack.push_execution_context("<global scope>", m_global_this->value().to_object(*this));
     if(has_exception())
         return;
-
-    auto _this = context.this_object();
-    auto _global = m_global_object;
-    auto _local = context.local_scope_object();
-
-    std::cerr << "this = " << _this->dump_string() << std::endl;
-    std::cerr << "global object = " << _global->dump_string() << std::endl;
-    std::cerr << "local scope = " << _local->dump_string() << std::endl;
 }
 
 Runtime::~Runtime()
 {
-    auto& context = m_call_stack.current_execution_context();
-    auto _this = context.this_object();
-    auto _global = global_object();
-    auto _local = context.local_scope_object();
-
-    std::cerr << "this = " << _this->dump_string() << std::endl;
-    std::cerr << "global object = " << _global->dump_string() << std::endl;
-    std::cerr << "local scope = " << _local->dump_string() << std::endl;
-
     m_call_stack.pop_execution_context();
 }
 
