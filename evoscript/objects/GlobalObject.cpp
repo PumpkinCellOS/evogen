@@ -4,6 +4,7 @@
 #include <evoscript/objects/Class.h>
 #include <evoscript/objects/Exception.h>
 #include <evoscript/objects/StringObject.h>
+#include <evoscript/objects/TimeObject.h>
 #include <fstream>
 
 namespace evo::script
@@ -15,9 +16,10 @@ GlobalObject::GlobalObject()
 
     DEFINE_NATIVE_FUNCTION(GlobalObject, "run", run_script);
 
+    DEFINE_NATIVE_OBJECT(object, "Exception", create_native_class<Exception>());
     DEFINE_NATIVE_OBJECT(object, "Object", create_native_class<Object>());
     DEFINE_NATIVE_OBJECT(object, "String", create_native_class<StringObject>());
-    DEFINE_NATIVE_OBJECT(object, "Exception", create_native_class<Exception>());
+    DEFINE_NATIVE_OBJECT(object, "Time", create_native_class<TimeObject>());
 }
 
 Value GlobalObject::run_script(Runtime& rt, GlobalObject&, std::vector<Value> const& args)

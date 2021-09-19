@@ -16,6 +16,7 @@ add_library(libevoscript
     "objects/Object.cpp"
     "objects/StringObject.cpp"
     "objects/SysObject.cpp"
+    "objects/TimeObject.cpp"
 )
 
 target_include_directories(libevoscript PUBLIC ${CMAKE_SOURCE_DIR})
