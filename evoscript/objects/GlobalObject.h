@@ -10,6 +10,9 @@ class GlobalObject : public Object
 {
 public:
     GlobalObject();
+
+private:
+    static Value run_script(Runtime&, GlobalObject&, std::vector<Value> const& arguments);
 };
 
 }

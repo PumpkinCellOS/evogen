@@ -6,11 +6,6 @@
 namespace evo::script
 {
 
-std::ostream& operator<<(std::ostream& stream, SourceLocation const& location)
-{
-    return stream << location.line << ":" << location.column;
-}
-
 std::shared_ptr<Expression> EVOParser::parse_expression()
 {
     return parse_assignment_expression();

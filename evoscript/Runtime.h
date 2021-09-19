@@ -40,6 +40,15 @@ public:
     ExecutionContext& current_execution_context();
     void pop_execution_context();
 
+    enum class RunType
+    {
+        Repl,
+        Script,
+        Include
+    };
+
+    Value run_code_from_stream(std::istream&, RunType);
+
 private:
     std::shared_ptr<Exception> m_exception;
     CallStack m_call_stack;

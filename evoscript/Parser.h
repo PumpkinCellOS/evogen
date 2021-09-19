@@ -11,8 +11,6 @@
 namespace evo::script
 {
 
-std::ostream& operator<<(std::ostream&, SourceLocation const&);
-
 class Token
 {
 public:
