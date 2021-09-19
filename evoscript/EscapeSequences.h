@@ -14,6 +14,6 @@ inline std::string keyword(std::string const& value) { return "\e[94m" + value +
 inline std::string literal(std::string const& value) { return "\e[95m" + value + "\e[0m"; }
 inline std::string error(std::string const& value) { return "\e[31m" + value + "\e[0m"; }
 inline std::string type(std::string const& value) { return "\e[32m" + value + "\e[0m"; }
-inline std::string name(std::string const& value) { return "\e[33m" + value + "\e[0m"; }
+inline std::string name(std::string const& value) { return "\e[3m" + value + "\e[0m"; }
 
 }

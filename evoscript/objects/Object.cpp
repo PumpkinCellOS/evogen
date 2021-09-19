@@ -40,11 +40,11 @@ void Object::repl_print(std::ostream& output, bool print_members) const
         for(auto& value: m_values)
         {
             if(value.second->value().is_object() && value.second->value().get_object().get() == this)
-                output << "    " << literal(value.first) << ": " << constant("<recursive reference>");
+                output << "  " << literal(value.first) << ": " << constant("<recursive reference>");
             else
             {
                 // TODO: Use dump_string if called from dump_string
-                output << "    " << literal(value.first) << ": ";
+                output << "  " << literal(value.first) << ": ";
                 value.second->repl_print(output, false);
             }
 
@@ -91,8 +91,7 @@ Function::Function(std::string const& name)
 
 void Function::repl_print(std::ostream& output, bool print_members) const
 {
-    using namespace escapes;
-    output << keyword("function") << " " << escapes::name(m_name) << "()";
+    output << escapes::keyword("function") << (m_name.empty() ? "" : " ") << escapes::name(m_name) << "()";
 }
 
 Value Function::get(std::string const& member)
