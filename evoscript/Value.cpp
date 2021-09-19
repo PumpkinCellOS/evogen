@@ -35,7 +35,7 @@ std::string Value::type_to_string(Type type)
     }
 }
     
-int Value::to_int(Runtime& rt) const
+Value::IntType Value::to_int(Runtime& rt) const
 {
     switch(m_type)
     {

@@ -117,7 +117,7 @@ public:
     IntegerLiteral(ErrorList const& error)
     : Expression(error) {}
 
-    IntegerLiteral(int value)
+    IntegerLiteral(Value::IntType value)
     : m_value(value) {}
 
     virtual EvalResult evaluate(Runtime&) const override;
@@ -131,7 +131,7 @@ public:
     }
 
 private:
-    int m_value;
+    Value::IntType m_value;
 };
 
 class StringLiteral : public Expression

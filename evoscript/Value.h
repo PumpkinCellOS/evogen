@@ -27,6 +27,8 @@ public:
         Reference
     };
 
+    using IntType = int64_t;
+
     Value()
     : m_type(Type::Invalid) {}
 
@@ -37,7 +39,7 @@ public:
 
     static Value null() { return Value(Null); }
     static Value undefined() { return Value(Undefined); }
-    static Value new_int(int value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
+    static Value new_int(IntType value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
     static Value new_bool(bool value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
     static Value new_object(std::shared_ptr<Object> value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
     static Value new_reference(std::shared_ptr<MemoryValue> value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
@@ -50,7 +52,7 @@ public:
     bool is_object() const { return m_type == Type::Object; }
     bool is_reference() const { return m_type == Type::Reference; }
 
-    int to_int(Runtime&) const;
+    IntType to_int(Runtime&) const;
     bool to_bool(Runtime&) const;
     std::string to_string() const;
     std::shared_ptr<Object> to_object(Runtime&) const;
@@ -61,12 +63,12 @@ public:
     void repl_print(std::ostream& output, bool print_members) const;
 
     // This is type-unsafe and should be used only internally / by Runtime!
-    int& get_int() { return m_int_value; }
+    IntType& get_int() { return m_int_value; }
     bool& get_bool() { return m_bool_value; }
     std::shared_ptr<Object>& get_object() { return m_object_value; }
     std::shared_ptr<MemoryValue>& get_reference() { return m_reference_value; }
 
-    int const& get_int() const { return m_int_value; }
+    IntType const& get_int() const { return m_int_value; }
     bool const& get_bool() const { return m_bool_value; }
     std::shared_ptr<Object> const& get_object() const { return m_object_value; }
     std::shared_ptr<MemoryValue> const& get_reference() const { return m_reference_value; }
@@ -88,7 +90,7 @@ public:
     bool operator==(Value const&) const = default;
 
 private:
-    explicit Value(int value, std::shared_ptr<Object> container)
+    explicit Value(IntType value, std::shared_ptr<Object> container)
     : m_type(Type::Int), m_int_value(value), m_container(container) {}
 
     explicit Value(bool value, std::shared_ptr<Object> container)
@@ -114,7 +116,7 @@ private:
 
     Type m_type = Type::Null;
 
-    int m_int_value = 0;
+    IntType m_int_value = 0;
     bool m_bool_value = false;
     std::shared_ptr<Object> m_object_value;
     std::shared_ptr<MemoryValue> m_reference_value;
@@ -142,7 +144,7 @@ public:
         return std::make_shared<MemoryValue>(Value::undefined());
     }
 
-    static std::shared_ptr<MemoryValue> create_int(int value)
+    static std::shared_ptr<MemoryValue> create_int(Value::IntType value)
     {
         return std::make_shared<MemoryValue>(Value::new_int(value));
     }

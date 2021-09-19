@@ -111,7 +111,7 @@ std::shared_ptr<Expression> EVOParser::parse_integer_literal()
 
     try
     {
-        return std::make_shared<IntegerLiteral>(std::stoi(name->value()));
+        return std::make_shared<IntegerLiteral>(std::stoll(name->value()));
     }
     catch(...)
     {
