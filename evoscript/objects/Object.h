@@ -16,9 +16,10 @@ class Object
 public:
     virtual Value get(std::string const& member);
 
-    // TODO: Make these definiable functions, e.g:
     // function type() : string
     virtual std::string type_name() const { return "Object"; }
+
+    // TODO: Make these definiable functions, e.g:
     // function dump_string() : string
     virtual std::string dump_string() const { std::ostringstream oss; repl_print(oss, true); return oss.str(); }
     // function repl_print() : string

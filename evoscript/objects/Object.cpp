@@ -12,6 +12,11 @@ namespace evo::script
 
 Value Object::get(std::string const& member)
 {
+    // function type() : string
+    NATIVE_FUNCTION(Object, "type", [](Runtime&, Object& container, std::vector<Value> const&) {
+        return Value::new_object(std::make_shared<StringObject>(container.type_name()));
+    });
+
     auto it = m_values.find(member);
     if(it == m_values.end())
     {
