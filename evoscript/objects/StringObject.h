@@ -8,10 +8,8 @@ namespace evo::script
 class StringObject : public Object
 {
 public:
-    StringObject(std::string str)
-    : m_string(str) {}
+    StringObject(std::string const& str);
 
-    virtual Value get(std::string const& member) override;
     virtual std::string type_name() const override { return "String"; }
     virtual std::string dump_string() const override { return "StringObject(" + m_string + ")"; }
     virtual void repl_print(std::ostream& output, bool) const override;

@@ -71,6 +71,8 @@ public:
     virtual std::string name() const override { return m_name; }
 
 private:
+    virtual Value get(std::string const& member) override;
+
     std::string m_name;
 };
 

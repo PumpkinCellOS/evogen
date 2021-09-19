@@ -7,13 +7,13 @@
 namespace evo::script
 {
 
-Value StringObject::get(std::string const& member)
+StringObject::StringObject(std::string const& str)
+: m_string(str)
 {
-    NATIVE_FUNCTION(StringObject, "length", length);
-    NATIVE_FUNCTION(StringObject, "concat", concat);
-    NATIVE_FUNCTION(StringObject, "substring", substring);
-    NATIVE_FUNCTION(StringObject, "append", append);
-    return Value::undefined();
+    DEFINE_NATIVE_FUNCTION(StringObject, "length", length);
+    DEFINE_NATIVE_FUNCTION(StringObject, "concat", concat);
+    DEFINE_NATIVE_FUNCTION(StringObject, "substring", substring);
+    DEFINE_NATIVE_FUNCTION(StringObject, "append", append);
 }
 
 void StringObject::repl_print(std::ostream& output, bool) const

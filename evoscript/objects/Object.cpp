@@ -91,4 +91,10 @@ void Function::repl_print(std::ostream& output, bool print_members) const
     output << keyword("function") << " " << escapes::name(m_name) << "()";
 }
 
+Value Function::get(std::string const& member)
+{
+    NATIVE_OBJECT(object, "name", std::make_shared<StringObject>(m_name));
+    return Object::get(member);
+}
+
 }
