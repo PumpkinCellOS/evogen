@@ -71,8 +71,8 @@ Value Object::operator_add(Runtime& rt, Value const& rhs) const
     std::ostringstream oss_lhs;
     repl_print(oss_lhs, true);
     std::ostringstream oss_rhs;
-    repl_print(oss_rhs, true);
-    rt.throw_exception("Cannot call operator+ on object lhs=" + oss_lhs.str() + " with rhs=" + oss_rhs.str());
+    rhs.repl_print(oss_rhs, true);
+    rt.throw_exception("Cannot call operator+ on object lhs = " + oss_lhs.str() + " with rhs = " + oss_rhs.str());
     return {};
 }
 
@@ -81,8 +81,8 @@ CompareResult Object::operator_compare(Runtime& rt, Value const& rhs) const
     std::ostringstream oss_lhs;
     repl_print(oss_lhs, true);
     std::ostringstream oss_rhs;
-    repl_print(oss_rhs, true);
-    rt.throw_exception("Cannot call operator<> on object lhs=" + oss_lhs.str() + " with rhs=" + oss_rhs.str());
+    rhs.repl_print(oss_rhs, true);
+    rt.throw_exception("Cannot call operator<> on object lhs = " + oss_lhs.str() + " with rhs = " + oss_rhs.str());
     return {};
 }
 
