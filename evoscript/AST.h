@@ -557,6 +557,27 @@ private:
     std::shared_ptr<Statement> m_true_statement;
 };
 
+class WhileStatement : public Statement
+{
+public:
+    WhileStatement(ErrorList const& error)
+    : Statement(error) {}
+
+    WhileStatement(std::shared_ptr<Expression> condition, std::shared_ptr<Statement> statement)
+    : m_condition(condition), m_statement(statement) {}
+
+    virtual EvalResult evaluate(Runtime&) const override;
+    virtual bool requires_semicolon() const override
+    {
+        assert(m_statement);
+        return m_statement->requires_semicolon();
+    }
+
+private:
+    std::shared_ptr<Expression> m_condition;
+    std::shared_ptr<Statement> m_statement;
+};
+
 class ReturnStatement : public Statement
 {
 public:

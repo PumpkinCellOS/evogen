@@ -366,6 +366,29 @@ EvalResult IfStatement::evaluate(Runtime& rt) const
         return Value::undefined();
 }
 
+EvalResult WhileStatement::evaluate(Runtime& rt) const
+{
+    Value result_value;
+    while(true)
+    {
+        Value condition = m_condition->evaluate(rt);
+        if(rt.has_exception())
+            return {};
+
+        auto condition_is_true = condition.to_bool(rt);
+        if(!condition_is_true)
+            break;
+
+        auto result = m_statement->evaluate(rt);
+        if(rt.has_exception())
+            return {};
+        if(result.is_abrupt())
+            return result;
+        result_value = result.value();
+    }
+    return result_value;
+}
+
 EvalResult ReturnStatement::evaluate(Runtime& rt) const
 {
     if(!m_expression)

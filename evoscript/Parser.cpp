@@ -651,7 +651,7 @@ std::shared_ptr<BlockStatement> EVOParser::parse_block_statement()
     return statement;
 }
 
-std::shared_ptr<Statement> EVOParser::parse_if_statement()
+std::shared_ptr<IfStatement> EVOParser::parse_if_statement()
 {
     auto if_keyword = consume_of_type(Token::Name);
     if(!if_keyword || if_keyword->value() != "if")
@@ -663,7 +663,7 @@ std::shared_ptr<Statement> EVOParser::parse_if_statement()
 
     auto condition = parse_expression();
     if(condition->is_error())
-        return std::make_shared<ExpressionStatement>(condition->errors());
+        return std::make_shared<IfStatement>(condition->errors());
 
     auto paren_close = consume_of_type(Token::ParenClose);
     if(!paren_close)
@@ -674,6 +674,31 @@ std::shared_ptr<Statement> EVOParser::parse_if_statement()
         return std::make_shared<IfStatement>(ASTNode::Error(location(), "Expected statement"));
 
     return std::make_shared<IfStatement>(condition, true_statement);
+}
+
+std::shared_ptr<WhileStatement> EVOParser::parse_while_statement()
+{
+    auto if_keyword = consume_of_type(Token::Name);
+    if(!if_keyword || if_keyword->value() != "while")
+        return {};
+
+    auto paren_open = consume_of_type(Token::ParenOpen);
+    if(!paren_open)
+        return std::make_shared<WhileStatement>(ASTNode::Error(location(), "Expected '(' after 'while'"));
+
+    auto condition = parse_expression();
+    if(condition->is_error())
+        return std::make_shared<WhileStatement>(condition->errors());
+
+    auto paren_close = consume_of_type(Token::ParenClose);
+    if(!paren_close)
+        return std::make_shared<WhileStatement>(ASTNode::Error(location(), "Expected ')' after 'while' condition"));
+
+    auto statement = parse_statement();
+    if(!statement || statement->is_error())
+        return std::make_shared<WhileStatement>(ASTNode::Error(location(), "Expected statement"));
+
+    return std::make_shared<WhileStatement>(condition, statement);
 }
 
 std::shared_ptr<ReturnStatement> EVOParser::parse_return_statement()
@@ -704,15 +729,20 @@ std::shared_ptr<Statement> EVOParser::parse_statement()
             if(!statement)
             {
                 set_offset(off);
-                statement = parse_declaration();
+                statement = parse_while_statement();
                 if(!statement)
                 {
                     set_offset(off);
-                    statement = parse_expression_statement();
-                    if(!statement || statement->is_error())
+                    statement = parse_declaration();
+                    if(!statement)
                     {
                         set_offset(off);
-                        return statement;
+                        statement = parse_expression_statement();
+                        if(!statement || statement->is_error())
+                        {
+                            set_offset(off);
+                            return statement;
+                        }
                     }
                 }
             }
