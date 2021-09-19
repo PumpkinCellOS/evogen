@@ -107,6 +107,7 @@ public:
     std::shared_ptr<Expression> parse_special_value();
     std::shared_ptr<Expression> parse_primary_expression(); // ( expression ) | integer_literal | string_literal | identifier | special_value
     std::shared_ptr<Expression> parse_postfix_expression(); // .name | (arg1, arg2, ...) | expr++ | expr--
+    std::shared_ptr<Expression> parse_new_expression();
     std::shared_ptr<Expression> parse_unary_expression();
     std::shared_ptr<Expression> parse_multiplicative_expression();
     std::shared_ptr<Expression> parse_additive_expression();

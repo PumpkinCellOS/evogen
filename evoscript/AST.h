@@ -266,6 +266,33 @@ private:
     std::vector<std::shared_ptr<Expression>> m_arguments;
 };
 
+class NewExpression : public Expression
+{
+public:
+    NewExpression(ErrorList const& error)
+    : Expression(error) {}
+
+    NewExpression(std::shared_ptr<Expression> const& name, std::vector<std::shared_ptr<Expression>> const& arguments)
+    : m_name(name), m_arguments(std::move(arguments)) {}
+
+    virtual EvalResult evaluate(Runtime&) const override;
+
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        std::string output = "NewExpression(new " + m_name->to_string() + "(";
+        for(auto& it: m_arguments)
+            output += it->to_string() + ", ";
+        return output + "))";
+    }
+
+private:
+    std::shared_ptr<Expression> m_name;
+    std::vector<std::shared_ptr<Expression>> m_arguments;
+};
+
 class UnaryExpression : public Expression
 {
 public:

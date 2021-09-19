@@ -12,8 +12,9 @@ public:
     LocalObject(std::shared_ptr<LocalObject> parent)
     : m_parent(parent) {}
 
+    EVO_OBJECT("LocalObject")
+
     virtual Value get(std::string const& member) override;
-    virtual std::string type_name() const override { return "LocalObject"; }
     std::shared_ptr<MemoryValue> allocate(std::string const& name);
     std::shared_ptr<LocalObject> parent() const { return m_parent; }
 

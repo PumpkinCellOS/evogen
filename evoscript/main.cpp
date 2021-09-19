@@ -16,9 +16,10 @@ using namespace evo::script;
 class ReplObject : public GlobalObject
 {
 public:
+    EVO_OBJECT("ReplObject")
     ReplObject();
+
     virtual Value get(std::string const& member) override;
-    virtual std::string type_name() const override { return "ReplObject"; }
 
     bool running() const { return m_running; }
     int exit_code() const { return m_exit_code; }

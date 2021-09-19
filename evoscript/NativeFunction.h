@@ -14,6 +14,8 @@ public:
     using ContainerType = T;
     using FunctionType = std::function<Value(Runtime&, ContainerType& container, std::vector<Value> const& args)>;
 
+    EVO_OBJECT("NativeFunction")
+
     NativeFunction(std::string const& name, FunctionType&& function)
     : Function(name), m_function(function) {}
 
@@ -33,8 +35,6 @@ public:
         }
         return m_function(rt, *this_container, arguments);
     }
-
-    virtual std::string type_name() const override { return "NativeFunction"; }
 
 private:
     FunctionType m_function;

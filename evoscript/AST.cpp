@@ -123,6 +123,32 @@ EvalResult FunctionCall::evaluate(Runtime& rt) const
     return callable.call(rt, arguments);
 }
 
+EvalResult NewExpression::evaluate(Runtime& rt) const
+{
+    Value name = m_name->evaluate(rt);
+    if(rt.has_exception())
+        return {};
+
+    auto name_object = name.to_object(rt);
+    if(rt.has_exception())
+        return {};
+
+    Value construct_function = name_object->get("construct");
+    if(rt.has_exception())
+        return {};
+
+    std::vector<Value> args;
+    for(auto& arg: m_arguments)
+    {
+        args.push_back(arg->evaluate(rt));
+        if(rt.has_exception())
+            return {};
+    }
+
+    construct_function.set_container(name_object);
+    return construct_function.call(rt, args);
+}
+
 EvalResult UnaryExpression::evaluate(Runtime& rt) const
 {
     auto value = m_expression->evaluate(rt);

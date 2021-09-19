@@ -9,7 +9,7 @@ class SysObject : public Object
 {
 public:
     SysObject();
-    virtual std::string type_name() const override { return "SysObject"; }
+    EVO_OBJECT("SysObject")
 
 private:
     // Read a string from stdin until a newline.

@@ -9,6 +9,7 @@ add_library(libevoscript
     "SourceLocation.cpp"
     "Value.cpp"
     "objects/ASTFunction.cpp"
+    "objects/Class.cpp"
     "objects/Exception.cpp"
     "objects/GlobalObject.cpp"
     "objects/LocalObject.cpp"

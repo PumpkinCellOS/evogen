@@ -258,8 +258,58 @@ std::shared_ptr<Expression> EVOParser::parse_postfix_expression()
     assert(false);
 }
 
+std::shared_ptr<Expression> EVOParser::parse_new_expression()
+{
+    auto new_keyword = consume_of_type(Token::Name);
+    if(!new_keyword || new_keyword->value() != "new")
+        return {};
+
+    // 'primary' because of ambiguity with function calls
+    auto name = parse_primary_expression();
+    if(name->is_error())
+        return name;
+
+    auto paren_open = consume_of_type(Token::ParenOpen);
+    if(!paren_open)
+        return std::make_shared<NewExpression>(ASTNode::Error(location(), "Expected '('"));
+
+    // FIXME: Code dupe with parse_function_call??
+    std::vector<std::shared_ptr<Expression>> arguments;
+
+    auto paren_close = consume_of_type(Token::ParenClose);
+    if(!paren_close)
+    {
+        while(true)
+        {
+            auto argument = parse_expression();
+            if(argument->is_error())
+                return argument;
+
+            arguments.push_back(argument);
+
+            auto comma = consume_of_type(Token::Comma);
+            if(!comma)
+                break;
+        }
+        
+        auto paren_close = consume_of_type(Token::ParenClose);
+        if(!paren_close)
+            return std::make_shared<NewExpression>(ASTNode::Error(location(), "Unmatched '('"));
+    }
+
+    return std::make_shared<NewExpression>(name, arguments);
+}
+
 std::shared_ptr<Expression> EVOParser::parse_unary_expression()
 {
+    {
+        size_t off = offset();
+        auto new_expression = parse_new_expression();
+        if(new_expression)
+            return new_expression;
+        set_offset(off);
+    }
+
     auto op = consume_of_type(Token::NormalOperator);
     if(!op)
         return parse_postfix_expression();

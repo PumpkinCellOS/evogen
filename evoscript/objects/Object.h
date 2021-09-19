@@ -11,13 +11,22 @@ namespace evo::script
 class Runtime;
 class MemoryValue;
 
+#define EVO_OBJECT(Name) \
+    virtual std::string type_name() const override { return static_type_name(); } \
+    static std::string static_type_name() { return Name; }
+
 class Object
 {
 public:
+    // TODO: This probably should be removed
+    Object() = default;
+    Object(Runtime&, std::vector<Value> const&) {}
+
     virtual Value get(std::string const& member);
 
     // function type() : string
-    virtual std::string type_name() const { return "Object"; }
+    virtual std::string type_name() const { return static_type_name(); }
+    static std::string static_type_name() { return "Object"; }
 
     // TODO: Make these definiable functions, e.g:
     // function dump_string() : string
@@ -62,12 +71,19 @@ private:
     std::map<std::string, std::shared_ptr<MemoryValue>> m_values;
 };
 
+template<class T>
+static Value new_object_value_from_args(Runtime& rt, std::vector<Value> const& args)
+{
+    static_assert(std::is_base_of_v<Object, T>);
+    return Value::new_object(std::make_shared<T>(rt, args));
+}
+
 class Function : public Object
 {
 public:
     Function(std::string const& name);
+    EVO_OBJECT("Function")
 
-    virtual std::string type_name() const override { return "Function"; }
     virtual void repl_print(std::ostream& output, bool print_members) const override;
     virtual std::string name() const override { return m_name; }
 

@@ -11,9 +11,12 @@ class Exception : public Object
 {
 public:
     Exception(Runtime& rt, std::string const& message);
+    Exception(Runtime& rt, std::vector<Value> const& args)
+    : Exception(rt, args.size() > 0 ? args[0].to_string() : "") {}
+
+    EVO_OBJECT("Exception")
 
     virtual void repl_print(std::ostream& output, bool) const override;
-    virtual std::string type_name() const override { return "Exception"; }
 
 private:
     static Value print_(Runtime& rt, Exception& container, std::vector<Value> const&);

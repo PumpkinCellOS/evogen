@@ -9,8 +9,11 @@ class StringObject : public Object
 {
 public:
     StringObject(std::string const& str);
+    StringObject(Runtime&, std::vector<Value> const& args)
+    : StringObject(args.size() > 0 ? args[0].to_string() : "") {}
 
-    virtual std::string type_name() const override { return "String"; }
+    EVO_OBJECT("String")
+
     virtual std::string dump_string() const override { return "StringObject(" + m_string + ")"; }
     virtual void repl_print(std::ostream& output, bool) const override;
     virtual std::string to_string() const override { return m_string; }
