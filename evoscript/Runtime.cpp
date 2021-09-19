@@ -30,7 +30,7 @@ Runtime::Runtime(std::shared_ptr<GlobalObject> global_object, std::shared_ptr<Me
         return;
 
     auto _this = context.this_object();
-    auto _global = global_object;
+    auto _global = m_global_object;
     auto _local = context.local_scope_object();
 
     std::cerr << "this = " << _this->dump_string() << std::endl;
