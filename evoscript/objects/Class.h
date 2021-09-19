@@ -12,21 +12,24 @@ class Class : public Object
 public:
     using ConstructorType = std::function<Value(Runtime&, std::vector<Value> const&)>;
 
-    Class(ConstructorType&& constructor);
+    Class(std::string const& name, ConstructorType&& constructor);
 
     EVO_OBJECT("Class")
+
+    virtual void repl_print(std::ostream& output, bool print_members) const override;
 
 private:
     static Value construct(Runtime&, Class&, std::vector<Value> const& args);
 
-   ConstructorType m_constructor;
+    std::string m_name;
+    ConstructorType m_constructor;
 };
 
 template<class T>
 std::shared_ptr<Class> create_native_class()
 {
     static_assert(std::is_base_of_v<Object, T>);
-    return std::make_shared<Class>([](Runtime& rt, std::vector<Value> const& args) {
+    return std::make_shared<Class>(T::static_type_name(), [](Runtime& rt, std::vector<Value> const& args) {
         return new_object_value_from_args<T>(rt, args);
     });
 }
