@@ -43,8 +43,13 @@ int Value::to_int(Runtime& rt) const
     case Type::Undefined:
         return 0;
     case Type::Object:
+    {
         assert(m_object_value);
-        return m_object_value->to_primitive(rt, Value::Type::Int).to_int(rt);
+        auto primitive = m_object_value->to_primitive(rt, Value::Type::Int);
+        if(rt.has_exception())
+            return 0;
+        return primitive.to_int(rt);
+    }
     case Type::Int:
         return m_int_value;
     case Type::Bool:
