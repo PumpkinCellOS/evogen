@@ -36,10 +36,10 @@ int main(int argc, char** argv)
     if(argc == 2)
     {
         auto file = std::ifstream(argv[1]);
-        return runtime.run_code_from_stream(file, Runtime::RunType::Repl).is_invalid() ? 1 : 0;
+        return runtime.run_code_from_stream(file, Runtime::RunType::Script).is_invalid() ? 1 : 0;
     }
     else if(!isatty(0))
-        return runtime.run_code_from_stream(std::cin, Runtime::RunType::Repl).is_invalid() ? 1 : 0;
+        return runtime.run_code_from_stream(std::cin, Runtime::RunType::Script).is_invalid() ? 1 : 0;
 
     std::cout << "EvoGen Script REPL" << std::endl;
     while(true)
