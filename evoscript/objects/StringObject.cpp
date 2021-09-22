@@ -10,10 +10,14 @@ namespace evo::script
 StringObject::StringObject(std::string const& str)
 : m_string(str)
 {
-    DEFINE_NATIVE_FUNCTION(StringObject, "length", length);
-    DEFINE_NATIVE_FUNCTION(StringObject, "concat", concat);
-    DEFINE_NATIVE_FUNCTION(StringObject, "substring", substring);
-    DEFINE_NATIVE_FUNCTION(StringObject, "append", append);
+    static StringId length_sid = "length";
+    DEFINE_NATIVE_FUNCTION(StringObject, length_sid, length);
+    static StringId concat_sid = "concat";
+    DEFINE_NATIVE_FUNCTION(StringObject, concat_sid, concat);
+    static StringId substring_sid = "substring";
+    DEFINE_NATIVE_FUNCTION(StringObject, substring_sid, substring);
+    static StringId append_sid = "append";
+    DEFINE_NATIVE_FUNCTION(StringObject, append_sid, append);
 }
 
 void StringObject::repl_print(std::ostream& output, bool) const

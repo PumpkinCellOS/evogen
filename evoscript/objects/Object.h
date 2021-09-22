@@ -52,7 +52,7 @@ public:
 protected:
     void add_object_property(StringId name, std::shared_ptr<MemoryValue> memory_value)
     {
-        memory_value->set_name(name.string());
+        memory_value->set_name(name);
         m_values.insert(std::make_pair(name, memory_value));
     }
 
