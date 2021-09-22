@@ -16,7 +16,7 @@ class Exception;
 class Runtime
 {
 public:
-    Runtime(std::shared_ptr<GlobalObject> global_object = nullptr, std::shared_ptr<MemoryValue> global_this = nullptr);
+    Runtime(std::shared_ptr<GlobalObject> const& global_object = nullptr, std::shared_ptr<MemoryValue> const& global_this = nullptr);
     ~Runtime();
 
     void throw_exception(std::string const& message);
@@ -35,7 +35,7 @@ public:
     std::shared_ptr<GlobalObject> global_object() { return m_global_object; }
     void print_backtrace() const;
 
-    ExecutionContext& push_execution_context(std::string const& name, std::shared_ptr<Object> this_object);
+    ExecutionContext& push_execution_context(std::string const& name, std::shared_ptr<Object> const& this_object);
     ExecutionContext& push_scope();
     ExecutionContext& current_execution_context();
     void pop_execution_context();

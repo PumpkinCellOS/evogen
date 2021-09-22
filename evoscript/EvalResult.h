@@ -23,8 +23,10 @@ public:
     static EvalResult break_(Value const& value = {}) { return EvalResult(value, Break); }
     static EvalResult continue_(Value const& value = {}) { return EvalResult(value, Continue); }
 
-    CompletionType type() const { return m_type; }
-    Value value() const { return m_value; }
+    CompletionType& type() { return m_type; }
+    CompletionType const& type() const { return m_type; }
+    Value& value() { return m_value; }
+    Value const& value() const { return m_value; }
     operator Value() const { return value(); }
 
     bool is_normal() const { return m_type == Normal; }

@@ -17,12 +17,12 @@ void CallStack::print(std::ostream& stream) const
     }
 }
 
-ExecutionContext& CallStack::push_execution_context(std::string const& name, std::shared_ptr<Object> this_object)
+ExecutionContext& CallStack::push_execution_context(std::string const& name, std::shared_ptr<Object> const& this_object)
 {
     return m_call_stack.emplace_front(name, this_object, nullptr);
 }
 
-ExecutionContext& CallStack::push_scope(std::shared_ptr<Object> this_object)
+ExecutionContext& CallStack::push_scope(std::shared_ptr<Object> const& this_object)
 {
     return m_call_stack.emplace_front("", this_object, current_execution_context().local_scope_object());
 }

@@ -15,7 +15,7 @@ Value LocalObject::get(std::string const& member)
         return {};
     }
 
-    return Value::new_reference(it->second);
+    return Value::new_reference(std::move(it->second));
 }
 
 std::shared_ptr<MemoryValue> LocalObject::allocate(std::string const& name)

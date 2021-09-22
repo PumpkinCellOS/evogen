@@ -109,7 +109,7 @@ EvalResult FunctionCall::evaluate(Runtime& rt) const
     {
         Value value = expr->evaluate(rt);
         if(rt.has_exception())
-            return {}; // failed to evaluate argument;
+            return {}; // failed to evaluate argument
 
         arguments.push_back(value.dereferenced());
     }
@@ -129,7 +129,7 @@ EvalResult Subscript::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {};
     auto result = value_object->operator_subscript(rt, subscript_value);
-    result.set_container(std::move(value_object));
+    result.set_container(value_object);
     return result;
 }
 
@@ -357,7 +357,7 @@ EvalResult BlockStatement::evaluate(Runtime& rt) const
             return {};
         if(result.is_abrupt())
             return result;
-        val = result;
+        val = std::move(result);
     }
     return val;
 }
@@ -468,7 +468,7 @@ EvalResult Program::evaluate(Runtime& rt) const
             rt.throw_exception("Cannot 'return' in global scope");
             return {};
         }
-        val = result;
+        val = std::move(result);
     }
     return val;
 }

@@ -11,7 +11,7 @@
 namespace evo::script
 {
 
-Runtime::Runtime(std::shared_ptr<GlobalObject> global_object, std::shared_ptr<MemoryValue> global_this)
+Runtime::Runtime(std::shared_ptr<GlobalObject> const& global_object, std::shared_ptr<MemoryValue> const& global_this)
 : m_global_object(global_object), m_global_this(global_this)
 {
     if(!m_global_object)
@@ -40,12 +40,12 @@ void Runtime::print_backtrace() const
     m_call_stack.print(std::cerr);
 }
 
-ExecutionContext& Runtime::push_execution_context(std::string const& name, std::shared_ptr<Object> this_object)
+ExecutionContext& Runtime::push_execution_context(std::string const& name, std::shared_ptr<Object> const& this_object)
 {
     if(!this_object)
     {
         assert(m_global_this->value().is_object());
-        this_object = m_global_this->value().get_object();
+        return m_call_stack.push_execution_context(name, m_global_this->value().get_object());
     }
     return m_call_stack.push_execution_context(name, this_object);
 }
