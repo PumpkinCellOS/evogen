@@ -66,7 +66,7 @@ public:
     IntType& get_int() { return m_int_value; }
     bool& get_bool() { return m_bool_value; }
     std::shared_ptr<Object>& get_object() { return m_object_value; }
-    std::shared_ptr<MemoryValue>& get_reference() { return m_reference_value; }
+    std::shared_ptr<MemoryValue>& get_reference() { assert(is_reference()); return m_reference_value; }
 
     IntType const& get_int() const { return m_int_value; }
     bool const& get_bool() const { return m_bool_value; }

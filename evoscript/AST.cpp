@@ -42,10 +42,10 @@ EvalResult Identifier::evaluate(Runtime& rt) const
         // be created on global object!
         auto global_object = rt.global_object();
         value = global_object->get(m_name);
-        container = global_object;
+        container = std::move(global_object);
     }
     else
-        container = local_scope_object;
+        container = std::move(local_scope_object);
 
     if(!value.is_reference()) 
     {
@@ -54,12 +54,8 @@ EvalResult Identifier::evaluate(Runtime& rt) const
         return value;
     }
     
-    memory_object = value.to_reference(rt);
-    assert(!rt.has_exception());
-
-    auto new_value = Value::new_reference(value.to_reference(rt));
-    if(rt.has_exception())
-        return {};
+    memory_object = value.get_reference();
+    auto new_value = Value::new_reference(memory_object);
     new_value.set_container(container);
     new_value.set_name(m_name);
     return new_value;
