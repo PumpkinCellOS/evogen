@@ -39,10 +39,10 @@ public:
 
     static Value null() { return Value(Null); }
     static Value undefined() { return Value(Undefined); }
-    static Value new_int(IntType value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
-    static Value new_bool(bool value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
-    static Value new_object(std::shared_ptr<Object> value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
-    static Value new_reference(std::shared_ptr<MemoryValue> value, std::shared_ptr<Object> container = {}) { return Value(value, container); }
+    static Value new_int(IntType value, std::shared_ptr<Object> const& container = {}) { return Value(value, container); }
+    static Value new_bool(bool value, std::shared_ptr<Object> const& container = {}) { return Value(value, container); }
+    static Value new_object(std::shared_ptr<Object> const& value, std::shared_ptr<Object> const& container = {}) { return Value(value, container); }
+    static Value new_reference(std::shared_ptr<MemoryValue> const& value, std::shared_ptr<Object> const& container = {}) { return Value(value, container); }
 
     bool is_invalid() const { return m_type == Type::Invalid; }
     bool is_null() const { return m_type == Type::Null; }
@@ -84,23 +84,23 @@ public:
     void set_name(std::string const& name) { m_name = name; } 
 
     std::shared_ptr<Object> container() const { return m_container; }
-    void set_container(std::shared_ptr<Object> object) { m_container = object; }
+    void set_container(std::shared_ptr<Object> const& object) { m_container = object; }
 
     // TODO: Default version will probably not be optimal
     bool operator==(Value const&) const = default;
 
 private:
-    explicit Value(IntType value, std::shared_ptr<Object> container)
+    explicit Value(IntType value, std::shared_ptr<Object> const& container)
     : m_type(Type::Int), m_int_value(value), m_container(container) {}
 
-    explicit Value(bool value, std::shared_ptr<Object> container)
+    explicit Value(bool value, std::shared_ptr<Object> const& container)
     : m_type(Type::Bool), m_bool_value(value), m_container(container) {}
 
-    explicit Value(std::shared_ptr<Object> value, std::shared_ptr<Object> container)
+    explicit Value(std::shared_ptr<Object> const& value, std::shared_ptr<Object> const& container)
     : m_type(Type::Object), m_object_value(value), m_container(container)
         { assert(m_object_value); }
 
-    explicit Value(std::shared_ptr<MemoryValue> value, std::shared_ptr<Object> container)
+    explicit Value(std::shared_ptr<MemoryValue> const& value, std::shared_ptr<Object> const& container)
     : m_type(Type::Reference), m_reference_value(value), m_container(container)
         { assert(m_reference_value); }
 
