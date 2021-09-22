@@ -19,7 +19,7 @@ public:
     std::shared_ptr<LocalObject> parent() const { return m_parent; }
 
 private:
-    std::map<std::string, std::shared_ptr<MemoryValue>> m_values;
+    std::unordered_map<std::string, std::shared_ptr<MemoryValue>> m_values;
     std::shared_ptr<LocalObject> m_parent;
 };
 

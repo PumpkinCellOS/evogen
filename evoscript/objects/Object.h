@@ -73,7 +73,7 @@ protected:
     }
 
 private:
-    std::map<std::string, std::shared_ptr<MemoryValue>> m_values;
+    std::unordered_map<std::string, std::shared_ptr<MemoryValue>> m_values;
 };
 
 template<class T>
