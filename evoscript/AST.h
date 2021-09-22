@@ -109,6 +109,9 @@ public:
     Expression() = default;
 
     virtual EvalResult evaluate(Runtime&) const override { return {}; }
+
+    // has effect = modifies environment (local/global/this object)
+    virtual bool has_effect() const { return true; }
 };
 
 class IntegerLiteral : public Expression
@@ -121,6 +124,7 @@ public:
     : m_value(value) {}
 
     virtual EvalResult evaluate(Runtime&) const override;
+    virtual bool has_effect() const override { return false; }
 
     virtual std::string to_string() const override
     {
@@ -144,6 +148,7 @@ public:
     : m_value(value) {}
 
     virtual EvalResult evaluate(Runtime&) const override;
+    virtual bool has_effect() const override { return false; }
 
     virtual std::string to_string() const override
     {
@@ -167,6 +172,7 @@ public:
     : m_name(name) {}
 
     virtual EvalResult evaluate(Runtime&) const override;
+    // TODO: has_effect = false
 
     virtual std::string to_string() const override
     {
@@ -200,6 +206,7 @@ public:
     : m_type(type) {}
 
     virtual EvalResult evaluate(Runtime&) const override;
+    virtual bool has_effect() const override { return false; }
 
     virtual std::string to_string() const override
     {
@@ -223,6 +230,7 @@ public:
     : m_expression(expression), m_name(name) {}
 
     virtual EvalResult evaluate(Runtime&) const override;
+    // TODO: has_effect = false
 
     std::shared_ptr<Expression> this_expression() const { return m_expression; }
 
@@ -509,6 +517,7 @@ public:
     Statement() = default;
 
     virtual bool requires_semicolon() const { return true; }
+    virtual bool has_effect() const { return true; }
 };
 
 class ExpressionStatement : public Statement
@@ -521,6 +530,7 @@ public:
     : m_expression(expression) { assert(expression); }
 
     virtual EvalResult evaluate(Runtime&) const override;
+    virtual bool has_effect() const override { return m_expression->has_effect(); }
 
     virtual std::string to_string() const override
     {

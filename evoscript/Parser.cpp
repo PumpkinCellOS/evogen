@@ -647,7 +647,8 @@ std::shared_ptr<BlockStatement> EVOParser::parse_block_statement()
         auto node = parse_statement();
         if(!node)
             break;
-        statement->add_node(node);
+        if(node->has_effect())
+            statement->add_node(node);
         if(node->is_error())
             break;
 
