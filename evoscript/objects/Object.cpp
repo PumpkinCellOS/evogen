@@ -10,10 +10,11 @@
 namespace evo::script
 {
 
-Value Object::get(std::string const& member)
+Value Object::get(StringId member)
 {
     // function type() : string
-    NATIVE_FUNCTION(Object, "type", [](Runtime&, Object& container, std::vector<Value> const&) {
+    static StringId type_sid = "type";
+    NATIVE_FUNCTION(Object, type_sid, [](Runtime&, Object& container, std::vector<Value> const&) {
         return StringObject::create_value(container.type_name());
     });
 
@@ -40,11 +41,11 @@ void Object::repl_print(std::ostream& output, bool print_members) const
         for(auto& value: m_values)
         {
             if(value.second->value().is_object() && value.second->value().get_object().get() == this)
-                output << "  " << literal(value.first) << ": " << constant("<recursive reference>");
+                output << "  " << literal(value.first.string()) << ": " << constant("<recursive reference>");
             else
             {
                 // TODO: Use dump_string if called from dump_string
-                output << "  " << literal(value.first) << ": ";
+                output << "  " << literal(value.first.string()) << ": ";
                 if(value.second->is_read_only())
                     output << comment("const") << " ";
                 value.second->repl_print(output, false);
@@ -91,19 +92,19 @@ Value Object::operator_subscript(Runtime& rt, Value const& rhs)
     return get(rhs.to_string());
 }
 
-Function::Function(std::string const& name)
+Function::Function(StringId name)
 : m_name(name)
 {
 }
 
 void Function::repl_print(std::ostream& output, bool print_members) const
 {
-    output << escapes::keyword("function") << (m_name.empty() ? "" : " ") << escapes::name(m_name) << "()";
+    output << escapes::keyword("function") << (m_name.empty() ? "" : " ") << escapes::name(m_name.string()) << "()";
 }
 
-Value Function::get(std::string const& member)
+Value Function::get(StringId member)
 {
-    NATIVE_OBJECT(object, "name", std::make_shared<StringObject>(m_name));
+    NATIVE_OBJECT(object, "name", std::make_shared<StringObject>(m_name.string()));
     return Object::get(member);
 }
 

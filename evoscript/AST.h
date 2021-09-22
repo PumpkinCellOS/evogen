@@ -3,6 +3,7 @@
 #include <compare>
 #include <evoscript/EvalResult.h>
 #include <evoscript/SourceLocation.h>
+#include <evoscript/StringId.h>
 #include <evoscript/Value.h>
 
 #include <memory>
@@ -168,7 +169,7 @@ public:
     Identifier(ErrorList const& error)
     : Expression(error) {}
 
-    Identifier(std::string const& name)
+    Identifier(StringId name)
     : m_name(name) {}
 
     virtual EvalResult evaluate(Runtime&) const override;
@@ -179,11 +180,11 @@ public:
         if(is_error())
             return ASTNode::to_string();
 
-        return "Identifier(" + m_name + ")";
+        return "Identifier(" + m_name.string() + ")";
     }
 
 private:
-    std::string m_name;
+    StringId m_name;
 };
 
 class SpecialValue : public Expression
@@ -239,12 +240,12 @@ public:
         if(is_error())
             return ASTNode::to_string();
 
-        return "MemberExpression(" + m_expression->to_string() + "." + m_name + ")";
+        return "MemberExpression(" + m_expression->to_string() + "." + m_name.string() + ")";
     }
 
 private:
     std::shared_ptr<Expression> m_expression;
-    std::string m_name;
+    StringId m_name;
 };
 
 class FunctionCall : public Expression
@@ -494,18 +495,18 @@ public:
     FunctionExpression(ErrorList const& error)
     : Expression(error) {}
 
-    FunctionExpression(std::string const& name, std::shared_ptr<BlockStatement> body, std::vector<std::string> const& arg_names)
+    FunctionExpression(StringId name, std::shared_ptr<BlockStatement> body, std::vector<StringId> const& arg_names)
     : m_name(name), m_body(body), m_arg_names(arg_names) {}
 
     virtual EvalResult evaluate(Runtime&) const override;
     virtual std::string to_string() const override;
 
-    std::string name() const { return m_name; }
+    std::string name() const { return m_name.string(); }
 
 private:
-    std::string m_name;
+    StringId m_name;
     std::shared_ptr<BlockStatement> m_body;
-    std::vector<std::string> m_arg_names;
+    std::vector<StringId> m_arg_names;
 };
 
 class Statement : public ASTNode
@@ -655,13 +656,13 @@ public:
     VariableDeclaration(ErrorList const& error)
     : Declaration(error) {}
 
-    VariableDeclaration(std::string const& name, std::shared_ptr<Expression> initializer)
+    VariableDeclaration(StringId name, std::shared_ptr<Expression> initializer)
     : m_name(name), m_initializer(initializer) {}
 
     virtual EvalResult evaluate(Runtime&) const override;
 
 private:
-    std::string m_name;
+    StringId m_name;
     std::shared_ptr<Expression> m_initializer;
 };
 

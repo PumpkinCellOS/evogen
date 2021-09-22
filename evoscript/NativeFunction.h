@@ -16,7 +16,7 @@ public:
 
     EVO_OBJECT("NativeFunction")
 
-    NativeFunction(std::string const& name, FunctionType&& function)
+    NativeFunction(StringId name, FunctionType&& function)
     : Function(name), m_function(function) {}
 
     static Value create_value(FunctionType&& function)

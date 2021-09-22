@@ -7,6 +7,7 @@ add_library(libevoscript
     "Parser.cpp"
     "Runtime.cpp"
     "SourceLocation.cpp"
+    "StringId.cpp"
     "Value.cpp"
     "objects/ASTFunction.cpp"
     "objects/Class.cpp"

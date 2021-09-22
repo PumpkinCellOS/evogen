@@ -6,6 +6,8 @@
 #include <memory>
 #include <string>
 
+#include <evoscript/StringId.h>
+
 namespace evo::script
 {
 
@@ -162,8 +164,8 @@ public:
     bool is_read_only() const { return m_read_only; }
     void set_read_only(bool read_only) { m_read_only = read_only; }
 
-    std::string name() const { return m_name; }
-    void set_name(std::string const& name) { m_name = name; }
+    StringId name() const { return m_name; }
+    void set_name(StringId name) { m_name = name; }
 
     std::string dump_string() const;
     void repl_print(std::ostream& output, bool print_members) const;
@@ -171,7 +173,7 @@ public:
 private:
     Value m_value { Value::null() };
     bool m_read_only = false;
-    std::string m_name;
+    StringId m_name;
 };
 
 std::ostream& operator<<(std::ostream&, MemoryValue const&);

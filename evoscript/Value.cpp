@@ -59,6 +59,7 @@ Value::IntType Value::to_int(Runtime& rt) const
         return m_reference_value->value().to_int(rt);
     default:
         assert(false);
+        return {};
     }
 }
     
@@ -80,6 +81,7 @@ bool Value::to_bool(Runtime& rt) const
         return m_reference_value->value().to_bool(rt);
     default:
         assert(false);
+        return {};
     }
 }
 
@@ -99,7 +101,9 @@ std::shared_ptr<Object> Value::to_object(Runtime& rt) const
     case Type::Reference:
         assert(m_reference_value);
         return m_reference_value->value().to_object(rt);
-    default: assert(false);
+    default:
+        assert(false);
+        return {};
     }
 }
 
@@ -123,7 +127,9 @@ std::string Value::to_string() const
     case Type::Object:
         assert(m_object_value);
         return m_object_value->to_string();
-    default: assert(false);
+    default:
+        assert(false);
+        return {};
     }
 }
     
@@ -141,7 +147,9 @@ std::shared_ptr<MemoryValue> Value::to_reference(Runtime& rt) const
     case Type::Reference:
         assert(m_reference_value);
         return m_reference_value;
-    default: assert(false);
+    default:
+        assert(false);
+        return {};
     }
 }
 

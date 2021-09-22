@@ -71,7 +71,7 @@ std::shared_ptr<FunctionExpression> EVOParser::parse_function_expression()
         return std::make_shared<FunctionExpression>(ASTNode::Error(location(), "Expected '('"));
 
     // Arguments / formal parameters
-    std::vector<std::string> arg_names;
+    std::vector<StringId> arg_names;
 
     auto paren_close = consume_of_type(Token::ParenClose);
     if(!paren_close)
@@ -566,7 +566,10 @@ std::shared_ptr<Expression> EVOParser::parse_assignment_expression()
     else if(op->value() == "%=")
         operation = AssignmentExpression::Modulo;
     else
+    {
         assert(false);
+        return {};
+    }
 
     return std::make_shared<AssignmentExpression>(lhs, rhs, operation);
 }

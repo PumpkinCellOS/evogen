@@ -77,6 +77,7 @@ EvalResult SpecialValue::evaluate(Runtime& rt) const
         return Value::undefined();
     default:
         assert(false);
+        return {};
     }
 }
 
@@ -143,7 +144,8 @@ EvalResult NewExpression::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {};
 
-    Value construct_function = name_object->get("construct");
+    static StringId construct_name = "construct";
+    Value construct_function = name_object->get(construct_name);
     if(rt.has_exception())
         return {};
 
@@ -337,7 +339,7 @@ std::string FunctionExpression::to_string() const
     if(is_error())
         return ASTNode::to_string();
 
-    return "FunctionExpression(" + m_name + " {" + m_body->to_string() + "})";
+    return "FunctionExpression(" + name() + " {" + m_body->to_string() + "})";
 }
 
 EvalResult ExpressionStatement::evaluate(Runtime& rt) const
@@ -419,6 +421,7 @@ EvalResult SimpleControlStatement::evaluate(Runtime&) const
             return EvalResult::continue_(Value::undefined());
         default:
             assert(false);
+            return {};
     }
 }
 

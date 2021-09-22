@@ -1,6 +1,7 @@
 #pragma once
 
 #include <evoscript/AbstractOperations.h>
+#include <evoscript/StringId.h>
 #include <evoscript/Value.h>
 
 #include <sstream>
@@ -22,7 +23,7 @@ public:
     Object() = default;
     Object(Runtime&, std::vector<Value> const&) {}
 
-    virtual Value get(std::string const& member);
+    virtual Value get(StringId member);
 
     // function type() : string
     virtual std::string type_name() const { return static_type_name(); }
@@ -49,14 +50,14 @@ public:
     virtual std::string name() const { return ""; }
 
 protected:
-    void add_object_property(std::string const& name, std::shared_ptr<MemoryValue> memory_value)
+    void add_object_property(StringId name, std::shared_ptr<MemoryValue> memory_value)
     {
-        memory_value->set_name(name);
+        memory_value->set_name(name.string());
         m_values.insert(std::make_pair(name, memory_value));
     }
 
     template<class T, class... Args>
-    void define_object_property(std::string const& name, Args&&... args)
+    void define_object_property(StringId name, Args&&... args)
     {
         auto memory_value = MemoryValue::create_object<T>(std::forward<Args>(args)...);
         memory_value->set_name(name);
@@ -64,7 +65,7 @@ protected:
     }
 
     template<class T, class... Args>
-    void define_read_only_object_property(std::string const& name, Args&&... args)
+    void define_read_only_object_property(StringId name, Args&&... args)
     {
         auto memory_value = MemoryValue::create_object<T>(std::forward<Args>(args)...);
         memory_value->set_read_only(true);
@@ -73,7 +74,7 @@ protected:
     }
 
 private:
-    std::unordered_map<std::string, std::shared_ptr<MemoryValue>> m_values;
+    std::unordered_map<StringId, std::shared_ptr<MemoryValue>> m_values;
 };
 
 template<class T>
@@ -86,16 +87,16 @@ static Value new_object_value_from_args(Runtime& rt, std::vector<Value> const& a
 class Function : public Object
 {
 public:
-    Function(std::string const& name);
+    Function(StringId name);
     EVO_OBJECT("Function")
 
     virtual void repl_print(std::ostream& output, bool print_members) const override;
-    virtual std::string name() const override { return m_name; }
+    virtual std::string name() const override { return m_name.string(); }
 
 private:
-    virtual Value get(std::string const& member) override;
+    virtual Value get(StringId member) override;
 
-    std::string m_name;
+    StringId m_name;
 };
 
 #define NATIVE_OBJECT(type, script_name, internal_name) \

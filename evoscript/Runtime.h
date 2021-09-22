@@ -2,6 +2,7 @@
 
 #include <evoscript/CallStack.h>
 #include <evoscript/ExecutionContext.h>
+#include <evoscript/StringId.h>
 #include <evoscript/Value.h>
 #include <evoscript/objects/GlobalObject.h>
 
