@@ -17,7 +17,7 @@ public:
     };
 
     EvalResult(Value const& value = {})
-    : EvalResult(std::move(value), Normal) {}
+    : EvalResult(value, Normal) {}
 
     static EvalResult return_(Value const& value = {}) { return EvalResult(value, Return); }
     static EvalResult break_(Value const& value = {}) { return EvalResult(value, Break); }
