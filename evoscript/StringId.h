@@ -43,7 +43,7 @@ class hash<evo::script::StringId> : public std::hash<size_t>
 public:
     size_t operator()(evo::script::StringId const& id) const
     {
-        return std::hash<size_t>{}(id.id());
+        return id.id();
     }
 };
 
