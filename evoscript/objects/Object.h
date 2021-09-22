@@ -51,6 +51,7 @@ public:
 protected:
     void add_object_property(std::string const& name, std::shared_ptr<MemoryValue> memory_value)
     {
+        memory_value->set_name(name);
         m_values.insert(std::make_pair(name, memory_value));
     }
 
@@ -58,6 +59,7 @@ protected:
     void define_object_property(std::string const& name, Args&&... args)
     {
         auto memory_value = MemoryValue::create_object<T>(std::forward<Args>(args)...);
+        memory_value->set_name(name);
         add_object_property(name, memory_value);
     }
 
@@ -66,6 +68,7 @@ protected:
     {
         auto memory_value = MemoryValue::create_object<T>(std::forward<Args>(args)...);
         memory_value->set_read_only(true);
+        memory_value->set_name(name);
         add_object_property(name, memory_value);
     }
 

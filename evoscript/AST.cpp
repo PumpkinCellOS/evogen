@@ -50,14 +50,12 @@ EvalResult Identifier::evaluate(Runtime& rt) const
     if(!value.is_reference()) 
     {
         value.set_container(container);
-        value.set_name(m_name);
         return value;
     }
     
     memory_object = value.get_reference();
     auto new_value = Value::new_reference(memory_object);
     new_value.set_container(container);
-    new_value.set_name(m_name);
     return new_value;
 }
 
@@ -97,7 +95,6 @@ EvalResult MemberExpression::evaluate(Runtime& rt) const
         return {}; // get() failed (e.g nonexisting objects are not tolerated)
 
     member.set_container(object);
-    member.set_name(m_name);
     return member;
 }
 

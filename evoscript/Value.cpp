@@ -286,26 +286,12 @@ Value Value::call(Runtime& rt, std::vector<Value> const& arguments)
         return {};
     }
 
-    ScopedExecutionContext context(rt, (m_container ? m_container->type_name() + "::" : "") + name() + "()", container());
+    std::string name = is_reference() ? get_reference()->name() : "<anonymous>";
+    ScopedExecutionContext context(rt, (m_container ? m_container->type_name() + "::" : "") + name + "()", container());
     if(rt.has_exception())
         return {}; // 'this' is not an object
     
     return real_value.get_object()->call(rt, m_container ? *m_container : *real_value.get_object(), arguments);
-}
-
-std::string Value::name() const
-{
-    auto real_value = dereferenced();
-    if(!real_value.is_object())
-        return "?";
-    auto name = real_value.get_object()->name();
-    if(name.empty())
-    {
-        if(!m_name.empty())
-            return m_name;
-        return "<object>";
-    }
-    return name;
 }
 
 std::ostream& operator<<(std::ostream& stream, Value const& value)
