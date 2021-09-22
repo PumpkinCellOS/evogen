@@ -43,6 +43,8 @@ public:
     virtual Value operator_add(Runtime& rt, Value const& rhs) const;
     // function operator<>(rhs: Value) : CompareResult
     virtual CompareResult operator_compare(Runtime& rt, Value const& rhs) const;
+    // function operator[](rhs: Value) : Value
+    virtual Value operator_subscript(Runtime& rt, Value const& rhs);
     // function name(): Value // this is already done for Function
     virtual std::string name() const { return ""; }
 

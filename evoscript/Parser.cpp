@@ -204,6 +204,21 @@ std::shared_ptr<Expression> EVOParser::parse_argument_list(std::shared_ptr<Expre
     return std::make_shared<FunctionCall>(lhs, arguments);
 }
 
+std::shared_ptr<Expression> EVOParser::parse_subscript_value(std::shared_ptr<Expression> lhs)
+{
+    auto paren_open = consume_of_type(Token::BraceOpen);
+    if(!paren_open)
+        return {};
+
+    auto value = parse_expression();
+
+    auto paren_close = consume_of_type(Token::BraceClose);
+    if(!paren_close)
+        return std::make_shared<Subscript>(ASTNode::Error(location(), "Unmatched '['"));
+
+    return value->is_error() ? value : std::make_shared<Subscript>(lhs, value);
+}
+
 std::shared_ptr<Expression> EVOParser::parse_postfix_operator(std::shared_ptr<Expression> lhs)
 {
     auto op = consume_of_type(Token::NormalOperator);
@@ -238,11 +253,16 @@ std::shared_ptr<Expression> EVOParser::parse_postfix_expression()
             if(!new_lhs)
             {
                 set_offset(off);
-                new_lhs = parse_postfix_operator(lhs);
+                new_lhs = parse_subscript_value(lhs);
                 if(!new_lhs)
                 {
                     set_offset(off);
-                    return lhs;
+                    new_lhs = parse_postfix_operator(lhs);
+                    if(!new_lhs)
+                    {
+                        set_offset(off);
+                        return lhs;
+                    }
                 }
             }
         }

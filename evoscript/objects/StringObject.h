@@ -25,6 +25,7 @@ public:
     virtual Value to_primitive(Runtime&, Value::Type) const override;
     virtual Value operator_add(Runtime& rt, Value const& rhs) const override;
     virtual CompareResult operator_compare(Runtime& rt, Value const& rhs) const override;
+    virtual Value operator_subscript(Runtime& rt, Value const& rhs) override;
 
 private:
     // int length() const

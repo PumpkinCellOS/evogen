@@ -124,6 +124,22 @@ EvalResult FunctionCall::evaluate(Runtime& rt) const
     return callable.call(rt, arguments);
 }
 
+EvalResult Subscript::evaluate(Runtime& rt) const
+{
+    Value value = m_expression->evaluate(rt);
+    if(rt.has_exception())
+        return {};
+    Value subscript_value = m_subscript->evaluate(rt);
+    if(rt.has_exception())
+        return {};
+    auto value_object = value.to_object(rt);
+    if(rt.has_exception())
+        return {};
+    auto result = value_object->operator_subscript(rt, subscript_value);
+    result.set_container(std::move(value_object));
+    return result;
+}
+
 EvalResult NewExpression::evaluate(Runtime& rt) const
 {
     Value name = m_name->evaluate(rt);

@@ -266,6 +266,22 @@ private:
     std::vector<std::shared_ptr<Expression>> m_arguments;
 };
 
+class Subscript : public Expression
+{
+public:
+    Subscript(ErrorList const& error)
+    : Expression(error) {}
+
+    Subscript(std::shared_ptr<Expression> expression, std::shared_ptr<Expression> subscript)
+    : m_expression(expression), m_subscript(subscript) {}
+
+    virtual EvalResult evaluate(Runtime&) const override;
+
+private:
+    std::shared_ptr<Expression> m_expression;
+    std::shared_ptr<Expression> m_subscript;
+};
+
 class NewExpression : public Expression
 {
 public:

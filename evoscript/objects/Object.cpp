@@ -86,6 +86,11 @@ CompareResult Object::operator_compare(Runtime& rt, Value const& rhs) const
     return {};
 }
 
+Value Object::operator_subscript(Runtime& rt, Value const& rhs)
+{
+    return get(rhs.to_string());
+}
+
 Function::Function(std::string const& name)
 : m_name(name)
 {

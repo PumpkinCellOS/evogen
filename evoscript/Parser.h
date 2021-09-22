@@ -28,6 +28,8 @@ public:
         String,                 // /["']([^"']*)["']/
         CurlyOpen,              // {
         CurlyClose,             // }
+        BraceOpen,              // [
+        BraceClose,             // ]
         Invalid                 // (others)
     };
 
@@ -131,6 +133,7 @@ public:
     // Postfix helpers
     std::shared_ptr<Expression> parse_member_name(std::shared_ptr<Expression> lhs); // .name
     std::shared_ptr<Expression> parse_argument_list(std::shared_ptr<Expression> lhs); // (arg1, arg2, ...)
+    std::shared_ptr<Expression> parse_subscript_value(std::shared_ptr<Expression> lhs); // [value]
     std::shared_ptr<Expression> parse_postfix_operator(std::shared_ptr<Expression> lhs); // ++ | --
 };
 

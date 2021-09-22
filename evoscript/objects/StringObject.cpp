@@ -52,6 +52,22 @@ CompareResult StringObject::operator_compare(Runtime& rt, Value const& rhs) cons
     return m_string == rhs_string ? CompareResult::Equal : (m_string < rhs_string ? CompareResult::Less : CompareResult::Greater);
 }
 
+Value StringObject::operator_subscript(Runtime& rt, Value const& rhs)
+{
+    int index = rhs.to_int(rt);
+    if(rt.has_exception())
+        return {};
+
+    if(index >= static_cast<Value::IntType>(m_string.size()) || index < 0)
+    {
+        std::ostringstream oss_rhs;
+        rhs.repl_print(oss_rhs, false);
+        rt.throw_exception("Index " + oss_rhs.str() + " out of range");
+        return {};
+    }
+    return StringObject::create_value(std::string{m_string[index]});
+}
+
 Value StringObject::length(Runtime&, StringObject const& container, std::vector<Value> const& args)
 {
     return Value::new_int(container.m_string.length());

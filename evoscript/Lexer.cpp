@@ -69,6 +69,16 @@ bool EVOLexer::lex(std::vector<Token>& output)
             consume();
             output.emplace_back(Token::CurlyClose, std::string(&next, 1), token_start, location());
         }
+        else if(next == '[')
+        {
+            consume();
+            output.emplace_back(Token::BraceOpen, std::string(&next, 1), token_start, location());
+        }
+        else if(next == ']')
+        {
+            consume();
+            output.emplace_back(Token::BraceClose, std::string(&next, 1), token_start, location());
+        }
         else if(next == '=')
         {
             consume();
