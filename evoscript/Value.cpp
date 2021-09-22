@@ -316,6 +316,8 @@ std::string MemoryValue::dump_string() const
 
 void MemoryValue::repl_print(std::ostream& output, bool print_members) const
 {
+    if(is_read_only())
+        output << escapes::comment("const") << " ";
     m_value.repl_print(output, print_members);
 }
 

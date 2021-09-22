@@ -46,8 +46,6 @@ void Object::repl_print(std::ostream& output, bool print_members) const
             {
                 // TODO: Use dump_string if called from dump_string
                 output << "  " << literal(value.first.string()) << ": ";
-                if(value.second->is_read_only())
-                    output << comment("const") << " ";
                 value.second->repl_print(output, false);
             }
 
