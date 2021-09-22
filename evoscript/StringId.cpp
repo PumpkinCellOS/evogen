@@ -15,7 +15,7 @@ StringId::StringId(std::string_view string)
 {
     if(string.empty())
     {
-        std::cout << "Reused empty StringID" << std::endl;
+        //std::cout << "Reused empty StringID" << std::endl;
         return;
     }
 
@@ -24,12 +24,12 @@ StringId::StringId(std::string_view string)
     {
         m_id = s_string_to_id_registry.insert(std::make_pair(string, ++s_last_string_id)).first->second;
         s_id_to_string_registry.insert(std::make_pair(s_last_string_id, string));
-        std::cout << "Generated new StringId: " << string << "[" << string.size() << "]" << ": " << m_id << std::endl;
+        //std::cout << "Generated new StringId: " << string << "[" << string.size() << "]" << ": " << m_id << std::endl;
     }
     else
     {
         m_id = id->second;
-        std::cout << "Reused StringId: " << string << "[" << string.size() << "]" << ": " << m_id << std::endl;
+        //std::cout << "Reused StringId: " << string << "[" << string.size() << "]" << ": " << m_id << std::endl;
     }
 }
 
