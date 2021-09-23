@@ -16,7 +16,7 @@ public:
     virtual Value to_primitive(Runtime&, Value::Type) const override;
 
 private:
-    Value::IntType m_value;
+    Value::IntType m_milliseconds;
 };
 
 }
