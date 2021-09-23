@@ -349,6 +349,9 @@ EvalResult ExpressionStatement::evaluate(Runtime& rt) const
 
 EvalResult BlockStatement::evaluate(Runtime& rt) const
 {
+    if(m_nodes.empty())
+        return Value::undefined();
+
     // TODO: Add some "inheritance" mechanism for block statement nodes
     Scope scope(rt);
     Value val = Value::undefined();
