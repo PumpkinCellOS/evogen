@@ -13,6 +13,7 @@ SysObject::SysObject()
 {
     define_native_function<SysObject>("read", &SysObject::read);
     define_native_function<SysObject>("write", &SysObject::write);
+    define_native_function<SysObject>("writeln", &SysObject::writeln);
     define_native_function<SysObject>("dump", [](SysObject* container, Runtime& rt, std::vector<Value> const& args)->Value {
         for(auto& value: args)
             std::cout << value.dump_string() << std::endl;
@@ -54,6 +55,12 @@ Value SysObject::write(Runtime& rt, std::vector<Value> const& args)
             return {};
         }
     }
+    return Value::undefined();
+}
+
+Value SysObject::writeln(Runtime& rt, std::vector<Value> const& args)
+{
+    write(rt, args);
     std::cout << std::endl;
     return Value::undefined();
 }

@@ -16,9 +16,13 @@ private:
     // function read() : String
     Value read(Runtime& rt, std::vector<Value> const& args);
 
-    // Write objects (using to_string) to stdout, space-separated.
+    // Write objects (using to_string) to stdout.
     // function write(values... : Value) : undefined
     Value write(Runtime& rt, std::vector<Value> const& args);
+
+    // Write objects (using to_string) to stdout with newline appended.
+    // function writeln(values... : Value) : undefined
+    Value writeln(Runtime& rt, std::vector<Value> const& args);
 
     // Print a backtrace.
     // function backtrace() : undefined
