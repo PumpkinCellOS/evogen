@@ -44,7 +44,7 @@ void Array::repl_print(std::ostream& out, bool print_members) const
         return;
     }
     out << escapes::type("Array") << "(" << escapes::literal(std::to_string(m_values.size())) << ") [";
-    size_t object_count = std::min((size_t)4, m_values.size());
+    size_t object_count = std::min((size_t)10, m_values.size());
     for(size_t s = 0; s < object_count; s++)
     {
         m_values[s]->repl_print(out, false);
