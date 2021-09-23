@@ -12,6 +12,8 @@ public:
     Array() = default;
     Array(Runtime&, std::vector<Value> const&);
 
+    static std::shared_ptr<Array> from_std_vector(std::vector<Value> const&);
+
     EVO_OBJECT("Array")
 
     virtual Value operator_subscript(Runtime& rt, Value const& rhs) override;

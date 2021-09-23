@@ -22,6 +22,14 @@ Array::Array(Runtime& rt, std::vector<Value> const& args)
         value = MemoryValue::create_undefined();
 }
 
+std::shared_ptr<Array> Array::from_std_vector(std::vector<Value> const& vector)
+{
+    std::shared_ptr<Array> array = std::make_shared<Array>();
+    for(auto& value: vector)
+        array->m_values.push_back(std::make_shared<MemoryValue>(value));
+    return array;
+}
+
 Value Array::operator_subscript(Runtime& rt, Value const& rhs)
 {
     auto index = rhs.to_int(rt);
