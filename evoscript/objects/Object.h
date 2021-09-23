@@ -9,6 +9,7 @@
 namespace evo::script
 {
 
+class Class;
 class Runtime;
 class MemoryValue;
 
@@ -48,6 +49,8 @@ public:
     virtual Value operator_subscript(Runtime& rt, Value const& rhs);
     // function name(): Value // this is already done for Function
     virtual std::string name() const { return ""; }
+
+    static void init_class(Class&) {}
 
     // TODO: Consider these functions to be protected
     void add_object_property(StringId name, std::shared_ptr<MemoryValue> memory_value)

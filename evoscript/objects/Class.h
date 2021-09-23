@@ -29,9 +29,11 @@ template<class T>
 std::shared_ptr<Class> create_native_class()
 {
     static_assert(std::is_base_of_v<Object, T>);
-    return std::make_shared<Class>(T::static_type_name(), [](Runtime& rt, std::vector<Value> const& args) {
+    auto class_ = std::make_shared<Class>(T::static_type_name(), [](Runtime& rt, std::vector<Value> const& args) {
         return new_object_value_from_args<T>(rt, args);
     });
+    T::init_class(*class_);
+    return class_;
 }
 
 }
