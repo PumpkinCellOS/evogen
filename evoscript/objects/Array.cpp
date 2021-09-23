@@ -3,6 +3,7 @@
 #include <evoscript/EscapeSequences.h>
 #include <evoscript/NativeFunction.h>
 #include <evoscript/Runtime.h>
+#include <evoscript/objects/Class.h>
 
 namespace evo::script
 {
@@ -25,6 +26,14 @@ Array::Array(Runtime& rt, std::vector<Value> const& args)
     // TODO: Do it lazily
     for(auto& value: m_values)
         value = MemoryValue::create_undefined();
+}
+
+void Array::init_class(Class& class_)
+{
+    static StringId from_values_sid = "from_values";
+    class_.define_native_function<Class>(from_values_sid, [](Class*, Runtime& rt, std::vector<Value> const& args) {
+        return Value::new_object(Array::from_std_vector(args));
+    });
 }
 
 std::shared_ptr<Array> Array::from_std_vector(std::vector<Value> const& vector)
