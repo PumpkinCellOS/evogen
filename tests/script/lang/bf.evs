@@ -1,0 +1,93 @@
+let buf = new Array(30000);
+let pointer = 0;
+let ip = 0;
+code = sys.read();
+
+while(true)
+{
+    if(ip >= code.length())
+        return 0;
+    let c = code[ip];
+    if(c == ".")
+    {
+        sys.write(String.from_codepoints(buf[pointer]));
+        ip++;
+        continue;
+    }
+    if(c == ",")
+    {
+        sys.write(String.from_codepoints(buf[pointer]));
+        ip++;
+        continue;
+    }
+    if(c == ">")
+    {
+        pointer++;
+        ip++;
+        continue;
+    }
+    if(c == "<")
+    {
+        pointer--;
+        ip++;
+        continue;
+    }
+    if(c == "+")
+    {
+        buf[pointer]++;
+        ip++;
+        continue;
+    }
+    if(c == "-")
+    {
+        buf[pointer]--;
+        ip++;
+        continue;
+    }
+    if(c == "[")
+    {
+        let braceDepth = 0;
+        if(buf[pointer])
+        {
+            ip++;
+            continue;
+        }
+        for(let s = ip;; ip++)
+        {
+            if(ip >= code.length())
+                return 1;
+            if(code[ip] == "[")
+            {
+                braceDepth++;
+                continue;
+            }
+            if(code[ip] == "]")
+            {
+                braceDepth--;
+                if(braceDepth == 0)
+                    break;
+            }
+        }
+        ip++;
+        continue;
+    }
+    if(c == "]")
+    {
+        let braceDepth = 0;
+        for(let s = ip;; ip--)
+        {
+            if(ip >= code.length())
+                return 1;
+            if(code[ip] == "]")
+                braceDepth++;
+            if(code[ip] == "[")
+            {
+                braceDepth--;
+                if(braceDepth == 0)
+                    break;
+            }
+        }
+        continue;
+    }
+}
+sys.writeln("Finished");
