@@ -37,32 +37,39 @@ void Object::repl_print(std::ostream& output, bool print_members) const
 void Object::print_impl(std::ostream& output, bool print_members, bool dump) const
 {
     using namespace escapes;
-    output << type(type_name()) << " {";
+    output << type(type_name()) << " ";
     if(print_members)
-    {
-        if(!m_values.empty())
-            output << std::endl;
-        size_t counter = 0;
-        for(auto& value: m_values)
-        {
-            if(value.second->value().is_object() && value.second->value().get_object().get() == this)
-                output << "  " << literal(value.first.string()) << ": " << constant("<recursive reference>");
-            else
-            {
-                output << "  " << literal(value.first.string()) << ": ";
-                if(dump)
-                    output << value.second->dump_string();
-                else
-                    value.second->repl_print(output, false);
-            }
+        print_members_impl(output, dump);
+    else
+        output << "{...}";
+}
 
-            if(counter < m_values.size() - 1)
-                output << std::endl;
-            counter++;
+void Object::print_members_impl(std::ostream& output, bool dump) const
+{
+    using namespace escapes;
+    output << "{";
+    if(!m_values.empty())
+        output << std::endl;
+    size_t counter = 0;
+    for(auto& value: m_values)
+    {
+        if(value.second->value().is_object() && value.second->value().get_object().get() == this)
+            output << "  " << literal(value.first.string()) << ": " << constant("<recursive reference>");
+        else
+        {
+            output << "  " << literal(value.first.string()) << ": ";
+            if(dump)
+                output << value.second->dump_string();
+            else
+                value.second->repl_print(output, false);
         }
-        if(!m_values.empty())
+
+        if(counter < m_values.size() - 1)
             output << std::endl;
+        counter++;
     }
+    if(!m_values.empty())
+        output << std::endl;
     output << "}";
 }
 

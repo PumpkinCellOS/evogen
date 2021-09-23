@@ -60,12 +60,13 @@ Value Array::operator_subscript(Runtime& rt, Value const& rhs)
 
 void Array::repl_print(std::ostream& out, bool print_members) const
 {
+    out << escapes::type("Array") << "(" << escapes::literal(std::to_string(m_values.size())) << ") ";
     if(!print_members)
     {
-        out << escapes::type("Array");
+        out << "[...]";
         return;
     }
-    out << escapes::type("Array") << "(" << escapes::literal(std::to_string(m_values.size())) << ") [";
+    out << "[";
     size_t object_count = std::min((size_t)10, m_values.size());
     for(size_t s = 0; s < object_count; s++)
     {

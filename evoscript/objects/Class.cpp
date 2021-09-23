@@ -15,9 +15,11 @@ Class::Class(std::string const& name, ConstructorType&& constructor)
     define_native_function<Class>("construct", &Class::construct);
 }
 
-void Class::repl_print(std::ostream& output, bool) const
+void Class::repl_print(std::ostream& output, bool print_members) const
 {
-    output << escapes::keyword("class") << " " << escapes::name(m_name);
+    output << escapes::keyword("class") << " " << escapes::name(m_name) << " ";
+    if(print_members)
+        print_members_impl(output, false);
 }
 
 Value Class::construct(Runtime& rt, std::vector<Value> const& args)
