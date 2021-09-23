@@ -29,16 +29,16 @@ public:
 
 private:
     // int length() const
-    static Value length(Runtime&, StringObject const& container, std::vector<Value> const& args);
+    Value length(Runtime&, std::vector<Value> const& args) const;
 
     // string concat(value... args) const
-    static Value concat(Runtime&, StringObject const& container, std::vector<Value> const& args);
+    Value concat(Runtime&, std::vector<Value> const& args) const;
 
     // string substring(int start, int seq_length = -1) const
-    static Value substring(Runtime&, StringObject const& container, std::vector<Value> const& args);
+    Value substring(Runtime&, std::vector<Value> const& args) const;
 
     // void append(value... args)
-    static Value append(Runtime&, StringObject& container, std::vector<Value> const& args);
+    Value append(Runtime&, std::vector<Value> const& args);
 
     std::string m_string;
 };

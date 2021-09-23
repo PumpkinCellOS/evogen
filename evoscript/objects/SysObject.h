@@ -14,13 +14,13 @@ public:
 private:
     // Read a string from stdin until a newline.
     // function read() : string
-    static Value read(Runtime& rt, SysObject& container, std::vector<Value> const& args);
+    Value read(Runtime& rt, std::vector<Value> const& args);
 
     // Write objects (using to_string) to stdout, space-separated.
     // function write(values... : Value) : undefined
-    static Value write(Runtime& rt, SysObject& container, std::vector<Value> const& args);
+    Value write(Runtime& rt, std::vector<Value> const& args);
 
-    static Value backtrace(Runtime& rt, SysObject& container, std::vector<Value> const& args);
+    Value backtrace(Runtime& rt, std::vector<Value> const& args);
 };
 
 }

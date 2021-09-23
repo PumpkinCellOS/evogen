@@ -12,7 +12,7 @@ public:
     GlobalObject();
 
 private:
-    static Value run_script(Runtime&, GlobalObject&, std::vector<Value> const& arguments);
+    Value run_script(Runtime&, std::vector<Value> const& arguments);
 };
 
 }

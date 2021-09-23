@@ -14,7 +14,7 @@ GlobalObject::GlobalObject()
 {
     DEFINE_NATIVE_OBJECT(object, "sys", std::make_shared<SysObject>());
 
-    DEFINE_NATIVE_FUNCTION(GlobalObject, "run", run_script);
+    DEFINE_NATIVE_FUNCTION(GlobalObject, "run", &GlobalObject::run_script);
 
     DEFINE_NATIVE_OBJECT(object, "Exception", create_native_class<Exception>());
     DEFINE_NATIVE_OBJECT(object, "Object", create_native_class<Object>());
@@ -22,7 +22,7 @@ GlobalObject::GlobalObject()
     DEFINE_NATIVE_OBJECT(object, "Time", create_native_class<TimeObject>());
 }
 
-Value GlobalObject::run_script(Runtime& rt, GlobalObject&, std::vector<Value> const& args)
+Value GlobalObject::run_script(Runtime& rt, std::vector<Value> const& args)
 {
     if(args.size() != 1)
     {

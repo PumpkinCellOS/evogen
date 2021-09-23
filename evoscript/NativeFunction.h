@@ -12,7 +12,7 @@ class NativeFunction : public Function
 {
 public:
     using ContainerType = T;
-    using FunctionType = std::function<Value(Runtime&, ContainerType& container, std::vector<Value> const& args)>;
+    using FunctionType = std::function<Value(ContainerType* container, Runtime&, std::vector<Value> const& args)>;
 
     EVO_OBJECT("NativeFunction")
 
@@ -33,7 +33,7 @@ public:
             rt.throw_exception("Cannot call function with invalid container '" + container.type_name() + "'");
             return {};
         }
-        return m_function(rt, *this_container, arguments);
+        return m_function(this_container, rt, arguments);
     }
 
 private:

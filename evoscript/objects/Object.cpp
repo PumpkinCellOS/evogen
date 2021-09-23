@@ -14,8 +14,8 @@ Value Object::get(StringId member)
 {
     // function type() : string
     static StringId type_sid = "type";
-    NATIVE_FUNCTION(Object, type_sid, [](Runtime&, Object& container, std::vector<Value> const&) {
-        return StringObject::create_value(container.type_name());
+    NATIVE_FUNCTION(Object, type_sid, [](Object* container, Runtime&, std::vector<Value> const&) {
+        return StringObject::create_value(container->type_name());
     });
 
     auto it = m_values.find(member);

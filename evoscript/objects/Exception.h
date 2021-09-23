@@ -19,7 +19,7 @@ public:
     virtual void repl_print(std::ostream& output, bool) const override;
 
 private:
-    static Value print_(Runtime& rt, Exception& container, std::vector<Value> const&);
+    Value print_(Runtime& rt, std::vector<Value> const&);
 
     CallStack m_call_stack;
     std::string m_message;

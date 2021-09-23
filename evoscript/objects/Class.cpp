@@ -12,7 +12,7 @@ Class::Class(std::string const& name, ConstructorType&& constructor)
 : m_name(name), m_constructor(constructor)
 {
     DEFINE_NATIVE_OBJECT(object, "name", std::make_shared<StringObject>(m_name));
-    DEFINE_NATIVE_FUNCTION(Class, "construct", construct);
+    DEFINE_NATIVE_FUNCTION(Class, "construct", &Class::construct);
 }
 
 void Class::repl_print(std::ostream& output, bool) const
@@ -20,10 +20,10 @@ void Class::repl_print(std::ostream& output, bool) const
     output << escapes::keyword("class") << " " << escapes::name(m_name);
 }
 
-Value Class::construct(Runtime& rt, Class& class_, std::vector<Value> const& args)
+Value Class::construct(Runtime& rt, std::vector<Value> const& args)
 {
-    assert(class_.m_constructor);
-    return class_.m_constructor(rt, args);
+    assert(m_constructor);
+    return m_constructor(rt, args);
 }
 
 }

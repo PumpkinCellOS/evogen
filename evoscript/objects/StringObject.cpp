@@ -11,13 +11,13 @@ StringObject::StringObject(std::string const& str)
 : m_string(str)
 {
     static StringId length_sid = "length";
-    DEFINE_NATIVE_FUNCTION(StringObject, length_sid, length);
+    DEFINE_NATIVE_FUNCTION(StringObject, length_sid, &StringObject::length);
     static StringId concat_sid = "concat";
-    DEFINE_NATIVE_FUNCTION(StringObject, concat_sid, concat);
+    DEFINE_NATIVE_FUNCTION(StringObject, concat_sid, &StringObject::concat);
     static StringId substring_sid = "substring";
-    DEFINE_NATIVE_FUNCTION(StringObject, substring_sid, substring);
+    DEFINE_NATIVE_FUNCTION(StringObject, substring_sid, &StringObject::substring);
     static StringId append_sid = "append";
-    DEFINE_NATIVE_FUNCTION(StringObject, append_sid, append);
+    DEFINE_NATIVE_FUNCTION(StringObject, append_sid, &StringObject::append);
 }
 
 void StringObject::repl_print(std::ostream& output, bool) const
@@ -47,7 +47,7 @@ Value StringObject::to_primitive(Runtime& rt, Value::Type type) const
 
 Value StringObject::operator_add(Runtime& rt, Value const& rhs) const
 {
-    return concat(rt, *this, {rhs});
+    return concat(rt, {rhs});
 }
 
 CompareResult StringObject::operator_compare(Runtime& rt, Value const& rhs) const
@@ -72,21 +72,21 @@ Value StringObject::operator_subscript(Runtime& rt, Value const& rhs)
     return StringObject::create_value(std::string{m_string[index]});
 }
 
-Value StringObject::length(Runtime&, StringObject const& container, std::vector<Value> const& args)
+Value StringObject::length(Runtime&, std::vector<Value> const& args) const
 {
-    return Value::new_int(container.m_string.length());
+    return Value::new_int(m_string.length());
 }
 
-Value StringObject::concat(Runtime& rt, StringObject const& container, std::vector<Value> const& args)
+Value StringObject::concat(Runtime& rt, std::vector<Value> const& args) const
 {
-    std::string result = container.m_string;
+    std::string result = m_string;
     for(auto& arg: args)
         result += arg.to_string();
 
     return StringObject::create_value(result);
 }
 
-Value StringObject::substring(Runtime& rt, StringObject const& container, std::vector<Value> const& args)
+Value StringObject::substring(Runtime& rt, std::vector<Value> const& args) const
 {
     if(args.size() < 1 || args.size() > 2)
     {
@@ -112,24 +112,24 @@ Value StringObject::substring(Runtime& rt, StringObject const& container, std::v
         return {};
     }
 
-    if(static_cast<size_t>(start) > container.m_string.size())
+    if(static_cast<size_t>(start) > m_string.size())
     {
         rt.throw_exception("start exceeds string length");
         return {};
     }
-    if(seq_length != -1 && static_cast<size_t>(start + seq_length) > container.m_string.size())
+    if(seq_length != -1 && static_cast<size_t>(start + seq_length) > m_string.size())
     {
         rt.throw_exception("seq_length exceeds string length");
         return {};
     }
 
-    return StringObject::create_value(seq_length == -1 ? container.m_string.substr(start) : container.m_string.substr(start, seq_length));
+    return StringObject::create_value(seq_length == -1 ? m_string.substr(start) : m_string.substr(start, seq_length));
 }
 
-Value StringObject::append(Runtime& rt, StringObject& container, std::vector<Value> const& args)
+Value StringObject::append(Runtime& rt, std::vector<Value> const& args)
 {
     for(auto& arg: args)
-        container.m_string.append(arg.to_string());
+        m_string.append(arg.to_string());
 
     // TODO: Return reference to this
     return Value::undefined();

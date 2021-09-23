@@ -19,7 +19,7 @@ public:
     virtual void repl_print(std::ostream& output, bool print_members) const override;
 
 private:
-    static Value construct(Runtime&, Class&, std::vector<Value> const& args);
+    Value construct(Runtime&, std::vector<Value> const& args);
 
     std::string m_name;
     ConstructorType m_constructor;
