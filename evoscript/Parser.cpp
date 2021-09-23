@@ -753,6 +753,11 @@ std::shared_ptr<SimpleControlStatement> EVOParser::parse_simple_control_statemen
 
 std::shared_ptr<Statement> EVOParser::parse_statement()
 {
+    // Empty statement
+    auto semicolon = consume_of_type(Token::Semicolon);
+    if(semicolon)
+        return std::make_shared<BlockStatement>();
+
     size_t off = offset();
     std::shared_ptr<Statement> statement = parse_block_statement();
     if(!statement)
