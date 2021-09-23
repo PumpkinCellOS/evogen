@@ -3,6 +3,7 @@
 #include <evoscript/AbstractOperations.h>
 #include <evoscript/EscapeSequences.h>
 #include <evoscript/NativeFunction.h>
+#include <evoscript/objects/Class.h>
 
 namespace evo::script
 {
@@ -18,6 +19,22 @@ StringObject::StringObject(std::string const& str)
     define_native_function<StringObject>(substring_sid, &StringObject::substring);
     static StringId append_sid = "append";
     define_native_function<StringObject>(append_sid, &StringObject::append);
+}
+
+void StringObject::init_class(Class& class_)
+{
+    static StringId from_codepoints_sid = "from_codepoints";
+    class_.define_native_function<Class>(from_codepoints_sid, [](Class*, Runtime& rt, std::vector<Value> const& args) {
+        std::string result;
+        // TODO: Load from array
+        for(auto& val: args)
+        {
+            result += static_cast<char>(val.to_int(rt));
+            if(rt.has_exception())
+                return Value();
+        }
+        return new_object_value<StringObject>(result);
+    });
 }
 
 void StringObject::repl_print(std::ostream& output, bool) const

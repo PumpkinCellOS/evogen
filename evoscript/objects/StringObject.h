@@ -22,6 +22,8 @@ public:
     virtual CompareResult operator_compare(Runtime& rt, Value const& rhs) const override;
     virtual Value operator_subscript(Runtime& rt, Value const& rhs) override;
 
+    static void init_class(Class&);
+
 private:
     // int length() const
     Value length(Runtime&, std::vector<Value> const& args) const;
