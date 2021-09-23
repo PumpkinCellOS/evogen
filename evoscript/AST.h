@@ -568,13 +568,14 @@ public:
     IfStatement(ErrorList const& error)
     : Statement(error) {}
 
-    // TODO: else
-    IfStatement(std::shared_ptr<Expression> condition, std::shared_ptr<Statement> true_statement)
-    : m_condition(condition), m_true_statement(true_statement) {}
+    IfStatement(std::shared_ptr<Expression> condition, std::shared_ptr<Statement> true_statement, std::shared_ptr<Statement> false_statement)
+    : m_condition(condition), m_true_statement(true_statement), m_false_statement(false_statement) {}
 
     virtual EvalResult evaluate(Runtime&) const override;
     virtual bool requires_semicolon() const override
     {
+        if(m_false_statement)
+            return m_false_statement->requires_semicolon();
         assert(m_true_statement);
         return m_true_statement->requires_semicolon();
     }
@@ -582,6 +583,7 @@ public:
 private:
     std::shared_ptr<Expression> m_condition;
     std::shared_ptr<Statement> m_true_statement;
+    std::shared_ptr<Statement> m_false_statement;
 };
 
 class WhileStatement : public Statement

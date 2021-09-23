@@ -697,7 +697,19 @@ std::shared_ptr<IfStatement> EVOParser::parse_if_statement()
     if(!true_statement || true_statement->is_error())
         return std::make_shared<IfStatement>(ASTNode::Error(location(), "Expected statement"));
 
-    return std::make_shared<IfStatement>(condition, true_statement);
+    size_t off = offset();
+    auto else_keyword = consume_of_type(Token::Name);
+    if(!else_keyword || else_keyword->value() != "else")
+    {
+        set_offset(off);
+        return std::make_shared<IfStatement>(condition, true_statement, nullptr);
+    }
+
+    auto false_statement = parse_statement();
+    if(!false_statement || false_statement->is_error())
+        return std::make_shared<IfStatement>(ASTNode::Error(location(), "Expected statement"));
+
+    return std::make_shared<IfStatement>(condition, true_statement, false_statement);
 }
 
 std::shared_ptr<WhileStatement> EVOParser::parse_while_statement()

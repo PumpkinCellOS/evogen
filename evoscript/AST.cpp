@@ -377,8 +377,11 @@ EvalResult IfStatement::evaluate(Runtime& rt) const
     if(condition_is_true)
         return m_true_statement->evaluate(rt);
     else
-        // TODO: else statements
+    {
+        if(m_false_statement)
+            return m_false_statement->evaluate(rt);
         return Value::undefined();
+    }
 }
 
 EvalResult WhileStatement::evaluate(Runtime& rt) const
