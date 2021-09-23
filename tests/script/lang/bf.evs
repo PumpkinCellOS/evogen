@@ -1,7 +1,7 @@
 let buf = new Array(30000);
 let pointer = 0;
 let ip = 0;
-code = sys.read();
+let code = sys.read();
 
 while(true)
 {
