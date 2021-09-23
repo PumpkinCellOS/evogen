@@ -11,7 +11,7 @@ TimeObject::TimeObject(Value::IntType milliseconds)
 {
     // TODO: Change it to a variable when getters are implemented
     static StringId milliseconds_sid = "milliseconds";
-    DEFINE_NATIVE_FUNCTION(TimeObject, milliseconds_sid, [](TimeObject* object, Runtime&, std::vector<Value> const&) {
+    define_native_function<TimeObject>(milliseconds_sid, [](TimeObject* object, Runtime&, std::vector<Value> const&) {
         return Value::new_int(object->m_milliseconds);
     });
 }

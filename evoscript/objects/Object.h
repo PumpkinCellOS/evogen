@@ -73,6 +73,9 @@ public:
         add_object_property(name, memory_value);
     }
 
+    template<class T, class Value>
+    void define_native_function(StringId script_name, Value&& value);
+
 private:
     void print_impl(std::ostream&, bool print_members, bool dump) const;
 

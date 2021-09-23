@@ -11,15 +11,15 @@ namespace evo::script
 
 SysObject::SysObject()
 {
-    DEFINE_NATIVE_FUNCTION(SysObject, "read", &SysObject::read);
-    DEFINE_NATIVE_FUNCTION(SysObject, "write", &SysObject::write);
-    DEFINE_NATIVE_FUNCTION(SysObject, "dump", [](SysObject* container, Runtime& rt, std::vector<Value> const& args)->Value {
+    define_native_function<SysObject>("read", &SysObject::read);
+    define_native_function<SysObject>("write", &SysObject::write);
+    define_native_function<SysObject>("dump", [](SysObject* container, Runtime& rt, std::vector<Value> const& args)->Value {
         for(auto& value: args)
             std::cout << value.dump_string() << std::endl;
 
         return Value::new_int(args.size());
     });
-    DEFINE_NATIVE_FUNCTION(SysObject, "exit", [](SysObject* container, Runtime& rt, std::vector<Value> const& args)->Value {
+    define_native_function<SysObject>("exit", [](SysObject* container, Runtime& rt, std::vector<Value> const& args)->Value {
         auto exit_code = args.size() == 1 ? args[0].to_int(rt) : 0;
         if(rt.has_exception())
             return {};
@@ -29,8 +29,8 @@ SysObject::SysObject()
         ::exit(exit_code);
         assert(false);
     });
-    DEFINE_NATIVE_FUNCTION(SysObject, "backtrace", &SysObject::backtrace);
-    DEFINE_NATIVE_FUNCTION(SysObject, "call_system", &SysObject::call_system);
+    define_native_function<SysObject>("backtrace", &SysObject::backtrace);
+    define_native_function<SysObject>("call_system", &SysObject::call_system);
 }
 
 Value SysObject::read(Runtime& rt, std::vector<Value> const& args)

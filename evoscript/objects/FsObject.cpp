@@ -13,7 +13,7 @@ namespace evo::script
 
 FsObject::FsObject()
 {
-    DEFINE_NATIVE_FUNCTION(FsObject, "list_files", &FsObject::list_files);
+    define_native_function<FsObject>("list_files", &FsObject::list_files);
 }
 
 Value FsObject::list_files(Runtime& rt, std::vector<Value> const& args) const

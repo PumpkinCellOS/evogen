@@ -7,12 +7,12 @@
 namespace evo::script
 {
 
-// TODO: Find a way to not store name double
+// TODO: Find a way to not store name twice
 Class::Class(std::string const& name, ConstructorType&& constructor)
 : m_name(name), m_constructor(constructor)
 {
     DEFINE_NATIVE_OBJECT(object, "name", std::make_shared<StringObject>(m_name));
-    DEFINE_NATIVE_FUNCTION(Class, "construct", &Class::construct);
+    define_native_function<Class>("construct", &Class::construct);
 }
 
 void Class::repl_print(std::ostream& output, bool) const

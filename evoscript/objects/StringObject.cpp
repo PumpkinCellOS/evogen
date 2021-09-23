@@ -11,13 +11,13 @@ StringObject::StringObject(std::string const& str)
 : m_string(str)
 {
     static StringId length_sid = "length";
-    DEFINE_NATIVE_FUNCTION(StringObject, length_sid, &StringObject::length);
+    define_native_function<StringObject>(length_sid, &StringObject::length);
     static StringId concat_sid = "concat";
-    DEFINE_NATIVE_FUNCTION(StringObject, concat_sid, &StringObject::concat);
+    define_native_function<StringObject>(concat_sid, &StringObject::concat);
     static StringId substring_sid = "substring";
-    DEFINE_NATIVE_FUNCTION(StringObject, substring_sid, &StringObject::substring);
+    define_native_function<StringObject>(substring_sid, &StringObject::substring);
     static StringId append_sid = "append";
-    DEFINE_NATIVE_FUNCTION(StringObject, append_sid, &StringObject::append);
+    define_native_function<StringObject>(append_sid, &StringObject::append);
 }
 
 void StringObject::repl_print(std::ostream& output, bool) const

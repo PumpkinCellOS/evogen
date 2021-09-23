@@ -17,7 +17,7 @@ GlobalObject::GlobalObject()
     DEFINE_NATIVE_OBJECT(object, "sys", std::make_shared<SysObject>());
     DEFINE_NATIVE_OBJECT(object, "fs", std::make_shared<FsObject>());
 
-    DEFINE_NATIVE_FUNCTION(GlobalObject, "run", &GlobalObject::run_script);
+    define_native_function<GlobalObject>("run", &GlobalObject::run_script);
 
     DEFINE_NATIVE_OBJECT(object, "Array", create_native_class<Array>());
     DEFINE_NATIVE_OBJECT(object, "Exception", create_native_class<Exception>());

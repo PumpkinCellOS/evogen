@@ -10,7 +10,7 @@ namespace evo::script
 Array::Array()
 {
     static StringId size_sid = "size";
-    DEFINE_NATIVE_FUNCTION(Array, size_sid, &Array::size);
+    define_native_function<Array>(size_sid, &Array::size);
 }
 
 Array::Array(Runtime& rt, std::vector<Value> const& args)
