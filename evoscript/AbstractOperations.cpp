@@ -30,7 +30,7 @@ Value add(Runtime& rt, Value const& lhs, Value const& rhs)
         // Unknown case, treat as strings.
         auto lhs_int = real_lhs.to_string();
         auto rhs_int = real_rhs.to_string();
-        return StringObject::create_value(lhs_int + rhs_int);
+        return new_object_value<StringObject>(lhs_int + rhs_int);
     }
 }
 

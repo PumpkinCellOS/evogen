@@ -89,6 +89,13 @@ static Value new_object_value_from_args(Runtime& rt, std::vector<Value> const& a
     return Value::new_object(std::make_shared<T>(rt, args));
 }
 
+template<class T, class... Args>
+static Value new_object_value(Args&&... args)
+{
+    static_assert(std::is_base_of_v<Object, T>);
+    return Value::new_object(std::make_shared<T>(args...));
+}
+
 class Function : public Object
 {
 public:

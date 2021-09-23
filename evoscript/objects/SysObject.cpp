@@ -41,7 +41,7 @@ Value SysObject::read(Runtime& rt, std::vector<Value> const& args)
         rt.throw_exception("Failed to read from stream");
         return {};
     }
-    return StringObject::create_value(out);
+    return new_object_value<StringObject>(out);
 }
 
 Value SysObject::write(Runtime& rt, std::vector<Value> const& args)

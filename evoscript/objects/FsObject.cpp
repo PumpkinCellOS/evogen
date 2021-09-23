@@ -40,7 +40,7 @@ Value FsObject::list_files(Runtime& rt, std::vector<Value> const& args) const
             rt.throw_exception("Failed to read directory: " + std::string(strerror(errno)));
             return {};
         }
-        result.push_back(StringObject::create_value(de->d_name));
+        result.push_back(new_object_value<StringObject>(de->d_name));
     }
 
     closedir(dir);

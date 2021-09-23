@@ -22,7 +22,7 @@ EvalResult IntegerLiteral::evaluate(Runtime&) const
 
 EvalResult StringLiteral::evaluate(Runtime&) const
 {
-    return StringObject::create_value(m_value);
+    return new_object_value<StringObject>(m_value);
 }
 
 EvalResult Identifier::evaluate(Runtime& rt) const

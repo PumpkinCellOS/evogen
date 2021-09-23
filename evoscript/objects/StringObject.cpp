@@ -69,7 +69,7 @@ Value StringObject::operator_subscript(Runtime& rt, Value const& rhs)
         rt.throw_exception("Index " + oss_rhs.str() + " out of range");
         return {};
     }
-    return StringObject::create_value(std::string{m_string[index]});
+    return new_object_value<StringObject>(std::string{m_string[index]});
 }
 
 Value StringObject::length(Runtime&, std::vector<Value> const& args) const
@@ -83,7 +83,7 @@ Value StringObject::concat(Runtime& rt, std::vector<Value> const& args) const
     for(auto& arg: args)
         result += arg.to_string();
 
-    return StringObject::create_value(result);
+    return new_object_value<StringObject>(result);
 }
 
 Value StringObject::substring(Runtime& rt, std::vector<Value> const& args) const
@@ -123,7 +123,7 @@ Value StringObject::substring(Runtime& rt, std::vector<Value> const& args) const
         return {};
     }
 
-    return StringObject::create_value(seq_length == -1 ? m_string.substr(start) : m_string.substr(start, seq_length));
+    return new_object_value<StringObject>(seq_length == -1 ? m_string.substr(start) : m_string.substr(start, seq_length));
 }
 
 Value StringObject::append(Runtime& rt, std::vector<Value> const& args)
