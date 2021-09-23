@@ -383,7 +383,7 @@ EvalResult IfStatement::evaluate(Runtime& rt) const
 
 EvalResult WhileStatement::evaluate(Runtime& rt) const
 {
-    Value result_value;
+    Value result_value = Value::undefined();
     while(true)
     {
         Value condition = m_condition->evaluate(rt);
