@@ -7,10 +7,15 @@
 namespace evo::script
 {
 
-Array::Array(Runtime& rt, std::vector<Value> const& args)
+Array::Array()
 {
     static StringId size_sid = "size";
     DEFINE_NATIVE_FUNCTION(Array, size_sid, &Array::size);
+}
+
+Array::Array(Runtime& rt, std::vector<Value> const& args)
+: Array()
+{
     auto size = (args.size() >= 1 ? args[0] : Value::undefined());
     auto size_int = size.to_int(rt);
     if(rt.has_exception())

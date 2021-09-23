@@ -9,7 +9,7 @@ namespace evo::script
 class Array : public Object
 {
 public:
-    Array() = default;
+    Array();
     Array(Runtime&, std::vector<Value> const&);
 
     static std::shared_ptr<Array> from_std_vector(std::vector<Value> const&);
