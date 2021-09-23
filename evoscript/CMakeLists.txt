@@ -10,6 +10,7 @@ add_library(libevoscript
     "StringId.cpp"
     "Value.cpp"
     "objects/ASTFunction.cpp"
+    "objects/Array.cpp"
     "objects/Class.cpp"
     "objects/Exception.cpp"
     "objects/GlobalObject.cpp"

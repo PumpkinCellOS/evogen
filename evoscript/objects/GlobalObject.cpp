@@ -1,6 +1,7 @@
 #include <evoscript/objects/GlobalObject.h>
 
 #include <evoscript/NativeFunction.h>
+#include <evoscript/objects/Array.h>
 #include <evoscript/objects/Class.h>
 #include <evoscript/objects/Exception.h>
 #include <evoscript/objects/StringObject.h>
@@ -16,6 +17,7 @@ GlobalObject::GlobalObject()
 
     DEFINE_NATIVE_FUNCTION(GlobalObject, "run", &GlobalObject::run_script);
 
+    DEFINE_NATIVE_OBJECT(object, "Array", create_native_class<Array>());
     DEFINE_NATIVE_OBJECT(object, "Exception", create_native_class<Exception>());
     DEFINE_NATIVE_OBJECT(object, "Object", create_native_class<Object>());
     DEFINE_NATIVE_OBJECT(object, "String", create_native_class<StringObject>());
