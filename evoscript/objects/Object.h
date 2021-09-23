@@ -31,7 +31,7 @@ public:
 
     // TODO: Make these definiable functions, e.g:
     // function dump_string() : string
-    virtual std::string dump_string() const { std::ostringstream oss; repl_print(oss, true); return oss.str(); }
+    virtual std::string dump_string() const { std::ostringstream oss; print_impl(oss, true, true); return oss.str(); }
     // function repl_print() : string
     virtual void repl_print(std::ostream& output, bool print_members) const;
     // function to_string() : string
@@ -74,6 +74,8 @@ protected:
     }
 
 private:
+    void print_impl(std::ostream&, bool print_members, bool dump) const;
+
     std::unordered_map<StringId, std::shared_ptr<MemoryValue>> m_values;
 };
 

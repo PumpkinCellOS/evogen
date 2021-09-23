@@ -31,6 +31,11 @@ Value Object::get(StringId member)
 
 void Object::repl_print(std::ostream& output, bool print_members) const
 {
+    print_impl(output, print_members, false);
+}
+
+void Object::print_impl(std::ostream& output, bool print_members, bool dump) const
+{
     using namespace escapes;
     output << type(type_name()) << " {";
     if(print_members)
@@ -44,9 +49,11 @@ void Object::repl_print(std::ostream& output, bool print_members) const
                 output << "  " << literal(value.first.string()) << ": " << constant("<recursive reference>");
             else
             {
-                // TODO: Use dump_string if called from dump_string
                 output << "  " << literal(value.first.string()) << ": ";
-                value.second->repl_print(output, false);
+                if(dump)
+                    output << value.second->dump_string();
+                else
+                    value.second->repl_print(output, false);
             }
 
             if(counter < m_values.size() - 1)
