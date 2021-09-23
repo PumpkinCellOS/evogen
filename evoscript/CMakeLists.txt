@@ -13,6 +13,7 @@ add_library(libevoscript
     "objects/Array.cpp"
     "objects/Class.cpp"
     "objects/Exception.cpp"
+    "objects/FsObject.cpp"
     "objects/GlobalObject.cpp"
     "objects/LocalObject.cpp"
     "objects/Object.cpp"
