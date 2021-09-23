@@ -30,6 +30,7 @@ SysObject::SysObject()
         assert(false);
     });
     DEFINE_NATIVE_FUNCTION(SysObject, "backtrace", &SysObject::backtrace);
+    DEFINE_NATIVE_FUNCTION(SysObject, "call_system", &SysObject::call_system);
 }
 
 Value SysObject::read(Runtime& rt, std::vector<Value> const& args)
@@ -61,6 +62,18 @@ Value SysObject::backtrace(Runtime& rt, std::vector<Value> const&)
 {
     rt.print_backtrace();
     return Value::undefined();
+}
+
+Value SysObject::call_system(Runtime& rt, std::vector<Value> const& args)
+{
+    if(args.size() < 1)
+    {
+        rt.throw_exception("Missing argument: command");
+        return {};
+    }
+    auto command = args[0];
+    int code = system(command.to_string().c_str());
+    return Value::new_int(code);
 }
 
 }
