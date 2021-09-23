@@ -126,6 +126,7 @@ public:
     std::shared_ptr<BlockStatement>         parse_block_statement();
     std::shared_ptr<IfStatement>            parse_if_statement();
     std::shared_ptr<WhileStatement>         parse_while_statement();
+    std::shared_ptr<ForStatement>           parse_for_statement();
     std::shared_ptr<ReturnStatement>        parse_return_statement();
     std::shared_ptr<SimpleControlStatement> parse_simple_control_statement();
     std::shared_ptr<Program>                parse_program();

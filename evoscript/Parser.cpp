@@ -725,6 +725,74 @@ std::shared_ptr<WhileStatement> EVOParser::parse_while_statement()
     return std::make_shared<WhileStatement>(condition, statement);
 }
 
+std::shared_ptr<ForStatement> EVOParser::parse_for_statement()
+{
+    auto if_keyword = consume_of_type(Token::Name);
+    if(!if_keyword || if_keyword->value() != "for")
+        return {};
+
+    auto paren_open = consume_of_type(Token::ParenOpen);
+    if(!paren_open)
+        return std::make_shared<ForStatement>(ASTNode::Error(location(), "Expected '(' after 'for'"));
+
+    std::shared_ptr<Statement> initialization, condition, incrementation;
+    do
+    {
+        {
+            size_t off = offset();
+            // NOTE: for(;;) case, also very hacky
+            // until we have real empty statements
+            auto token = consume_of_type(Token::Semicolon);
+            if(token)
+            {
+                token = consume_of_type(Token::Semicolon);
+                if(token)
+                {
+                    token = peek();
+                    if(token && token->type() == Token::ParenClose)
+                        break;
+                }
+            }
+            set_offset(off);
+        }
+
+        initialization = parse_statement();
+        if(initialization->is_error())
+            return std::make_shared<ForStatement>(initialization->errors());
+        if(initialization->requires_semicolon())
+        {
+            auto semicolon = consume_of_type(Token::Semicolon);
+            if(!semicolon && !eof())
+                return std::make_shared<ForStatement>(ASTNode::Error(location(), "Expected ';' after initialization statement"));
+        }
+
+        condition = parse_statement();
+        if(condition->is_error())
+            return std::make_shared<ForStatement>(condition->errors());
+        if(condition->requires_semicolon())
+        {
+            auto semicolon = consume_of_type(Token::Semicolon);
+            if(!semicolon && !eof())
+                return std::make_shared<ForStatement>(ASTNode::Error(location(), "Expected ';' after condition statement"));
+        }
+
+        // FIXME: This is very hacky.
+        incrementation = parse_statement();
+        if(incrementation->is_error())
+            incrementation = {};
+    } while(false);
+
+    auto paren_close = consume_of_type(Token::ParenClose);
+    if(!paren_close)
+        return std::make_shared<ForStatement>(ASTNode::Error(location(), "Expected ')'"));
+
+    auto statement = parse_statement();
+    if(!statement || statement->is_error())
+        return std::make_shared<ForStatement>(ASTNode::Error(location(), "Expected statement"));
+
+    return std::make_shared<ForStatement>(initialization, condition, incrementation, statement);
+}
+
 std::shared_ptr<ReturnStatement> EVOParser::parse_return_statement()
 {
     auto return_keyword = consume_of_type(Token::Name);
@@ -779,15 +847,20 @@ std::shared_ptr<Statement> EVOParser::parse_statement()
                     if(!statement)
                     {
                         set_offset(off);
-                        statement = parse_declaration();
+                        statement = parse_for_statement();
                         if(!statement)
                         {
                             set_offset(off);
-                            statement = parse_expression_statement();
-                            if(!statement || statement->is_error())
+                            statement = parse_declaration();
+                            if(!statement)
                             {
                                 set_offset(off);
-                                return statement;
+                                statement = parse_expression_statement();
+                                if(!statement || statement->is_error())
+                                {
+                                    set_offset(off);
+                                    return statement;
+                                }
                             }
                         }
                     }
@@ -817,7 +890,6 @@ std::shared_ptr<Program> EVOParser::parse_program()
         {
             auto semicolon = consume_of_type(Token::Semicolon);
             if(!semicolon && !eof())
-                // TODO: Fix error propagation here.
                 return std::make_shared<Program>(ASTNode::Error(location(), "Expected ';' after statement"));
         }
     }

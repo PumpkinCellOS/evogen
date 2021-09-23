@@ -605,6 +605,39 @@ private:
     std::shared_ptr<Statement> m_statement;
 };
 
+class ForStatement : public Statement
+{
+public:
+    ForStatement(ErrorList const& error)
+    : Statement(error) {}
+
+    ForStatement(std::shared_ptr<Statement> initialization, std::shared_ptr<Statement> condition, std::shared_ptr<Statement> incrementation, std::shared_ptr<Statement> statement)
+    : m_initialization(initialization), m_condition(condition), m_incrementation(incrementation), m_statement(statement) {}
+
+    virtual EvalResult evaluate(Runtime&) const override;
+    virtual bool requires_semicolon() const override
+    {
+        assert(m_statement);
+        return m_statement->requires_semicolon();
+    }
+
+    virtual std::string to_string() const override
+    {
+        if(is_error())
+            return ASTNode::to_string();
+
+        return "ForStatement(for(" + (m_initialization ? m_initialization->to_string() : "null") + ";"
+            + (m_condition ? m_condition->to_string() : "null") + ";"
+            + (m_incrementation ? m_incrementation->to_string() : "null") + ") {" + m_statement->to_string() + "})";
+    }
+
+private:
+    std::shared_ptr<Statement> m_initialization;
+    std::shared_ptr<Statement> m_condition;
+    std::shared_ptr<Statement> m_incrementation;
+    std::shared_ptr<Statement> m_statement;
+};
+
 class ReturnStatement : public Statement
 {
 public:

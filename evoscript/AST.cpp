@@ -404,6 +404,43 @@ EvalResult WhileStatement::evaluate(Runtime& rt) const
     return result_value;
 }
 
+EvalResult ForStatement::evaluate(Runtime& rt) const
+{
+    Value result_value = Value::undefined();
+    Scope scope(rt);
+    if(m_initialization)
+    {
+        m_initialization->evaluate(rt);
+        if(rt.has_exception())
+            return {};
+    }
+    while(true)
+    {
+        auto condition = m_condition ? m_condition->evaluate(rt).value() : Value::new_bool(true);
+        if(rt.has_exception())
+            return {};
+
+        auto condition_is_true = condition.to_bool(rt);
+        if(!condition_is_true)
+            break;
+
+        auto result = m_statement->evaluate(rt);
+        if(rt.has_exception())
+            return {};
+        if(result.is_abrupt() && !result.is_continue())
+            return result;
+        result_value = result.value();
+
+        if(m_incrementation)
+        {
+            m_incrementation->evaluate(rt);
+            if(rt.has_exception())
+                return {};
+        }
+    }
+    return result_value;
+}
+
 EvalResult ReturnStatement::evaluate(Runtime& rt) const
 {
     if(!m_expression)
