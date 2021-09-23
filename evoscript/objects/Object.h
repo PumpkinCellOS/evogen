@@ -49,7 +49,7 @@ public:
     // function name(): Value // this is already done for Function
     virtual std::string name() const { return ""; }
 
-protected:
+    // TODO: Consider these functions to be protected
     void add_object_property(StringId name, std::shared_ptr<MemoryValue> memory_value)
     {
         memory_value->set_name(name);
