@@ -398,7 +398,7 @@ EvalResult WhileStatement::evaluate(Runtime& rt) const
         if(rt.has_exception())
             return {};
         if(result.is_abrupt() && !result.is_continue())
-            return result;
+            return result.value();
         result_value = result.value();
     }
     return result_value;
@@ -428,7 +428,7 @@ EvalResult ForStatement::evaluate(Runtime& rt) const
         if(rt.has_exception())
             return {};
         if(result.is_abrupt() && !result.is_continue())
-            return result;
+            return result.value();
         result_value = result.value();
 
         if(m_incrementation)
