@@ -31,6 +31,10 @@ private:
     // Run a shell command. Equivalent to C's `system` function.
     // function call_system(command : String) : int
     Value call_system(Runtime& rt, std::vector<Value> const& args);
+
+    // Get current working directory.
+    // function cwd() : String
+    Value cwd(Runtime& rt, std::vector<Value> const& args);
 };
 
 }

@@ -1,3 +1,4 @@
+#include "evoscript/objects/Object.h"
 #include <evoscript/objects/SysObject.h>
 
 #include <evoscript/NativeFunction.h>
@@ -32,6 +33,7 @@ SysObject::SysObject()
     });
     define_native_function<SysObject>("backtrace", &SysObject::backtrace);
     define_native_function<SysObject>("call_system", &SysObject::call_system);
+    define_native_function<SysObject>("cwd", &SysObject::cwd);
 }
 
 Value SysObject::read(Runtime& rt, std::vector<Value> const& args)
@@ -81,6 +83,14 @@ Value SysObject::call_system(Runtime& rt, std::vector<Value> const& args)
     auto command = args[0];
     int code = system(command.to_string().c_str());
     return Value::new_int(code);
+}
+
+Value SysObject::cwd(Runtime&, std::vector<Value> const&)
+{
+    char* buffer = getcwd(nullptr, 0);
+    std::string result(buffer);
+    free(buffer);
+    return new_object_value<StringObject>(result);
 }
 
 }
