@@ -111,6 +111,8 @@ std::shared_ptr<Expression> EVOParser::parse_integer_literal()
 
     try
     {
+        if(name->value().starts_with("0x"))
+            return std::make_shared<IntegerLiteral>(std::stoll(name->value().substr(2), nullptr, 16));
         return std::make_shared<IntegerLiteral>(std::stoll(name->value()));
     }
     catch(...)
@@ -594,16 +596,18 @@ std::shared_ptr<Declaration> EVOParser::parse_declaration()
 std::shared_ptr<VariableDeclaration> EVOParser::parse_variable_declaration()
 {
     auto let = consume_of_type(Token::Name);
-    if(!let || let->value() != "let")
+    if(!let || (let->value() != "let" && let->value() != "const"))
         return {};
     
     auto name = consume_of_type(Token::Name);
     if(!name)
         return std::make_shared<VariableDeclaration>(ASTNode::Error(location(), "Expected variable name"));
+
+    VariableDeclaration::Type type = let->value() == "const" ? VariableDeclaration::Const : VariableDeclaration::Let;
     
     auto equal = consume_of_type(Token::AssignmentOperator);
     if(!equal)
-        return std::make_shared<VariableDeclaration>(name->value(), nullptr);
+        return std::make_shared<VariableDeclaration>(type, name->value(), nullptr);
     if(equal->value() != "=")
         // TODO: Fix syntax error displayed at expression instead of operator itself
         return std::make_shared<VariableDeclaration>(ASTNode::Error(location(), "Invalid operator for initializer, expected '='"));
@@ -612,7 +616,7 @@ std::shared_ptr<VariableDeclaration> EVOParser::parse_variable_declaration()
     if(initializer->is_error())
         return std::make_shared<VariableDeclaration>(initializer->errors());
     
-    return std::make_shared<VariableDeclaration>(name->value(), initializer);
+    return std::make_shared<VariableDeclaration>(type, name->value(), initializer);
 }
 
 std::shared_ptr<FunctionDeclaration> EVOParser::parse_function_declaration()

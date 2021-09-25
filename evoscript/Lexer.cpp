@@ -41,7 +41,15 @@ bool EVOLexer::lex(std::vector<Token>& output)
         }
         else if(isdigit(next))
         {
-            std::string value = consume_while(isdigit);
+            bool is_hex_digit = false;
+            std::string value = consume_while([&](char ch) {
+                if(ch == 'x')
+                {
+                    is_hex_digit = true;
+                    return true;
+                }
+                return isdigit(ch) || (is_hex_digit && ((ch >= 'a' && ch <= 'f') || (ch >= 'a' && ch <= 'f')));
+            });
             output.emplace_back(Token::Number, value, token_start, location());
         }
         else if(next == '.')

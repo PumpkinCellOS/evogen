@@ -688,15 +688,22 @@ public:
 class VariableDeclaration : public Declaration
 {
 public:
+    enum Type
+    {
+        Let,
+        Const
+    };
+
     VariableDeclaration(ErrorList const& error)
     : Declaration(error) {}
 
-    VariableDeclaration(StringId name, std::shared_ptr<Expression> initializer)
-    : m_name(name), m_initializer(initializer) {}
+    VariableDeclaration(Type type, StringId name, std::shared_ptr<Expression> initializer)
+    : m_type(type), m_name(name), m_initializer(initializer) {}
 
     virtual EvalResult evaluate(Runtime&) const override;
 
 private:
+    Type m_type { Let };
     StringId m_name;
     std::shared_ptr<Expression> m_initializer;
 };

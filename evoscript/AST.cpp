@@ -480,6 +480,8 @@ EvalResult VariableDeclaration::evaluate(Runtime& rt) const
             return {};
     }
     auto memory_value = local_scope->allocate(m_name);
+    if(m_type == Const)
+        memory_value->set_read_only(true);
     if(m_initializer)
     {
         assert(!init_value.is_invalid());
