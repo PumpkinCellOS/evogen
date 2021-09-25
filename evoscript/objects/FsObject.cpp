@@ -18,12 +18,14 @@ FsObject::FsObject()
 
 Value FsObject::list_files(Runtime& rt, std::vector<Value> const& args) const
 {
-    if(args.size() < 1)
-    {
-        rt.throw_exception("Missing argument: path");
-        return {};
-    }
-    auto path = args[0].to_string();
+    auto working_directory = []() {
+        char* buffer = getcwd(nullptr, 0);
+        std::string result(buffer);
+        free(buffer);
+        return result;
+    };
+
+    std::string path = args.size() == 0 ? working_directory() : args[0].to_string();
 
     DIR* dir = opendir(path.c_str());
     if(!dir)
