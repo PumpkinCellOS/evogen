@@ -1,4 +1,4 @@
-add_library(libevoscript
+add_library(evoscript
     "AbstractOperations.cpp"
     "AST.cpp"
     "CallStack.cpp"
@@ -22,10 +22,18 @@ add_library(libevoscript
     "objects/TimeObject.cpp"
 )
 
-target_include_directories(libevoscript PUBLIC ${CMAKE_SOURCE_DIR})
+target_include_directories(evoscript PUBLIC PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
 
 add_executable(evos
     "main.cpp"
 )
 target_include_directories(evos PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(evos libevoscript)
+target_link_libraries(evos evoscript)
+
+install(TARGETS evoscript DESTINATION lib)
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/evoscript" DESTINATION include FILES_MATCHING PATTERN "*.h" PATTERN "*.inl")
+install(TARGETS evoscript EXPORT evoscript DESTINATION lib)
+install(FILES ${CMAKE_SOURCE_DIR}/cmake/evoscriptConfig.cmake DESTINATION lib/cmake/evoscript)
+install(EXPORT evoscript DESTINATION lib/cmake/evoscript)
