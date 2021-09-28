@@ -5,6 +5,8 @@
 #include <evoscript/Value.h>
 
 #include <sstream>
+#include <vector>
+#include <unordered_map>
 
 namespace evo::script
 {
