@@ -2,12 +2,14 @@
 
 #include <evoscript/CallStack.h>
 #include <evoscript/ExecutionContext.h>
+#include <evoscript/Lexer.h>
 #include <evoscript/StringId.h>
 #include <evoscript/Value.h>
 #include <evoscript/objects/GlobalObject.h>
 
 #include <stack>
 #include <string>
+#include <iostream>
 
 namespace evo::script
 {
@@ -50,11 +52,21 @@ public:
 
     Value run_code_from_stream(std::istream&, RunType);
 
+    void set_output_stream(std::ostream& stream) { m_output_stream = &stream; }
+    void set_error_stream(std::ostream& stream) { m_error_stream = &stream; }
+
+    std::ostream& output_stream() const { return *m_output_stream; }
+    std::ostream& error_stream() const { return *m_error_stream; }
+
 private:
+    void display_source_range(std::istream& input, SourceSpan const& span);
+
     std::shared_ptr<Exception> m_exception;
     CallStack m_call_stack;
     std::shared_ptr<GlobalObject> m_global_object;
     std::shared_ptr<MemoryValue> m_global_this;
+    std::ostream* m_output_stream = &std::cout;
+    std::ostream* m_error_stream = &std::cerr;
 };
 
 }

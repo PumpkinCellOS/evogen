@@ -1,7 +1,6 @@
 #include <evoscript/CallStack.h>
 #include <evoscript/Runtime.h>
 
-#include <evoscript/Lexer.h>
 #include <evoscript/Parser.h>
 #include <evoscript/objects/Exception.h>
 #include <evoscript/objects/Object.h>
@@ -36,8 +35,8 @@ void Runtime::throw_exception(std::string const& message)
 
 void Runtime::print_backtrace() const
 {
-    std::cerr << "Backtrace:" << std::endl;
-    m_call_stack.print(std::cerr);
+    *m_error_stream << "Backtrace:" << std::endl;
+    m_call_stack.print(*m_error_stream);
 }
 
 ExecutionContext& Runtime::push_execution_context(std::string const& name, std::shared_ptr<Object> const& this_object)
@@ -65,7 +64,7 @@ void Runtime::pop_execution_context()
     m_call_stack.pop_execution_context();
 }
 
-static void display_source_range(std::istream& input, SourceSpan const& span)
+void Runtime::display_source_range(std::istream& input, SourceSpan const& span)
 {
     // TODO: Handle EOF errors
     size_t start = span.start.index - span.start.column;
@@ -75,19 +74,19 @@ static void display_source_range(std::istream& input, SourceSpan const& span)
     std::string code;
     if(!std::getline(input, code))
     {
-        std::cerr << "(failed to read code)" << std::endl;
+        *m_output_stream << "(failed to read code)" << std::endl;
         return;
     }
     
     // TODO: Handle multiline
-    std::cerr << " | " << code << std::endl << " | ";
+    *m_output_stream << " | " << code << std::endl << " | ";
     for(size_t s = 0; s < span.start.column; s++)
-        std::cerr << " ";
+        *m_output_stream << " ";
 
     for(size_t s = 0; s < span.size; s++)
-        std::cerr << "^";
+        *m_output_stream << "^";
 
-    std::cerr << std::endl;
+    *m_output_stream << std::endl;
 }
 
 Value Runtime::run_code_from_stream(std::istream& input, RunType run_type)
@@ -114,24 +113,24 @@ Value Runtime::run_code_from_stream(std::istream& input, RunType run_type)
         }
         else
         {
-            std::cerr << "\e[31mSyntax Errors detected:\e[0m" << std::endl;
+            *m_output_stream << "\e[31mSyntax Errors detected:\e[0m" << std::endl;
             for(auto& it: program->errors())
             {
-                std::cerr << it.location.start << ": " << it.message << std::endl;
+                *m_output_stream << it.location.start << ": " << it.message << std::endl;
                 display_source_range(input, it.location);
             }
         }
         return {};
     }
 
-    std::cerr << *program << std::endl;
+    *m_error_stream << *program << std::endl;
 
     auto value = program->evaluate(*this);
     if(run_type != RunType::Include)
     {
         if(has_exception())
         {
-            exception()->repl_print(std::cerr, true);
+            exception()->repl_print(*m_output_stream, true);
             clear_exception();
             return {};
         }
@@ -140,8 +139,8 @@ Value Runtime::run_code_from_stream(std::istream& input, RunType run_type)
             if(run_type == RunType::Repl)
             {
                 // TODO: Do not print escape sequences if not running in tty
-                value.value().repl_print(std::cout, true);
-                std::cout << std::endl;
+                value.value().repl_print(*m_output_stream, true);
+                *m_output_stream << std::endl;
             }
         }
     }
