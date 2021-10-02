@@ -19,10 +19,14 @@ FsObject::FsObject()
 Value FsObject::list_files(Runtime& rt, std::vector<Value> const& args) const
 {
     auto working_directory = []() {
-        char* buffer = getcwd(nullptr, 0);
-        std::string result(buffer);
-        free(buffer);
-        return result;
+        #ifdef __unix__
+            char* buffer = getcwd(nullptr, 0);
+            std::string result(buffer);
+            free(buffer);
+            return result;
+        #else
+            return ".";
+        #endif
     };
 
     std::string path = args.size() == 0 ? working_directory() : args[0].to_string();

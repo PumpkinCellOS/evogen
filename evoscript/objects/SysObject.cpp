@@ -87,10 +87,14 @@ Value SysObject::call_system(Runtime& rt, std::vector<Value> const& args)
 
 Value SysObject::cwd(Runtime&, std::vector<Value> const&)
 {
-    char* buffer = getcwd(nullptr, 0);
-    std::string result(buffer);
-    free(buffer);
-    return new_object_value<StringObject>(result);
+    #ifdef __unix__
+        char* buffer = getcwd(nullptr, 0);
+        std::string result(buffer);
+        free(buffer);
+        return new_object_value<StringObject>(result);
+    #else
+        return Value::undefined();
+    #endif
 }
 
 }
