@@ -13,25 +13,9 @@
 
 using namespace evo::script;
 
-class ReplObject : public GlobalObject
-{
-public:
-    EVO_OBJECT("ReplObject")
-
-    bool running() const { return m_running; }
-    int exit_code() const { return m_exit_code; }
-
-private:
-    void exit(int code) { m_running = false; m_exit_code = code; }
-
-    bool m_running = true;
-    int m_exit_code = 0;
-};
-
 int main(int argc, char** argv)
 {
-    auto repl_object = std::make_shared<ReplObject>();
-    Runtime runtime{repl_object};
+    Runtime runtime;
 
     if(argc == 2)
     {
@@ -55,9 +39,6 @@ int main(int argc, char** argv)
         std::cout << "\e[0m";
         std::istringstream iss(source);
         runtime.run_code_from_stream(iss, Runtime::RunType::Repl);
-
-        if(!repl_object->running())
-            return repl_object->exit_code();
     }
     return 0;
 }
