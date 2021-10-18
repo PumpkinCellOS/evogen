@@ -50,7 +50,7 @@ private:
 template<class T, class Value>
 void Object::define_native_function(StringId script_name, Value const& value)
 {
-    define_read_only_object_property<NativeFunction<T>>(script_name, script_name, std::forward<Value>(value));
+    define_read_only_object_property<NativeFunction<T>>(script_name, script_name, std::forward<Value const>(value));
 }
 
 }
