@@ -125,18 +125,17 @@ Value Runtime::run_code_from_stream(std::istream& input, RunType run_type)
     return value;
 }
 
-Runtime::IdentifierRecord Runtime::resolve_identifier(StringId name) const
+ScopeObject::IdentifierRecord Runtime::resolve_identifier(StringId name) const
 {
     // Lookup for already created value in local scope
     auto container = current_execution_context().scope_object();
-    auto value = container->get(name);
+    auto [scope, reference] = container->resolve_identifier(name);
 
     // Default to global object if no value is yet created. The
     // access to reference will fail because it's empty.
-    if(value.is_invalid())
+    if(!reference)
         return {global_object(), nullptr};
-    assert(value.is_reference());
-    return {container, value.get_reference()};
+    return {scope, reference};
 }
 
 }

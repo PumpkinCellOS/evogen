@@ -36,7 +36,7 @@ EvalResult StringLiteral::evaluate(Runtime&) const
 
 EvalResult Identifier::evaluate(Runtime& rt) const
 {
-    auto [container, reference] = rt.resolve_identifier(m_name);
+    auto [scope, reference] = rt.resolve_identifier(m_name);
     if(!reference)
     {
         rt.throw_exception("'" + m_name.string() + "' is not declared");
@@ -44,7 +44,7 @@ EvalResult Identifier::evaluate(Runtime& rt) const
     }
     
     auto new_value = Value::new_reference(reference);
-    new_value.set_container(container);
+    new_value.set_container(scope);
     return new_value;
 }
 

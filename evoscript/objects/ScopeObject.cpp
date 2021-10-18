@@ -8,15 +8,22 @@ namespace evo::script
 
 Value ScopeObject::get(StringId member)
 {
-    auto it = values().find(member);
+    auto [scope, reference] = resolve_identifier(member);
+    if(!reference)
+        return {};
+    return reference->value();
+}
+
+ScopeObject::IdentifierRecord ScopeObject::resolve_identifier(StringId name)
+{
+    auto it = values().find(name);
     if(it == values().end())
     {
         if(m_parent)
-            return m_parent->get(member);
-        return {};
+            return m_parent->resolve_identifier(name);
+        return {shared_from_this(), nullptr};
     }
-
-    return Value::new_reference(std::move(it->second));
+    return {shared_from_this(), it->second};
 }
 
 std::shared_ptr<MemoryValue> ScopeObject::allocate(StringId name)
