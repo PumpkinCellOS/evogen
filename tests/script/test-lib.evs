@@ -3,7 +3,8 @@ function test(name, callback) {
     let env = new Object();
     env.name = name;
     env.callback = callback;
-    env.callback();
+    if(throws(env.callback))
+        test_fail(env.name);
 }
 
 function expect(cond) {
