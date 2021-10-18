@@ -4,6 +4,7 @@
 #include <evoscript/Parser.h>
 #include <evoscript/objects/Exception.h>
 #include <evoscript/objects/Object.h>
+#include <evoscript/objects/SyntaxError.h>
 
 #include <exception>
 #include <iostream>
@@ -68,31 +69,6 @@ void Runtime::pop_execution_context()
     m_call_stack.pop_execution_context();
 }
 
-void Runtime::display_source_range(std::istream& input, SourceSpan const& span)
-{
-    // TODO: Handle EOF errors
-    size_t start = span.start.index - span.start.column;
-    input.clear();
-    input.seekg(start);
-
-    std::string code;
-    if(!std::getline(input, code))
-    {
-        *m_output_stream << "(failed to read code)" << std::endl;
-        return;
-    }
-    
-    // TODO: Handle multiline
-    *m_output_stream << " | " << code << std::endl << " | ";
-    for(size_t s = 0; s < span.start.column; s++)
-        *m_output_stream << " ";
-
-    for(size_t s = 0; s < span.size; s++)
-        *m_output_stream << "^";
-
-    *m_output_stream << std::endl;
-}
-
 Value Runtime::run_code_from_stream(std::istream& input, RunType run_type)
 {
     EVOLexer lexer(input);
@@ -111,18 +87,11 @@ Value Runtime::run_code_from_stream(std::istream& input, RunType run_type)
     if(program->is_error())
     {
         if(run_type == RunType::Include)
-        {
-            // TODO: Add SyntaxError exception
-            throw_exception("Parser errors in included script");
-        }
+            throw_exception<SyntaxError>(input, program->errors());
         else
         {
-            *m_output_stream << "\e[31mSyntax Errors detected:\e[0m" << std::endl;
-            for(auto& it: program->errors())
-            {
-                *m_output_stream << it.location.start << ": " << it.message << std::endl;
-                display_source_range(input, it.location);
-            }
+            std::cout << "\e[1;31mSyntax Error:\e[m" << std::endl;
+            program->errors().print(*m_output_stream, input);
         }
         return {};
     }

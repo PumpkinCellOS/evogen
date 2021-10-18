@@ -23,6 +23,13 @@ public:
     ~Runtime();
 
     void throw_exception(std::string const& message);
+
+    template<class T, class... Args> requires(std::is_base_of_v<Exception, T> || requires(Runtime& rt, Args&&... a) { T(rt, a...); })
+    void throw_exception(Args&&... args)
+    {
+        m_exception = std::make_shared<T>(*this, std::forward<Args>(args)...);
+    }
+
     void clear_exception() { m_exception.reset(); }
 
     bool has_exception() const { return !!m_exception; }
@@ -68,8 +75,6 @@ public:
     std::ostream& error_stream() const { return *m_error_stream; }
 
 private:
-    void display_source_range(std::istream& input, SourceSpan const& span);
-
     std::shared_ptr<Exception> m_exception;
     CallStack m_call_stack;
     std::shared_ptr<GlobalObject> m_global_object;

@@ -28,7 +28,6 @@ char Lexer::consume()
 
 bool EVOLexer::lex(std::vector<Token>& output)
 {
-    bool was_error = false;
     while(!eof())
     {
         char next = peek();
@@ -181,7 +180,6 @@ bool EVOLexer::lex(std::vector<Token>& output)
             std::string literal = consume_while([&](char ch) { return ch != next; });
             if(eof())
             {
-                was_error = true;
                 std::cout << "ERROR: Unclosed string literal" << std::endl;
                 return false;
             }
@@ -190,14 +188,12 @@ bool EVOLexer::lex(std::vector<Token>& output)
         }
         else
         {
-            was_error = true;
-            std::cout << "ERROR: Invalid token: " << next << std::endl;
             consume();
             output.emplace_back(Token::Invalid, std::string(&next, 1), token_start, location());
         }
         ignore_whitespace();
     }
-    return !was_error;
+    return true;
 }
 
 }

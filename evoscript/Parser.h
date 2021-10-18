@@ -74,7 +74,6 @@ public:
 
     Token const* peek() const
     {
-        assert(!m_tokens.empty());
         return !eof() ? &m_tokens[m_offset] : nullptr;
     }
 
@@ -89,7 +88,9 @@ public:
     SourceSpan location() const
     { 
         auto* token = peek();
-        return token ? SourceSpan{token->start(), token->value().size()} : SourceSpan{m_tokens.back().end(), 1};
+        return token ? SourceSpan{token->start(), token->value().size()} : (
+            m_tokens.empty() ? SourceSpan{} : SourceSpan{m_tokens.back().end(), 1}
+        );
     }
 
 private:

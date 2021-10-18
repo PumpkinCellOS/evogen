@@ -15,6 +15,15 @@
 namespace evo::script
 {
 
+void ASTNode::ErrorList::print(std::ostream& output, std::istream& input) const
+{
+    for(auto& it: *this)
+    {
+        output << "\e[1m" << it.location.start << "\e[m: " << it.message << std::endl;
+        display_source_range(output, input, it.location);
+    }
+}
+
 EvalResult IntegerLiteral::evaluate(Runtime&) const
 {
     return Value::new_int(m_value);

@@ -18,6 +18,8 @@ public:
 
     virtual void repl_print(std::ostream& output, bool) const override;
 
+    std::string message() const { return m_message; }
+
 private:
     Value print_(Runtime& rt, std::vector<Value> const&);
 

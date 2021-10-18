@@ -18,6 +18,7 @@ add_library(evoscript
     "objects/Object.cpp"
     "objects/ScopeObject.cpp"
     "objects/StringObject.cpp"
+    "objects/SyntaxError.cpp"
     "objects/SysObject.cpp"
     "objects/TimeObject.cpp"
 )

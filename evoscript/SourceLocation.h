@@ -21,4 +21,6 @@ struct SourceSpan
 
 std::ostream& operator<<(std::ostream& stream, SourceLocation const& node);
 
+void display_source_range(std::ostream& output, std::istream& input, SourceSpan const& span);
+
 }

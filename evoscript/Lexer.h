@@ -20,7 +20,7 @@ protected:
     char consume();
 
     char peek() const { return m_input.peek(); }
-    bool eof() const { return m_input.eof(); }
+    bool eof() const { return m_input.eof() || m_input.fail(); }
 
     template<class Predicate>
     std::string consume_while(Predicate&& predicate)

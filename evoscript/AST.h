@@ -46,6 +46,8 @@ public:
         bool empty() const { return m_errors.empty(); }
         void add(Error const& error) { m_errors.push_back(error); }
 
+        void print(std::ostream& out, std::istream& in) const;
+
     private:
         Type m_errors;
     };
