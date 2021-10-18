@@ -12,6 +12,8 @@ class GlobalObject : public ScopeObject
 public:
     GlobalObject();
 
+    EVO_OBJECT("GlobalObject")
+
 private:
     Value run_script(Runtime&, std::vector<Value> const& arguments);
 };
