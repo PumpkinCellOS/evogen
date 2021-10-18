@@ -86,13 +86,13 @@ Value Runtime::run_code_from_stream(std::istream& input, RunType run_type)
     auto program = parser.parse_program();
     if(program->is_error())
     {
-        if(run_type == RunType::Include)
-            throw_exception<SyntaxError>(input, program->errors());
-        else
+        if(run_type == RunType::Repl)
         {
             std::cout << "\e[1;31mSyntax Error:\e[m" << std::endl;
             program->errors().print(*m_output_stream, input);
         }
+        else
+            throw_exception<SyntaxError>(input, program->errors());
         return {};
     }
 
