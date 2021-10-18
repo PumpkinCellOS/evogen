@@ -79,7 +79,7 @@ public:
     }
 
     template<class T, class Value>
-    void define_native_function(StringId script_name, Value&& value);
+    void define_native_function(StringId script_name, Value const& value);
 
     void print_members_impl(std::ostream&, bool dump) const;
 
