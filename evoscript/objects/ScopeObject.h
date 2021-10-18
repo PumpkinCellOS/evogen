@@ -20,7 +20,6 @@ public:
 
 private:
     // FIXME: Map dupe with Object
-    std::unordered_map<StringId, std::shared_ptr<MemoryValue>> m_values;
     std::shared_ptr<ScopeObject> m_parent;
 };
 

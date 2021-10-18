@@ -149,4 +149,9 @@ Value Runtime::run_code_from_stream(std::istream& input, RunType run_type)
     return value;
 }
 
+std::shared_ptr<ScopeObject> Runtime::lookup_scope_container_for_member(StringId name) const
+{
+    return {};
+}
+
 }

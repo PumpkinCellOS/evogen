@@ -47,6 +47,12 @@ EvalResult Identifier::evaluate(Runtime& rt) const
     else
         container = std::move(scope_object);
 
+    if(value.is_invalid())
+    {
+        rt.throw_exception("Non-existing reference to " + m_name.string());
+        return {};
+    }
+
     if(!value.is_reference()) 
     {
         value.set_container(container);

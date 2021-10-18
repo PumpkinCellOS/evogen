@@ -83,6 +83,10 @@ public:
 
     void print_members_impl(std::ostream&, bool dump) const;
 
+protected:
+    std::unordered_map<StringId, std::shared_ptr<MemoryValue>>& values() { return m_values; }
+    std::unordered_map<StringId, std::shared_ptr<MemoryValue>> const& values() const { return m_values; }
+
 private:
     void print_impl(std::ostream&, bool print_members, bool dump) const;
 

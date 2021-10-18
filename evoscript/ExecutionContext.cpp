@@ -7,8 +7,8 @@
 namespace evo::script
 {
 
-ExecutionContext::ExecutionContext(std::string const& name, std::shared_ptr<Object> const& this_object, std::shared_ptr<ScopeObject> const& parent_scope)
-:  m_this(this_object), m_local_scope(std::make_shared<ScopeObject>(parent_scope)), m_name(name)
+ExecutionContext::ExecutionContext(std::string const& name, std::shared_ptr<Object> const& this_object, std::shared_ptr<GlobalObject> const& global_object, std::shared_ptr<ScopeObject> const& parent_scope)
+:  m_this(this_object), m_local_scope(std::make_shared<ScopeObject>(parent_scope ? parent_scope : global_object)), m_global_object(global_object), m_name(name)
 {
     assert(this_object);
 }

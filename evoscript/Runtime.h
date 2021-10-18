@@ -34,9 +34,11 @@ public:
     template<class T = Object>
     std::shared_ptr<T> this_object() { return call_stack().current_execution_context().this_object<T>(); }
 
-    std::shared_ptr<ScopeObject> scope_object() { return call_stack().current_execution_context().scope_object(); }
-    std::shared_ptr<GlobalObject> global_object() { return m_global_object; }
+    std::shared_ptr<ScopeObject> scope_object() const { return call_stack().current_execution_context().scope_object(); }
+    std::shared_ptr<GlobalObject> global_object() const { return m_global_object; }
     void print_backtrace() const;
+
+    std::shared_ptr<ScopeObject> lookup_scope_container_for_member(StringId) const;
 
     ExecutionContext& push_execution_context(std::string const& name, std::shared_ptr<Object> const& this_object);
     ExecutionContext& push_scope();

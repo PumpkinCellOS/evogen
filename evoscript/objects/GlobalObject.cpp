@@ -13,6 +13,7 @@ namespace evo::script
 {
 
 GlobalObject::GlobalObject()
+: ScopeObject(nullptr)
 {
     DEFINE_NATIVE_OBJECT(object, "sys", std::make_shared<SysObject>());
     DEFINE_NATIVE_OBJECT(object, "fs", std::make_shared<FsObject>());
