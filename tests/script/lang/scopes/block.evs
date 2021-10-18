@@ -8,16 +8,38 @@ test("variables declared in an inner block are not visible in an outer block", f
     }));
 });
 
-test("variables declared in an outer block are visible in an inner block", function() {
+test("variables declared in an outer block are readable in an inner block", function() {
     let i = 2137;
+    const ic = 1234;
     {
         let j = 7312;
+        const jc = 4321;
         expect(i == 2137);
+        expect(ic == 1234);
         {
             expect(i == 2137);
+            expect(ic == 1234);
             expect(j == 7312);
+            expect(jc == 4321);
         }
     }
+});
+
+test("variables declared in an outer block are writable in an inner block", function() {
+    let i;
+    {
+        i = 1234;
+        expect(i == 1234);
+        let j;
+        {
+            i = 2345;
+            j = 8888;
+            expect(i == 2345);
+            expect(j == 8888);
+        }
+        expect(j == 8888);
+    }
+    expect(i == 2345);
 });
 
 test("variables declared in a function scope are not captured by default", function() {

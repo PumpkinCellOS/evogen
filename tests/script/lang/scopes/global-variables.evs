@@ -1,0 +1,18 @@
+let a = 2137;
+const b = 7312;
+
+expect(a == 2137);
+expect(b == 7312);
+
+a = 1234;
+expect(a == 1234);
+
+test("global variables are readable in functions", function() {
+    expect(a == 1234);
+    expect(b == 7312);
+});
+
+test("global variables are writable in functions", function() {
+    a = 4321;
+    expect(a == 4321);
+});
