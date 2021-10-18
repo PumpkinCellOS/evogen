@@ -22,7 +22,7 @@ add_library(evoscript
     "objects/TimeObject.cpp"
 )
 
-target_include_directories(evoscript PUBLIC PUBLIC
+target_include_directories(evoscript PUBLIC
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
 
