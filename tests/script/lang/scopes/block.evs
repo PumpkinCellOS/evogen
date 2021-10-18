@@ -1,9 +1,11 @@
 test("variables declared in an inner block are not visible in an outer block", function() {
-    let i = 0;
-    {
-        let j = 0;
-    }
-    expect(throws(function() { j }))
+    expect(throws(function() {
+        let i = 0;
+        {
+            let j = 0;
+        }
+        j
+    }));
 });
 
 test("variables declared in an outer block are visible in an inner block", function() {
