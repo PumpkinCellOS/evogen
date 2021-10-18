@@ -39,7 +39,7 @@ EvalResult Identifier::evaluate(Runtime& rt) const
     auto [container, reference] = rt.resolve_identifier(m_name);
     if(!reference)
     {
-        rt.throw_exception("Non-existing reference to " + m_name.string());
+        rt.throw_exception("'" + m_name.string() + "' is not declared");
         return {};
     }
     
