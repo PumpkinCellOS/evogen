@@ -6,22 +6,22 @@
 namespace evo::script
 {
 
-class LocalObject : public Object
+class ScopeObject : public Object
 {
 public:
-    LocalObject(std::shared_ptr<LocalObject> parent)
+    ScopeObject(std::shared_ptr<ScopeObject> parent)
     : m_parent(parent) {}
 
-    EVO_OBJECT("LocalObject")
+    EVO_OBJECT("ScopeObject")
 
     virtual Value get(StringId member) override;
     std::shared_ptr<MemoryValue> allocate(StringId name);
-    std::shared_ptr<LocalObject> parent() const { return m_parent; }
+    std::shared_ptr<ScopeObject> parent() const { return m_parent; }
 
 private:
     // FIXME: Map dupe with Object
     std::unordered_map<StringId, std::shared_ptr<MemoryValue>> m_values;
-    std::shared_ptr<LocalObject> m_parent;
+    std::shared_ptr<ScopeObject> m_parent;
 };
 
 }

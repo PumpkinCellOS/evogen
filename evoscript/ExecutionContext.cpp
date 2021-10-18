@@ -1,14 +1,14 @@
 #include <evoscript/ExecutionContext.h>
 
 #include <evoscript/Runtime.h>
-#include <evoscript/objects/LocalObject.h>
 #include <evoscript/objects/Object.h>
+#include <evoscript/objects/ScopeObject.h>
 
 namespace evo::script
 {
 
-ExecutionContext::ExecutionContext(std::string const& name, std::shared_ptr<Object> const& this_object, std::shared_ptr<LocalObject> const& parent_scope)
-:  m_this(this_object), m_local_scope(std::make_shared<LocalObject>(parent_scope)), m_name(name)
+ExecutionContext::ExecutionContext(std::string const& name, std::shared_ptr<Object> const& this_object, std::shared_ptr<ScopeObject> const& parent_scope)
+:  m_this(this_object), m_local_scope(std::make_shared<ScopeObject>(parent_scope)), m_name(name)
 {
     assert(this_object);
 }

@@ -27,8 +27,8 @@ EvalResult StringLiteral::evaluate(Runtime&) const
 
 EvalResult Identifier::evaluate(Runtime& rt) const
 {
-    auto local_scope_object = rt.current_execution_context().local_scope_object();
-    auto value = local_scope_object->get(m_name);
+    auto scope_object = rt.current_execution_context().scope_object();
+    auto value = scope_object->get(m_name);
     if(rt.has_exception())
         return {}; // Getter thrown an exception
 
@@ -45,7 +45,7 @@ EvalResult Identifier::evaluate(Runtime& rt) const
         container = std::move(global_object);
     }
     else
-        container = std::move(local_scope_object);
+        container = std::move(scope_object);
 
     if(!value.is_reference()) 
     {
@@ -471,7 +471,7 @@ EvalResult SimpleControlStatement::evaluate(Runtime&) const
 EvalResult VariableDeclaration::evaluate(Runtime& rt) const
 {
     // TODO: Don't allow redefinition in the same scope
-    auto local_scope = rt.local_scope_object();
+    auto local_scope = rt.scope_object();
     Value init_value;
     if(m_initializer)
     {

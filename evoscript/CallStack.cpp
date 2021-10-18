@@ -24,7 +24,7 @@ ExecutionContext& CallStack::push_execution_context(std::string const& name, std
 
 ExecutionContext& CallStack::push_scope(std::shared_ptr<Object> const& this_object)
 {
-    return m_call_stack.emplace_front("", this_object, current_execution_context().local_scope_object());
+    return m_call_stack.emplace_front("", this_object, current_execution_context().scope_object());
 }
 
 ExecutionContext& CallStack::current_execution_context()

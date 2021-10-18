@@ -34,7 +34,7 @@ public:
     template<class T = Object>
     std::shared_ptr<T> this_object() { return call_stack().current_execution_context().this_object<T>(); }
 
-    std::shared_ptr<LocalObject> local_scope_object() { return call_stack().current_execution_context().local_scope_object(); }
+    std::shared_ptr<ScopeObject> scope_object() { return call_stack().current_execution_context().scope_object(); }
     std::shared_ptr<GlobalObject> global_object() { return m_global_object; }
     void print_backtrace() const;
 

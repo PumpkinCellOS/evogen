@@ -1,11 +1,11 @@
-#include <evoscript/objects/LocalObject.h>
+#include <evoscript/objects/ScopeObject.h>
 
 #include <sstream>
 
 namespace evo::script
 {
 
-Value LocalObject::get(StringId member)
+Value ScopeObject::get(StringId member)
 {
     auto it = m_values.find(member);
     if(it == m_values.end())
@@ -18,7 +18,7 @@ Value LocalObject::get(StringId member)
     return Value::new_reference(std::move(it->second));
 }
 
-std::shared_ptr<MemoryValue> LocalObject::allocate(StringId name)
+std::shared_ptr<MemoryValue> ScopeObject::allocate(StringId name)
 {
     return m_values.insert(std::make_pair(name, MemoryValue::create_undefined())).first->second;
 }
