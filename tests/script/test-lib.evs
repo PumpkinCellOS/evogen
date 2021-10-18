@@ -1,4 +1,5 @@
 function test(name, callback) {
+    sys.writeln("Test case: " + name);
     let env = new Object();
     env.name = name;
     env.callback = callback;
