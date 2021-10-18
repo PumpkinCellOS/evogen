@@ -10,7 +10,7 @@ namespace evo::script
 class ExecutionContext
 {
 public:
-    ExecutionContext(std::string const& name, std::shared_ptr<Object> const& this_object, std::shared_ptr<GlobalObject> const& global_object, std::shared_ptr<ScopeObject> const& parent_scope = nullptr);
+    ExecutionContext(std::string const& name, std::shared_ptr<Object> const& this_object, std::shared_ptr<GlobalObject> const& global_object, std::shared_ptr<ScopeObject> const& scope);
 
     template<class T = Object>
     std::shared_ptr<T> this_object() const { return std::static_pointer_cast<T>(m_this); }

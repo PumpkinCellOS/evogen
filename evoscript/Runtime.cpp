@@ -20,7 +20,7 @@ Runtime::Runtime(std::shared_ptr<GlobalObject> const& global_object, std::shared
     if(!m_global_this)
         m_global_this = MemoryValue::create_object<Object>();
 
-    m_call_stack.push_execution_context("<global scope>", m_global_this->value().to_object(*this), m_global_object);
+    m_call_stack.push_global_scope(m_global_this->value().get_object(), m_global_object);
 }
 
 Runtime::~Runtime()
