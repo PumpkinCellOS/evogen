@@ -19,7 +19,6 @@ public:
     std::shared_ptr<ScopeObject> parent() const { return m_parent; }
 
 private:
-    // FIXME: Map dupe with Object
     std::shared_ptr<ScopeObject> m_parent;
 };
 
