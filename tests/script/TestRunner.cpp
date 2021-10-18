@@ -16,6 +16,8 @@ public:
         define_native_function<TestObject>(throws_sid, &TestObject::throws);
     }
 
+    EVO_OBJECT("TestObject")
+
 private:
     // TODO: Remove it once a try-catch construction is implemented
     Value throws(Runtime& rt, std::vector<Value> const& args)
@@ -29,7 +31,7 @@ private:
     Value test_fail(Runtime& rt, std::vector<Value> const& args)
     {
         std::string test_name = args.size() < 1 ? "" : args[0].to_string();
-        rt.throw_exception("Test failed (should throw): " + test_name);
+        rt.throw_exception("Test failed: " + test_name);
         return {};
     }
 };
