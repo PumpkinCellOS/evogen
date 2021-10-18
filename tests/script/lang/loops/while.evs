@@ -3,3 +3,12 @@ test("basic functionality", function() {
     while(i < 10) ++i;
     expect(i == 10);
 });
+test("while loop creates a scope", function() {
+    let i = 0;
+    while(i < 10)
+    {
+        i++;
+        let i = 5;
+    }
+    expect(i == 10);
+});

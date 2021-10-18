@@ -1,5 +1,25 @@
-let i = 0;
-{
-    let j = 0;
-}
-expect(throws(function() { j }))
+test("variables declared in an inner block are not visible in an outer block", function() {
+    let i = 0;
+    {
+        let j = 0;
+    }
+    expect(throws(function() { j }))
+});
+
+test("variables declared in an outer block are visible in an inner block", function() {
+    let i = 2137;
+    {
+        let j = 7312;
+        expect(i == 2137);
+        {
+            expect(i == 2137);
+            expect(j == 7312);
+        }
+    }
+});
+
+test("variables declared in a function scope are not captured by default", function() {
+    let i = 2137;
+    function a() { i };
+    expect(throws(a));
+});
