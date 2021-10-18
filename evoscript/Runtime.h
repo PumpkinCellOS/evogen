@@ -38,11 +38,18 @@ public:
     std::shared_ptr<GlobalObject> global_object() const { return m_global_object; }
     void print_backtrace() const;
 
-    std::shared_ptr<ScopeObject> lookup_scope_container_for_member(StringId) const;
+    struct IdentifierRecord
+    {
+        std::shared_ptr<ScopeObject> scope;
+        std::shared_ptr<MemoryValue> reference;
+    };
+
+    IdentifierRecord resolve_identifier(StringId) const;
 
     ExecutionContext& push_execution_context(std::string const& name, std::shared_ptr<Object> const& this_object);
     ExecutionContext& push_scope();
     ExecutionContext& current_execution_context();
+    ExecutionContext const& current_execution_context() const;
     void pop_execution_context();
 
     enum class RunType

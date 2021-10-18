@@ -27,40 +27,14 @@ EvalResult StringLiteral::evaluate(Runtime&) const
 
 EvalResult Identifier::evaluate(Runtime& rt) const
 {
-    auto scope_object = rt.current_execution_context().scope_object();
-    auto value = scope_object->get(m_name);
-    if(rt.has_exception())
-        return {}; // Getter thrown an exception
-
-    std::shared_ptr<MemoryValue> memory_object;
-    std::shared_ptr<Object> container;
-
-    if(value.is_invalid())
-    {
-        // Not in local scope; try searching global scope
-        // TODO: This means that not existing "local" variables will
-        // be created on global object!
-        auto global_object = rt.global_object();
-        value = global_object->get(m_name);
-        container = std::move(global_object);
-    }
-    else
-        container = std::move(scope_object);
-
-    if(value.is_invalid())
+    auto [container, reference] = rt.resolve_identifier(m_name);
+    if(!reference)
     {
         rt.throw_exception("Non-existing reference to " + m_name.string());
         return {};
     }
-
-    if(!value.is_reference()) 
-    {
-        value.set_container(container);
-        return value;
-    }
     
-    memory_object = value.get_reference();
-    auto new_value = Value::new_reference(memory_object);
+    auto new_value = Value::new_reference(reference);
     new_value.set_container(container);
     return new_value;
 }
@@ -476,8 +450,13 @@ EvalResult SimpleControlStatement::evaluate(Runtime&) const
 
 EvalResult VariableDeclaration::evaluate(Runtime& rt) const
 {
-    // TODO: Don't allow redefinition in the same scope
-    auto local_scope = rt.scope_object();
+    auto [scope, reference] = rt.resolve_identifier(m_name);
+    assert(scope);
+    if(reference)
+    {
+        rt.throw_exception("Redeclaration of '" + m_name.string() + "' as " + (m_type == Const ? "const " : "") + "variable");
+        return {};
+    }
     Value init_value;
     if(m_initializer)
     {
@@ -485,14 +464,11 @@ EvalResult VariableDeclaration::evaluate(Runtime& rt) const
         if(rt.has_exception())
             return {};
     }
-    auto memory_value = local_scope->allocate(m_name);
+    auto memory_value = scope->allocate(m_name);
+    if(m_initializer)
+        memory_value->value() = init_value;
     if(m_type == Const)
         memory_value->set_read_only(true);
-    if(m_initializer)
-    {
-        assert(!init_value.is_invalid());
-        memory_value->value() = init_value;
-    }
     return Value::new_reference(memory_value);
 }
 
@@ -503,9 +479,14 @@ EvalResult FunctionDeclaration::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {};
 
-    // HACK: This should have its AO
-    Identifier(m_expression->name()).evaluate(rt).value().assign(rt, result);
-
+    auto [scope, reference] = rt.resolve_identifier(m_expression->name());
+    assert(scope);
+    if(reference)
+    {
+        rt.throw_exception("Redeclaration of '" + m_expression->name() + "' as function");
+        return {};
+    }
+    scope->allocate(m_expression->name())->value().assign(rt, result);
     return result;
 }
 

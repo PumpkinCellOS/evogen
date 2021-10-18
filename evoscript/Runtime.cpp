@@ -5,6 +5,7 @@
 #include <evoscript/objects/Exception.h>
 #include <evoscript/objects/Object.h>
 
+#include <exception>
 #include <iostream>
 
 namespace evo::script
@@ -18,9 +19,7 @@ Runtime::Runtime(std::shared_ptr<GlobalObject> const& global_object, std::shared
     if(!m_global_this)
         m_global_this = MemoryValue::create_object<Object>();
 
-    m_call_stack.push_execution_context("<global scope>", m_global_this->value().to_object(*this));
-    if(has_exception())
-        return;
+    m_call_stack.push_execution_context("<global scope>", m_global_this->value().to_object(*this), m_global_object);
 }
 
 Runtime::~Runtime()
@@ -44,17 +43,22 @@ ExecutionContext& Runtime::push_execution_context(std::string const& name, std::
     if(!this_object)
     {
         assert(m_global_this->value().is_object());
-        return m_call_stack.push_execution_context(name, m_global_this->value().get_object());
+        return m_call_stack.push_execution_context(name, m_global_this->value().get_object(), m_global_object);
     }
-    return m_call_stack.push_execution_context(name, this_object);
+    return m_call_stack.push_execution_context(name, this_object, m_global_object);
 }
 
 ExecutionContext& Runtime::push_scope()
 {
-    return m_call_stack.push_scope(this_object());
+    return m_call_stack.push_scope(this_object(), m_global_object);
 }
 
 ExecutionContext& Runtime::current_execution_context()
+{
+    return m_call_stack.current_execution_context();
+}
+
+ExecutionContext const& Runtime::current_execution_context() const
 {
     return m_call_stack.current_execution_context();
 }
@@ -149,9 +153,18 @@ Value Runtime::run_code_from_stream(std::istream& input, RunType run_type)
     return value;
 }
 
-std::shared_ptr<ScopeObject> Runtime::lookup_scope_container_for_member(StringId name) const
+Runtime::IdentifierRecord Runtime::resolve_identifier(StringId name) const
 {
-    return {};
+    // Lookup for already created value in local scope
+    auto container = current_execution_context().scope_object();
+    auto value = container->get(name);
+
+    // Default to global object if no value is yet created. The
+    // access to reference will fail because it's empty.
+    if(value.is_invalid())
+        return {global_object(), nullptr};
+    assert(value.is_reference());
+    return {container, value.get_reference()};
 }
 
 }
