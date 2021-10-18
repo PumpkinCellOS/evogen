@@ -24,7 +24,7 @@ public:
 
     void throw_exception(std::string const& message);
 
-    template<class T, class... Args> requires(std::is_base_of_v<Exception, T> || requires(Runtime& rt, Args&&... a) { T(rt, a...); })
+    template<class T, class... Args> requires(std::is_base_of_v<Exception, T> && requires(Runtime& rt, Args&&... a) { T(rt, a...); })
     void throw_exception(Args&&... args)
     {
         m_exception = std::make_shared<T>(*this, std::forward<Args>(args)...);
