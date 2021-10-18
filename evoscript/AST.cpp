@@ -459,13 +459,8 @@ EvalResult SimpleControlStatement::evaluate(Runtime&) const
 
 EvalResult VariableDeclaration::evaluate(Runtime& rt) const
 {
-    auto [scope, reference] = rt.resolve_identifier(m_name);
+    auto scope = rt.scope_object();
     assert(scope);
-    if(reference)
-    {
-        rt.throw_exception("Redeclaration of '" + m_name.string() + "' as " + (m_type == Const ? "const " : "") + "variable");
-        return {};
-    }
     Value init_value;
     if(m_initializer)
     {
@@ -473,6 +468,7 @@ EvalResult VariableDeclaration::evaluate(Runtime& rt) const
         if(rt.has_exception())
             return {};
     }
+    // TODO: Handle redefinition
     auto memory_value = scope->allocate(m_name);
     if(m_initializer)
         memory_value->value() = init_value;
@@ -488,13 +484,9 @@ EvalResult FunctionDeclaration::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {};
 
-    auto [scope, reference] = rt.resolve_identifier(m_expression->name());
+    auto scope = rt.scope_object();
     assert(scope);
-    if(reference)
-    {
-        rt.throw_exception("Redeclaration of '" + m_expression->name() + "' as function");
-        return {};
-    }
+    // TODO: Handle redefinition
     scope->allocate(m_expression->name())->value().assign(rt, result);
     return result;
 }
