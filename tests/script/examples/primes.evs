@@ -16,5 +16,5 @@ function is_prime(n)
 
 let i = 2000;
 let start = new Time();
-while(i < 2400) sys.write(i, ": ", is_prime(i++));
-sys.write("Time: " + (new Time() - start) + "s");
+while(i < 2400) sys.writeln(i, ": ", is_prime(i++));
+sys.writeln("Time: " + (new Time() - start) + "s");
