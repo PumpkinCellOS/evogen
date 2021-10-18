@@ -21,7 +21,9 @@ Value ScopeObject::get(StringId member)
 
 std::shared_ptr<MemoryValue> ScopeObject::allocate(StringId name)
 {
-    return values().insert(std::make_pair(name, MemoryValue::create_undefined())).first->second;
+    auto memory_value = MemoryValue::create_undefined();
+    memory_value->set_name(name);
+    return values().insert(std::make_pair(name, std::move(memory_value))).first->second;
 }
 
 }
