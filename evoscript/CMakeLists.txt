@@ -13,6 +13,7 @@ add_library(evoscript
     "objects/Array.cpp"
     "objects/Class.cpp"
     "objects/Exception.cpp"
+    "objects/FileObject.cpp"
     "objects/FsObject.cpp"
     "objects/GlobalObject.cpp"
     "objects/Object.cpp"

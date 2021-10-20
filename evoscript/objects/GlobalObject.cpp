@@ -4,6 +4,7 @@
 #include <evoscript/objects/Array.h>
 #include <evoscript/objects/Class.h>
 #include <evoscript/objects/Exception.h>
+#include <evoscript/objects/FileObject.h>
 #include <evoscript/objects/FsObject.h>
 #include <evoscript/objects/StringObject.h>
 #include <evoscript/objects/TimeObject.h>
@@ -22,6 +23,7 @@ GlobalObject::GlobalObject()
 
     DEFINE_NATIVE_OBJECT(object, "Array", create_native_class<Array>());
     DEFINE_NATIVE_OBJECT(object, "Exception", create_native_class<Exception>());
+    DEFINE_NATIVE_OBJECT(object, "File", create_native_class<FileObject>());
     DEFINE_NATIVE_OBJECT(object, "Object", create_native_class<Object>());
     DEFINE_NATIVE_OBJECT(object, "String", create_native_class<StringObject>());
     DEFINE_NATIVE_OBJECT(object, "Time", create_native_class<TimeObject>());
