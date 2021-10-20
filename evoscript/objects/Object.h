@@ -55,7 +55,7 @@ public:
     static void init_class(Class&) {}
 
     // TODO: Consider these functions to be protected
-    void add_object_property(StringId name, std::shared_ptr<MemoryValue> memory_value)
+    void add_object_property(StringId name, std::shared_ptr<MemoryValue> const& memory_value)
     {
         memory_value->set_name(name);
         m_values.insert(std::make_pair(name, memory_value));
@@ -93,7 +93,7 @@ private:
     std::unordered_map<StringId, std::shared_ptr<MemoryValue>> m_values;
 };
 
-template<class T>
+template<class T> requires(std::is_base_of_v<Object, T>)
 static Value new_object_value_from_args(Runtime& rt, std::vector<Value> const& args)
 {
     static_assert(std::is_base_of_v<Object, T>);
