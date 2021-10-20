@@ -157,6 +157,8 @@ std::shared_ptr<Expression> EVOParser::parse_special_value()
         return std::make_shared<SpecialValue>(SpecialValue::False);
     if(name->value() == "undefined")
         return std::make_shared<SpecialValue>(SpecialValue::Undefined);
+    if(name->value() == "local")
+        return std::make_shared<SpecialValue>(SpecialValue::Local);
 
     return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Invalid special value"));
 }

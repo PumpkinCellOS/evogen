@@ -64,6 +64,8 @@ EvalResult SpecialValue::evaluate(Runtime& rt) const
         return Value::new_bool(false);
     case Undefined:
         return Value::undefined();
+    case Local:
+        return Value::new_reference(MemoryValue::create_existing_object(rt.scope_object()));
     default:
         assert(false);
         return {};
