@@ -41,6 +41,8 @@ public:
     template<class T = Object>
     std::shared_ptr<T> this_object() { return call_stack().current_execution_context().this_object<T>(); }
 
+    void set_this_object(std::shared_ptr<MemoryValue> const& this_) { m_global_this = this_; }
+
     std::shared_ptr<ScopeObject> scope_object() const { return call_stack().current_execution_context().scope_object(); }
     std::shared_ptr<GlobalObject> global_object() const { return m_global_object; }
     void print_backtrace() const;
