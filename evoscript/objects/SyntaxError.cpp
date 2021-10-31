@@ -3,10 +3,18 @@
 namespace evo::script
 {
 
-void SyntaxError::repl_print(std::ostream& output, bool print_members) const
+SyntaxError::SyntaxError(Runtime& rt, std::istream& input, ASTNode::ErrorList const& errors)
+: Exception(rt, "SyntaxError")
 {
-    std::cout << "\e[1;31mSyntax Error\e[m" << std::endl;
-    m_errors.print(output, m_input);
+    std::ostringstream oss;
+    oss << "\e[1;31mSyntax Error\e[m" << std::endl;
+    errors.print(oss, input);
+    m_message = oss.str();
+}
+
+void SyntaxError::repl_print(std::ostream& output, bool) const
+{
+    output << m_message;
 }
 
 }
