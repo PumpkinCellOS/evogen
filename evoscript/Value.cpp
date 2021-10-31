@@ -285,7 +285,7 @@ Value Value::dereferenced() const
     return is_reference() ? get_reference()->value().dereferenced() : *this;
 }
 
-Value Value::call(Runtime& rt, std::vector<Value> const& arguments)
+Value Value::call(Runtime& rt, ArgumentList const& arguments)
 {
     Value real_value = dereferenced();
     if(!real_value.is_object())

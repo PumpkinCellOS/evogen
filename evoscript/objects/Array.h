@@ -10,11 +10,12 @@ class Array : public Object
 {
 public:
     Array();
-    Array(Runtime&, std::vector<Value> const&);
+    Array(Runtime&, ArgumentList const&);
 
     static void init_class(Class&);
 
-    static std::shared_ptr<Array> from_std_vector(std::vector<Value> const&);
+    static std::shared_ptr<Array> from_argument_list(ArgumentList const&);
+    static std::shared_ptr<Array> from_vector(std::vector<Value> const&);
 
     EVO_OBJECT("Array")
 
@@ -25,7 +26,7 @@ public:
 private:
     std::vector<std::shared_ptr<MemoryValue>> m_values; 
 
-    Value size(Runtime&, std::vector<Value> const& args) const;
+    Value size(Runtime&, ArgumentList const& args) const;
 };
 
 }

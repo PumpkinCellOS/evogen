@@ -9,7 +9,7 @@ class TimeObject : public Object
 {
 public:
     explicit TimeObject(Value::IntType value);
-    TimeObject(Runtime&, std::vector<Value> const& args);
+    TimeObject(Runtime&, ArgumentList const& args);
 
     EVO_OBJECT("Time")
 

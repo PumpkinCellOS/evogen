@@ -16,7 +16,7 @@ FsObject::FsObject()
     define_native_function<FsObject>("list_files", &FsObject::list_files);
 }
 
-Value FsObject::list_files(Runtime& rt, std::vector<Value> const& args) const
+Value FsObject::list_files(Runtime& rt, ArgumentList const& args) const
 {
     auto working_directory = []() {
         #ifdef __unix__
@@ -29,7 +29,8 @@ Value FsObject::list_files(Runtime& rt, std::vector<Value> const& args) const
         #endif
     };
 
-    std::string path = args.size() == 0 ? working_directory() : args[0].to_string();
+    auto path_arg = args.get(0);
+    std::string path = path_arg.is_undefined() ? working_directory() : path_arg.to_string();
 
     DIR* dir = opendir(path.c_str());
     if(!dir)
@@ -50,7 +51,7 @@ Value FsObject::list_files(Runtime& rt, std::vector<Value> const& args) const
     }
 
     closedir(dir);
-    return Value::new_object(Array::from_std_vector(result));
+    return Value::new_object(Array::from_vector(result));
 }
 
 }

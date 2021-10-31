@@ -12,7 +12,7 @@ class NativeFunction : public Function
 {
 public:
     using ContainerType = T;
-    using FunctionType = std::function<Value(ContainerType* container, Runtime&, std::vector<Value> const& args)>;
+    using FunctionType = std::function<Value(ContainerType* container, Runtime&, ArgumentList const& args)>;
 
     EVO_OBJECT("NativeFunction")
 
@@ -24,7 +24,7 @@ public:
         return Value::new_object(std::make_shared<NativeFunction>(std::move(function)));
     }
 
-    virtual Value call(Runtime& rt, Object& container, std::vector<Value> const& arguments) override
+    virtual Value call(Runtime& rt, Object& container, ArgumentList const& arguments) override
     {
         assert(m_function);
         auto this_container = dynamic_cast<ContainerType*>(&container);

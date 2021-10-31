@@ -22,7 +22,7 @@ void Class::repl_print(std::ostream& output, bool print_members) const
         print_members_impl(output, false);
 }
 
-Value Class::construct(Runtime& rt, std::vector<Value> const& args)
+Value Class::construct(Runtime& rt, ArgumentList const& args)
 {
     assert(m_constructor);
     return m_constructor(rt, args);

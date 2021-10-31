@@ -14,10 +14,10 @@ Array::Array()
     define_native_function<Array>(size_sid, &Array::size);
 }
 
-Array::Array(Runtime& rt, std::vector<Value> const& args)
+Array::Array(Runtime& rt, ArgumentList const& args)
 : Array()
 {
-    auto size = (args.size() >= 1 ? args[0] : Value::undefined());
+    auto size = args.get(0);
     auto size_int = size.to_int(rt);
     if(rt.has_exception())
         return;
@@ -31,12 +31,20 @@ Array::Array(Runtime& rt, std::vector<Value> const& args)
 void Array::init_class(Class& class_)
 {
     static StringId from_values_sid = "from_values";
-    class_.define_native_function<Class>(from_values_sid, [](Class*, Runtime& rt, std::vector<Value> const& args) {
-        return Value::new_object(Array::from_std_vector(args));
+    class_.define_native_function<Class>(from_values_sid, [](Class*, Runtime& rt, ArgumentList const& args) {
+        return Value::new_object(Array::from_argument_list(args));
     });
 }
 
-std::shared_ptr<Array> Array::from_std_vector(std::vector<Value> const& vector)
+std::shared_ptr<Array> Array::from_argument_list(ArgumentList const& vector)
+{
+    std::shared_ptr<Array> array = std::make_shared<Array>();
+    for(auto& value: vector)
+        array->m_values.push_back(std::make_shared<MemoryValue>(value));
+    return array;
+}
+
+std::shared_ptr<Array> Array::from_vector(std::vector<Value> const& vector)
 {
     std::shared_ptr<Array> array = std::make_shared<Array>();
     for(auto& value: vector)
@@ -79,7 +87,7 @@ void Array::repl_print(std::ostream& out, bool print_members) const
     out << "]";
 }
 
-Value Array::size(Runtime&, std::vector<Value> const&) const
+Value Array::size(Runtime&, ArgumentList const&) const
 {
     return Value::new_int(m_values.size());
 }

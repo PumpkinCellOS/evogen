@@ -12,6 +12,7 @@
 namespace evo::script
 {
 
+class ArgumentList;
 class MemoryValue;
 class Object;
 class Runtime;
@@ -81,7 +82,7 @@ public:
 
     Value dereferenced() const;
 
-    Value call(Runtime&, std::vector<Value> const& arguments);
+    Value call(Runtime&, ArgumentList const&);
 
     std::shared_ptr<Object> container() const { return m_container; }
     void set_container(std::shared_ptr<Object> const& object) { m_container = object; }

@@ -24,7 +24,7 @@ StringObject::StringObject(std::string const& str)
 void StringObject::init_class(Class& class_)
 {
     static StringId from_codepoints_sid = "from_codepoints";
-    class_.define_native_function<Class>(from_codepoints_sid, [](Class*, Runtime& rt, std::vector<Value> const& args) {
+    class_.define_native_function<Class>(from_codepoints_sid, [](Class*, Runtime& rt, ArgumentList const& args) {
         std::string result;
         // TODO: Load from array
         for(auto& val: args)
@@ -64,7 +64,7 @@ Value StringObject::to_primitive(Runtime& rt, Value::Type type) const
 
 Value StringObject::operator_add(Runtime& rt, Value const& rhs) const
 {
-    return concat(rt, {rhs});
+    return concat(rt, ArgumentList{{rhs}});
 }
 
 CompareResult StringObject::operator_compare(Runtime& rt, Value const& rhs) const
@@ -89,12 +89,12 @@ Value StringObject::operator_subscript(Runtime& rt, Value const& rhs)
     return new_object_value<StringObject>(std::string{m_string[index]});
 }
 
-Value StringObject::length(Runtime&, std::vector<Value> const& args) const
+Value StringObject::length(Runtime&, ArgumentList const& args) const
 {
     return Value::new_int(m_string.length());
 }
 
-Value StringObject::concat(Runtime& rt, std::vector<Value> const& args) const
+Value StringObject::concat(Runtime& rt, ArgumentList const& args) const
 {
     std::string result = m_string;
     for(auto& arg: args)
@@ -103,18 +103,18 @@ Value StringObject::concat(Runtime& rt, std::vector<Value> const& args) const
     return new_object_value<StringObject>(result);
 }
 
-Value StringObject::substring(Runtime& rt, std::vector<Value> const& args) const
+Value StringObject::substring(Runtime& rt, ArgumentList const& args) const
 {
-    if(args.size() < 1 || args.size() > 2)
+    if(!args.is_given(0))
     {
-        rt.throw_exception("Invalid argument count");
+        rt.throw_exception("You need to give at least 1 argument");
         return {};
     }
-    auto start = args[0].to_int(rt);
+    auto start = args.get(0).to_int(rt);
     if(rt.has_exception())
         return {};
 
-    auto seq_length = args.size() == 2 ? args[1].to_int(rt) : -1;
+    auto seq_length = args.get_or(1, Value::new_int(-1)).to_int(rt);
     if(rt.has_exception())
         return {};
     
@@ -143,7 +143,7 @@ Value StringObject::substring(Runtime& rt, std::vector<Value> const& args) const
     return new_object_value<StringObject>(seq_length == -1 ? m_string.substr(start) : m_string.substr(start, seq_length));
 }
 
-Value StringObject::append(Runtime& rt, std::vector<Value> const& args)
+Value StringObject::append(Runtime& rt, ArgumentList const& args)
 {
     for(auto& arg: args)
         m_string.append(arg.to_string());

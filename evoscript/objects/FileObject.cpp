@@ -26,9 +26,9 @@ FileObject::FileObject(Runtime& rt, std::string const& name)
         rt.throw_exception("Failed to open file '" + name + "': " + std::string{strerror(errno)});
 }
 
-Value FileObject::read(Runtime& rt, std::vector<Value> const& args)
+Value FileObject::read(Runtime& rt, ArgumentList const& args)
 {
-    int bytes = args.size() == 1 ? args[0].to_int(rt) : 0;
+    int bytes = args.get(0).to_int(rt);
     if(rt.has_exception())
         return {};
     if(bytes < 0)
@@ -44,13 +44,13 @@ Value FileObject::read(Runtime& rt, std::vector<Value> const& args)
     return new_object_value<StringObject>(data);
 }
 
-Value FileObject::close(Runtime&, std::vector<Value> const&)
+Value FileObject::close(Runtime&, ArgumentList const&)
 {
     m_file.close();
     return Value::undefined();
 }
 
-Value FileObject::eof(Runtime&, std::vector<Value> const&)
+Value FileObject::eof(Runtime&, ArgumentList const&)
 {
     return Value::new_bool(m_file.eof());
 }

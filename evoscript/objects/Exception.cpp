@@ -24,7 +24,7 @@ void Exception::repl_print(std::ostream& output, bool detailed) const
         m_call_stack.print(output);
 }
 
-Value Exception::print_(Runtime& rt, std::vector<Value> const&)
+Value Exception::print_(Runtime& rt, ArgumentList const&)
 {
     repl_print(std::cerr, false);
     return Value::undefined();

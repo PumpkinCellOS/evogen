@@ -11,12 +11,12 @@ TimeObject::TimeObject(Value::IntType milliseconds)
 {
     // TODO: Change it to a variable when getters are implemented
     static StringId milliseconds_sid = "milliseconds";
-    define_native_function<TimeObject>(milliseconds_sid, [](TimeObject* object, Runtime&, std::vector<Value> const&) {
+    define_native_function<TimeObject>(milliseconds_sid, [](TimeObject* object, Runtime&, ArgumentList const&) {
         return Value::new_int(object->m_milliseconds);
     });
 }
 
-TimeObject::TimeObject(Runtime& rt, std::vector<Value> const& args)
+TimeObject::TimeObject(Runtime& rt, ArgumentList const& args)
 : TimeObject(0)
 {
     if(args.size() != 1)
@@ -27,7 +27,7 @@ TimeObject::TimeObject(Runtime& rt, std::vector<Value> const& args)
     }
     else
     {
-        m_milliseconds = args[0].to_int(rt);
+        m_milliseconds = args.get(0).to_int(rt);
         if(rt.has_exception())
             return;
     }

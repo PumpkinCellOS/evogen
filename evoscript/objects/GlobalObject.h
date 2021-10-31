@@ -15,7 +15,7 @@ public:
     EVO_OBJECT("GlobalObject")
 
 private:
-    Value run_script(Runtime&, std::vector<Value> const& arguments);
+    Value run_script(Runtime&, ArgumentList const& arguments);
 };
 
 }

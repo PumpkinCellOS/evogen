@@ -1,6 +1,7 @@
 #pragma once
 
 #include <evoscript/AbstractOperations.h>
+#include <evoscript/ArgumentList.h>
 #include <evoscript/StringId.h>
 #include <evoscript/Value.h>
 
@@ -24,7 +25,7 @@ class Object
 public:
     // TODO: This probably should be removed
     Object() = default;
-    Object(Runtime&, std::vector<Value> const&) {}
+    Object(Runtime&, ArgumentList const&) {}
 
     virtual Value get(StringId member);
 
@@ -40,7 +41,7 @@ public:
     // function to_string() : string
     virtual std::string to_string() const { return "[object " + type_name() + "]"; }
     // function call(container: Object, arguments: Array) : Value
-    virtual Value call(Runtime&, Object& container, std::vector<Value> const& arguments);
+    virtual Value call(Runtime&, Object& container, ArgumentList const&);
     // function to_primitive() : Value
     virtual Value to_primitive(Runtime&, Value::Type) const { return {}; }
     // function operator+(rhs: Value) : Value
@@ -94,7 +95,7 @@ private:
 };
 
 template<class T> requires(std::is_base_of_v<Object, T>)
-static Value new_object_value_from_args(Runtime& rt, std::vector<Value> const& args)
+static Value new_object_value_from_args(Runtime& rt, ArgumentList const& args)
 {
     static_assert(std::is_base_of_v<Object, T>);
     return Value::new_object(std::make_shared<T>(rt, args));

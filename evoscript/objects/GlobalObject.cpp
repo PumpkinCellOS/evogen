@@ -29,14 +29,15 @@ GlobalObject::GlobalObject()
     DEFINE_NATIVE_OBJECT(object, "Time", create_native_class<TimeObject>());
 }
 
-Value GlobalObject::run_script(Runtime& rt, std::vector<Value> const& args)
+Value GlobalObject::run_script(Runtime& rt, ArgumentList const& args)
 {
-    if(args.size() != 1)
+    auto file_name_arg = args.get(0);
+    if(file_name_arg.is_undefined())
     {
         rt.throw_exception("You need to specify file name");
         return {};
     }
-    auto file_name = args[0].to_string();
+    auto file_name = file_name_arg.to_string();
     std::ifstream file(file_name);
     if(file.fail())
     {

@@ -12,7 +12,7 @@ public:
     ASTFunction(StringId name, std::shared_ptr<BlockStatement> const& body, std::vector<StringId> const& arg_names)
     : Function(name), m_body(body), m_arg_names(arg_names) {}
 
-    virtual Value call(Runtime&, Object& container, std::vector<Value> const& arguments);
+    virtual Value call(Runtime&, Object& container, ArgumentList const& arguments);
 
 private:
     std::shared_ptr<BlockStatement> m_body;

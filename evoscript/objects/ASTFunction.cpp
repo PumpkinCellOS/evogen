@@ -5,7 +5,7 @@
 namespace evo::script
 {
 
-Value ASTFunction::call(Runtime& rt, Object&, std::vector<Value> const& args)
+Value ASTFunction::call(Runtime& rt, Object&, ArgumentList const& args)
 {
     auto scope = rt.scope_object();
     assert(scope);

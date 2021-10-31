@@ -12,15 +12,15 @@ class FileObject : public Object
 public:
     FileObject(Runtime& rt, std::string const& name);
 
-    FileObject(Runtime& rt, std::vector<Value> const& args)
-    : FileObject(rt, args.empty() ? "" : args[0].to_string()) {}
+    FileObject(Runtime& rt, ArgumentList const& args)
+    : FileObject(rt, args.get(0).to_string()) {}
 
     EVO_OBJECT("File")
 
 private:
-    Value read(Runtime& rt, std::vector<Value> const& args);
-    Value close(Runtime& rt, std::vector<Value> const& args);
-    Value eof(Runtime& rt, std::vector<Value> const& args);
+    Value read(Runtime& rt, ArgumentList const& args);
+    Value close(Runtime& rt, ArgumentList const& args);
+    Value eof(Runtime& rt, ArgumentList const& args);
 
     std::ifstream m_file;
 };

@@ -14,7 +14,7 @@ Value Object::get(StringId member)
 {
     // function type() : string
     static StringId type_sid = "type";
-    NATIVE_FUNCTION(Object, type_sid, [](Object* container, Runtime&, std::vector<Value> const&) {
+    NATIVE_FUNCTION(Object, type_sid, [](Object* container, Runtime&, ArgumentList const&) {
         return new_object_value<StringObject>(container->type_name());
     });
 
@@ -73,7 +73,7 @@ void Object::print_members_impl(std::ostream& output, bool dump) const
     output << "}";
 }
 
-Value Object::call(Runtime& rt, Object&, std::vector<Value> const&)
+Value Object::call(Runtime& rt, Object&, ArgumentList const&)
 {
     rt.throw_exception("Cannot call non-callable object");
     return {};

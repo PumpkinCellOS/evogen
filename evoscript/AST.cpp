@@ -107,7 +107,7 @@ EvalResult FunctionCall::evaluate(Runtime& rt) const
         arguments.push_back(value.dereferenced());
     }
 
-    return callable.call(rt, arguments);
+    return callable.call(rt, ArgumentList{arguments});
 }
 
 EvalResult Subscript::evaluate(Runtime& rt) const
@@ -150,7 +150,7 @@ EvalResult NewExpression::evaluate(Runtime& rt) const
     }
 
     construct_function.set_container(name_object);
-    return construct_function.call(rt, args);
+    return construct_function.call(rt, ArgumentList{args});
 }
 
 EvalResult UnaryExpression::evaluate(Runtime& rt) const

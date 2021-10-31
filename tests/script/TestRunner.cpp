@@ -1,3 +1,4 @@
+#include "evoscript/objects/Object.h"
 #include <evoscript/Runtime.h>
 #include <evoscript/NativeFunction.h>
 #include <evoscript/objects/Exception.h>
@@ -20,17 +21,16 @@ public:
 
 private:
     // TODO: Remove it once a try-catch construction is implemented
-    Value throws(Runtime& rt, std::vector<Value> const& args)
+    Value throws(Runtime& rt, ArgumentList const& args)
     {
-        Value function = args.size() < 1 ? Value::undefined() : args[0];
-        function.call(rt, {});
+        args.get(0).call(rt, ArgumentList{{}});
         bool has_exception = rt.has_exception();
         rt.clear_exception();
         return Value::new_bool(has_exception);
     }
-    Value test_fail(Runtime& rt, std::vector<Value> const& args)
+    Value test_fail(Runtime& rt, ArgumentList const& args)
     {
-        std::string test_name = args.size() < 1 ? "" : args[0].to_string();
+        std::string test_name = args.is_given(0) ? args.get(0).to_string() : "";
         rt.throw_exception("Test failed: " + test_name);
         return {};
     }

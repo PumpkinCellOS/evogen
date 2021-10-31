@@ -11,8 +11,8 @@ class Exception : public Object
 {
 public:
     Exception(Runtime& rt, std::string const& message);
-    Exception(Runtime& rt, std::vector<Value> const& args)
-    : Exception(rt, args.size() > 0 ? args[0].to_string() : "") {}
+    Exception(Runtime& rt, ArgumentList const& args)
+    : Exception(rt, args.get(0).to_string()) {}
 
     EVO_OBJECT("Exception")
 
@@ -21,7 +21,7 @@ public:
     std::string message() const { return m_message; }
 
 private:
-    Value print_(Runtime& rt, std::vector<Value> const&);
+    Value print_(Runtime& rt, ArgumentList const&);
 
     CallStack m_call_stack;
     std::string m_message;
