@@ -75,7 +75,7 @@ Value SysObject::backtrace(Runtime& rt, ArgumentList const&)
 
 Value SysObject::call_system(Runtime& rt, ArgumentList const& args)
 {
-    if(args.is_given(0))
+    if(!args.is_given(0))
     {
         rt.throw_exception("Missing argument: command");
         return {};
