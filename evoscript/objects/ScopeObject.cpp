@@ -10,7 +10,7 @@ Value ScopeObject::get(StringId member)
 {
     auto [scope, reference] = resolve_identifier(member);
     if(!reference)
-        return {};
+        return Value::undefined();
     return reference->value();
 }
 
