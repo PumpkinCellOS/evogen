@@ -6,6 +6,7 @@
 #include <cassert>
 #include <ostream>
 #include <type_traits>
+#include <variant>
 #include <vector>
 
 namespace evo::script
@@ -30,6 +31,7 @@ public:
         CurlyClose,             // }
         BraceOpen,              // [
         BraceClose,             // ]
+        Colon,                  // :
         Invalid                 // (others)
     };
 
@@ -102,8 +104,8 @@ class EVOParser : public Parser
 {
 public:
     std::shared_ptr<FunctionExpression> parse_function_expression();
-    std::shared_ptr<Expression> parse_integer_literal();
-    std::shared_ptr<Expression> parse_string_literal();
+    std::shared_ptr<IntegerLiteral> parse_integer_literal();
+    std::shared_ptr<StringLiteral> parse_string_literal();
     std::shared_ptr<Expression> parse_identifier();
     std::shared_ptr<Expression> parse_special_value();
     std::shared_ptr<Expression> parse_primary_expression(); // ( expression ) | integer_literal | string_literal | identifier | special_value
@@ -124,10 +126,15 @@ public:
 
     std::shared_ptr<Statement>              parse_statement();
     std::shared_ptr<Statement>              parse_expression_statement();
+
+    enum class NoCaseLabel { Default, None };
+    using Label = std::variant<std::shared_ptr<CaseLabel>, NoCaseLabel>;
+    Label                                   parse_label();
     std::shared_ptr<BlockStatement>         parse_block_statement();
     std::shared_ptr<IfStatement>            parse_if_statement();
     std::shared_ptr<WhileStatement>         parse_while_statement();
     std::shared_ptr<ForStatement>           parse_for_statement();
+    std::shared_ptr<SwitchStatement>        parse_switch_statement();
     std::shared_ptr<ReturnStatement>        parse_return_statement();
     std::shared_ptr<SimpleControlStatement> parse_simple_control_statement();
     std::shared_ptr<Program>                parse_program();

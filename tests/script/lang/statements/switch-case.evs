@@ -1,0 +1,41 @@
+test("basic functionality", function() {
+    let i = 12;
+    switch(i)
+    {
+        case 10:
+            i = 2137;
+            break;
+        case 12:
+            i = 7312;
+            break;
+        case 14:
+            i = 4444;
+            break;
+    }
+    expect(i == 2137);
+});
+test("default", function() {
+    let i = 1111;
+    switch(i)
+    {
+        case 10:
+            i = 2137;
+            break;
+        default:
+            i = 7312;
+            break;
+    }
+    expect(i == 7312);
+});
+test("fallthrough", function() {
+    let i = 2137;
+    switch(i)
+    {
+        case 2137:
+            i = 4321;
+        case 1111:
+            i = 1234;
+            break;
+    }
+    expect(i == 1234);
+});

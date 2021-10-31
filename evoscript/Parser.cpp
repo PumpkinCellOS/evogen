@@ -2,6 +2,7 @@
 #include <evoscript/Parser.h>
 
 #include <iostream>
+#include <variant>
 
 namespace evo::script
 {
@@ -103,11 +104,11 @@ std::shared_ptr<FunctionExpression> EVOParser::parse_function_expression()
     return std::make_shared<FunctionExpression>(function_name, body, arg_names);
 }
 
-std::shared_ptr<Expression> EVOParser::parse_integer_literal()
+std::shared_ptr<IntegerLiteral> EVOParser::parse_integer_literal()
 {
     auto name = consume_of_type(Token::Number);
     if(!name)
-        return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Invalid literal"));
+        return std::make_shared<IntegerLiteral>(ASTNode::Error(location(), "Invalid literal"));
 
     try
     {
@@ -117,15 +118,15 @@ std::shared_ptr<Expression> EVOParser::parse_integer_literal()
     }
     catch(...)
     {
-        return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Invalid integer literal"));
+        return std::make_shared<IntegerLiteral>(ASTNode::Error(location(), "Invalid integer literal"));
     }
 }
 
-std::shared_ptr<Expression> EVOParser::parse_string_literal()
+std::shared_ptr<StringLiteral> EVOParser::parse_string_literal()
 {
     auto name = consume_of_type(Token::String);
     if(!name)
-        return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Invalid literal"));
+        return std::make_shared<StringLiteral>(ASTNode::Error(location(), "Invalid literal"));
 
     return std::make_shared<StringLiteral>(name->value());
 }
@@ -640,6 +641,34 @@ std::shared_ptr<Statement> EVOParser::parse_expression_statement()
     return std::make_shared<ExpressionStatement>(expression);
 }
 
+EVOParser::Label EVOParser::parse_label()
+{
+    size_t off = offset();
+    auto case_or_default = consume_of_type(Token::Name);
+    if(!case_or_default)
+        return NoCaseLabel::None;
+    if(case_or_default->value() == "case")
+    {
+        // TODO: Other literals
+        auto literal = parse_integer_literal();
+        if(!literal)
+            return std::make_shared<CaseLabel>(ASTNode::Error(location(), "Expected literal in case label"));
+        auto colon = consume_of_type(Token::Colon);
+        if(!colon)
+            return std::make_shared<CaseLabel>(ASTNode::Error(location(), "Expected ':'"));
+        return std::make_shared<CaseLabel>(literal);
+    }
+    else if(case_or_default->value() == "default")
+    {
+        auto colon = consume_of_type(Token::Colon);
+        if(!colon)
+            return std::make_shared<CaseLabel>(ASTNode::Error(location(), "Expected ':'"));
+        return NoCaseLabel::Default;
+    }
+    set_offset(off);
+    return NoCaseLabel::None;
+}
+
 std::shared_ptr<BlockStatement> EVOParser::parse_block_statement()
 {
     auto curly_open = consume_of_type(Token::CurlyOpen);
@@ -653,13 +682,40 @@ std::shared_ptr<BlockStatement> EVOParser::parse_block_statement()
         if(curly_close)
             return statement;
 
+        auto label = parse_label();
+
         auto node = parse_statement();
         if(!node)
             break;
-        if(node->has_effect())
-            statement->add_node(node);
         if(node->is_error())
             break;
+        if(node->has_effect())
+        {
+            ASTNode::ErrorList errors;
+            std::visit([&](auto&& value) {
+                using T = std::decay_t<decltype(value)>;
+                if constexpr(std::is_same_v<T, NoCaseLabel>)
+                {
+                    if(value == NoCaseLabel::Default)
+                        statement->add_default_labeled_node(node);
+                    else
+                        statement->add_node(node);
+                    return;
+                }
+                if constexpr(std::is_same_v<T, std::shared_ptr<CaseLabel>>)
+                {
+                    if(value->is_error())
+                    {
+                        errors = value->errors();
+                        return;
+                    }
+                    statement->add_case_labeled_node(value, node);
+                    return;
+                }
+            }, label);
+            if(!errors.empty())
+                return std::make_shared<BlockStatement>(errors);
+        }
 
         if(node->requires_semicolon())
         {
@@ -811,6 +867,31 @@ std::shared_ptr<ForStatement> EVOParser::parse_for_statement()
     return std::make_shared<ForStatement>(initialization, condition, incrementation, statement);
 }
 
+std::shared_ptr<SwitchStatement> EVOParser::parse_switch_statement()
+{
+    auto switch_keyword = consume_of_type(Token::Name);
+    if(!switch_keyword || switch_keyword->value() != "switch")
+        return {};
+
+    auto paren_open = consume_of_type(Token::ParenOpen);
+    if(!paren_open)
+        return std::make_shared<SwitchStatement>(ASTNode::Error(location(), "Expected '(' after 'switch'"));
+
+    auto expression = parse_expression();
+    if(expression->is_error())
+        return std::make_shared<SwitchStatement>(expression->errors());
+
+    auto paren_close = consume_of_type(Token::ParenClose);
+    if(!paren_close)
+        return std::make_shared<SwitchStatement>(ASTNode::Error(location(), "Expected ')' after 'switch' condition"));
+
+    auto statement = parse_block_statement();
+    if(!statement || statement->ASTGroupNode::is_error())
+        return std::make_shared<SwitchStatement>(ASTNode::Error(location(), "Expected block statement"));
+
+    return std::make_shared<SwitchStatement>(expression, statement);
+}
+
 std::shared_ptr<ReturnStatement> EVOParser::parse_return_statement()
 {
     auto return_keyword = consume_of_type(Token::Name);
@@ -869,15 +950,20 @@ std::shared_ptr<Statement> EVOParser::parse_statement()
                         if(!statement)
                         {
                             set_offset(off);
-                            statement = parse_declaration();
+                            statement = parse_switch_statement();
                             if(!statement)
                             {
                                 set_offset(off);
-                                statement = parse_expression_statement();
-                                if(!statement || statement->is_error())
+                                statement = parse_declaration();
+                                if(!statement)
                                 {
                                     set_offset(off);
-                                    return statement;
+                                    statement = parse_expression_statement();
+                                    if(!statement || statement->is_error())
+                                    {
+                                        set_offset(off);
+                                        return statement;
+                                    }
                                 }
                             }
                         }

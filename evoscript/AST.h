@@ -7,6 +7,7 @@
 #include <evoscript/Value.h>
 
 #include <memory>
+#include <optional>
 #include <vector>
 #include <sstream>
 
@@ -548,6 +549,24 @@ private:
     std::shared_ptr<Expression> m_expression;
 };
 
+class CaseLabel : public ASTNode
+{
+public:
+    CaseLabel(ErrorList const& error)
+    : ASTNode(error) {}
+
+    // TODO: Allow string literals here
+    CaseLabel(std::shared_ptr<IntegerLiteral> const& literal)
+    : m_literal(literal) {}
+
+    bool matches(Runtime& rt, Value const&) const;
+
+    virtual EvalResult evaluate(Runtime&) const override { assert(false); return {}; }
+
+private:
+    std::shared_ptr<IntegerLiteral> m_literal;
+};
+
 class BlockStatement : public ASTGroupNode<Statement>, public Statement
 {
 public:
@@ -557,12 +576,31 @@ public:
     BlockStatement() = default;
 
     virtual EvalResult evaluate(Runtime&) const override;
+    EvalResult evaluate_starting_from(Runtime& rt, size_t index) const;
     virtual bool requires_semicolon() const override { return false; }
 
     virtual std::string to_string() const override
     {
         return "BlockStatement { TODO }";
     }
+
+    void add_case_labeled_node(std::shared_ptr<CaseLabel> const& label, std::shared_ptr<Statement> const& target)
+    {
+        m_case_labels.push_back({label, m_nodes.size()});
+        add_node(target);
+    }
+
+    void add_default_labeled_node(std::shared_ptr<Statement> const& target)
+    {
+        m_default_label = m_nodes.size();
+        add_node(target);
+    }
+
+    std::optional<size_t> find_matching_case_label(Runtime& rt, Value const&);
+
+private:
+    std::vector<std::pair<std::shared_ptr<CaseLabel>, size_t>> m_case_labels;
+    std::optional<size_t> m_default_label;
 };
 
 class IfStatement : public Statement
@@ -641,6 +679,23 @@ private:
     std::shared_ptr<Statement> m_condition;
     std::shared_ptr<Statement> m_incrementation;
     std::shared_ptr<Statement> m_statement;
+};
+
+class SwitchStatement : public Statement
+{
+public:
+    SwitchStatement(ErrorList const& error)
+    : Statement(error) {}
+
+    SwitchStatement(std::shared_ptr<Expression> const& expression, std::shared_ptr<BlockStatement> const& statement)
+    : m_expression(expression), m_statement(statement) {}
+
+    virtual EvalResult evaluate(Runtime&) const override;
+    virtual bool requires_semicolon() const override { return false; }
+
+private:
+    std::shared_ptr<Expression> m_expression;
+    std::shared_ptr<BlockStatement> m_statement;
 };
 
 class ReturnStatement : public Statement

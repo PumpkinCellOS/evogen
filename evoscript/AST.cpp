@@ -11,6 +11,7 @@
 #include <cassert>
 #include <iostream>
 #include <memory>
+#include <optional>
 
 namespace evo::script
 {
@@ -338,24 +339,46 @@ EvalResult ExpressionStatement::evaluate(Runtime& rt) const
     return m_expression->evaluate(rt);
 }
 
-EvalResult BlockStatement::evaluate(Runtime& rt) const
+EvalResult BlockStatement::evaluate_starting_from(Runtime& rt, size_t index) const
 {
     if(m_nodes.empty())
+        // HACK to make for loop working
         return Value::new_bool(true);
 
     // TODO: Add some "inheritance" mechanism for block statement nodes
     Scope scope(rt);
-    Value val = Value::undefined();
-    for(auto& it: m_nodes)
+    EvalResult result = Value::undefined();
+    for(size_t s = index; s < m_nodes.size(); s++)
     {
-        auto result = it->evaluate(rt);
+        auto& statement = m_nodes[s];
+        result = statement->evaluate(rt);
         if(rt.has_exception())
             return {};
         if(result.is_abrupt())
             return result;
-        val = std::move(result);
     }
-    return val;
+    assert(result.is_normal());
+    return result;
+}
+
+EvalResult BlockStatement::evaluate(Runtime& rt) const
+{
+    return evaluate_starting_from(rt, 0);
+}
+
+bool CaseLabel::matches(Runtime& rt, Value const& value) const
+{
+    return abstract::compare(rt, m_literal->evaluate(rt).value(), value) == CompareResult::Equal;
+}
+
+std::optional<size_t> BlockStatement::find_matching_case_label(Runtime& rt, Value const& value)
+{
+    for(auto& it: m_case_labels)
+    {
+        if(it.first->matches(rt, value))
+            return it.second;
+    }
+    return m_default_label;
 }
 
 EvalResult IfStatement::evaluate(Runtime& rt) const
@@ -396,6 +419,19 @@ EvalResult WhileStatement::evaluate(Runtime& rt) const
         result_value = result.value();
     }
     return result_value;
+}
+
+EvalResult SwitchStatement::evaluate(Runtime& rt) const
+{
+    auto check_value = m_expression->evaluate(rt);
+    if(check_value.is_abrupt() || rt.has_exception())
+        return check_value;
+
+    auto case_label = m_statement->find_matching_case_label(rt, check_value);
+    if(!case_label.has_value())
+        return Value::undefined();
+
+    return m_statement->evaluate_starting_from(rt, case_label.value());
 }
 
 EvalResult ForStatement::evaluate(Runtime& rt) const
