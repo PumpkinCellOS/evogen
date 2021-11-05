@@ -598,9 +598,13 @@ public:
 
     std::optional<size_t> find_matching_case_label(Runtime& rt, Value const&);
 
+    void set_needs_scope() { m_needs_scope = true; }
+    bool needs_scope() const { return m_needs_scope; }
+
 private:
     std::vector<std::pair<std::shared_ptr<CaseLabel>, size_t>> m_case_labels;
     std::optional<size_t> m_default_label;
+    bool m_needs_scope { false };
 };
 
 class IfStatement : public Statement

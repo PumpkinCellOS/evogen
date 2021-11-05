@@ -144,6 +144,8 @@ public:
     std::shared_ptr<Expression> parse_argument_list(std::shared_ptr<Expression> lhs); // (arg1, arg2, ...)
     std::shared_ptr<Expression> parse_subscript_value(std::shared_ptr<Expression> lhs); // [value]
     std::shared_ptr<Expression> parse_postfix_operator(std::shared_ptr<Expression> lhs); // ++ | --
+
+    BlockStatement* m_current_block { nullptr };
 };
 
 }

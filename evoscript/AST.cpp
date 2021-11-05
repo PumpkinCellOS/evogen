@@ -346,18 +346,29 @@ EvalResult BlockStatement::evaluate_starting_from(Runtime& rt, size_t index) con
         return Value::new_bool(true);
 
     // TODO: Add some "inheritance" mechanism for block statement nodes
-    Scope scope(rt);
     EvalResult result = Value::undefined();
-    for(size_t s = index; s < m_nodes.size(); s++)
+    auto execute = [this, index, &rt]() {
+        EvalResult result = Value::undefined();
+        for(size_t s = index; s < m_nodes.size(); s++)
+        {
+            auto& statement = m_nodes[s];
+            result = statement->evaluate(rt);
+            if(result.is_abrupt())
+                return result;
+        }
+        assert(result.is_normal());
+        return result;
+    };
+
+    if(needs_scope())
     {
-        auto& statement = m_nodes[s];
-        result = statement->evaluate(rt);
-        if(rt.has_exception())
-            return {};
-        if(result.is_abrupt())
-            return result;
+        Scope scope(rt);
+        result = execute();
     }
-    assert(result.is_normal());
+    else
+        result = execute();
+    if(rt.has_exception())
+        return {};
     return result;
 }
 

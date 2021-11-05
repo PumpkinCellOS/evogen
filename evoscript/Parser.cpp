@@ -159,7 +159,11 @@ std::shared_ptr<Expression> EVOParser::parse_special_value()
     if(name->value() == "undefined")
         return std::make_shared<SpecialValue>(SpecialValue::Undefined);
     if(name->value() == "local")
+    {
+        if(m_current_block)
+            m_current_block->set_needs_scope();
         return std::make_shared<SpecialValue>(SpecialValue::Local);
+    }
 
     return std::make_shared<SpecialValue>(ASTNode::Error(location(), "Invalid special value"));
 }
@@ -619,6 +623,8 @@ std::shared_ptr<VariableDeclaration> EVOParser::parse_variable_declaration()
     if(initializer->is_error())
         return std::make_shared<VariableDeclaration>(initializer->errors());
     
+    if(m_current_block)
+        m_current_block->set_needs_scope();
     return std::make_shared<VariableDeclaration>(type, name->value(), initializer);
 }
 
@@ -629,6 +635,8 @@ std::shared_ptr<FunctionDeclaration> EVOParser::parse_function_declaration()
         return {};
     if(expression->is_error())
         return std::make_shared<FunctionDeclaration>(expression->errors());
+    if(m_current_block)
+        m_current_block->set_needs_scope();
     return std::make_shared<FunctionDeclaration>(expression);
 }
 
@@ -676,6 +684,7 @@ std::shared_ptr<BlockStatement> EVOParser::parse_block_statement()
         return {};
 
     auto statement = std::make_shared<BlockStatement>();
+    m_current_block = statement.get();
     while(!eof())
     {
         auto curly_close = consume_of_type(Token::CurlyClose);
@@ -684,7 +693,13 @@ std::shared_ptr<BlockStatement> EVOParser::parse_block_statement()
 
         auto label = parse_label();
 
-        auto node = parse_statement();
+        std::shared_ptr<Statement> node;
+        {
+            auto current_block_statement = m_current_block;
+            node = parse_statement();
+            m_current_block = current_block_statement;
+        }
+
         if(!node)
             break;
         if(node->is_error())
