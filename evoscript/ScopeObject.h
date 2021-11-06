@@ -1,7 +1,10 @@
 #pragma once
 
-#include <evoscript/objects/Object.h>
+#include <evoscript/Object.h>
+#include <evoscript/StringId.h>
+#include <evoscript/Value.h>
 #include <map>
+#include <memory>
 
 namespace evo::script
 {
@@ -9,12 +12,10 @@ namespace evo::script
 class ScopeObject : public Object, public std::enable_shared_from_this<ScopeObject>
 {
 public:
-    ScopeObject(std::shared_ptr<ScopeObject> parent)
+    ScopeObject(std::shared_ptr<ScopeObject> const& parent)
     : m_parent(parent) {}
 
-    EVO_OBJECT("ScopeObject")
-
-    virtual Value get(StringId member) override;
+    virtual std::shared_ptr<MemoryValue> get(StringId member) override;
     std::shared_ptr<MemoryValue> allocate(StringId name);
 
     struct IdentifierRecord

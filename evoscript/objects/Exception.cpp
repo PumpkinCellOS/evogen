@@ -1,33 +1,35 @@
 #include <evoscript/objects/Exception.h>
 
 #include <evoscript/EscapeSequences.h>
-#include <evoscript/NativeFunction.h>
-#include <evoscript/objects/StringObject.h>
-#include <iostream>
-#include <sstream>
+#include <evoscript/objects/NativeFunction.h>
 
 namespace evo::script
 {
 
-Exception::Exception(Runtime& rt, std::string const& message)
-: m_call_stack(rt.call_stack()), m_message(message)
+Exception::Exception()
+: Class("Exception")
 {
-    define_native_function<Exception>("print", &Exception::print_);
-    DEFINE_NATIVE_OBJECT(object, "message", std::make_shared<StringObject>(m_message));
+    define_native_function<Exception>("print", [](Runtime& rt, Object& object, ArgumentList const&) {
+        object.repl_print(std::cerr, false);
+        return Value::undefined();
+    });
+    /*
+    define_native_function<Exception>("message", [](Runtime& rt, Object& object, ArgumentList const&) {
+        return Object::create_native<String>(&rt, object.internal_data<InternalData>().message);
+    });*/
 }
 
-void Exception::repl_print(std::ostream& output, bool detailed) const
+void Exception::print(Object const& object, std::ostream& output, bool detailed, bool dump) const
 {
-    using namespace escapes;
-    output << "\e[1m" << error(type_name()) << "\e[0m: " << m_message << std::endl;
+    auto& data = object.internal_data<InternalData>();
+    if(dump)
+    {
+        Class::print(object, output, detailed, dump);
+        return;
+    }
+    output << "\e[1m" << escapes::error(name()) << "\e[0m: " << data.message << std::endl;
     if(detailed)
-        m_call_stack.print(output);
-}
-
-Value Exception::print_(Runtime& rt, ArgumentList const&)
-{
-    repl_print(std::cerr, false);
-    return Value::undefined();
+        data.call_stack.print(output);
 }
 
 }

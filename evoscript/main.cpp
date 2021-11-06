@@ -1,8 +1,4 @@
-#include <evoscript/NativeFunction.h>
-#include <evoscript/Value.h>
-#include <evoscript/Lexer.h>
-#include <evoscript/objects/Exception.h>
-#include <evoscript/objects/Object.h>
+#include <evoscript/Runtime.h>
 
 #include <fstream>
 #include <iostream>

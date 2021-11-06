@@ -1,8 +1,8 @@
 #include <evoscript/ExecutionContext.h>
 
+#include <evoscript/Object.h>
 #include <evoscript/Runtime.h>
-#include <evoscript/objects/Object.h>
-#include <evoscript/objects/ScopeObject.h>
+#include <evoscript/ScopeObject.h>
 
 namespace evo::script
 {

@@ -1,8 +1,8 @@
 #pragma once
 
+#include <evoscript/GlobalObject.h>
+#include <evoscript/ScopeObject.h>
 #include <evoscript/Value.h>
-#include <evoscript/objects/GlobalObject.h>
-#include <evoscript/objects/ScopeObject.h>
 
 namespace evo::script
 {

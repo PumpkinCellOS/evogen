@@ -149,15 +149,9 @@ public:
         return std::make_shared<MemoryValue>(Value::new_int(value));
     }
 
-    static std::shared_ptr<MemoryValue> create_existing_object(std::shared_ptr<Object> value)
+    static std::shared_ptr<MemoryValue> create_object(std::shared_ptr<Object> value)
     {
         return std::make_shared<MemoryValue>(Value::new_object(value));
-    }
-
-    template<class T, class... Args>
-    static std::shared_ptr<MemoryValue> create_object(Args&&... args)
-    {
-        return std::make_shared<MemoryValue>(Value::new_object(std::make_shared<T>(std::forward<Args>(args)...)));
     }
 
     Value& value() { return m_value; }

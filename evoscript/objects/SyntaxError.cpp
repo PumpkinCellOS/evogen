@@ -3,18 +3,20 @@
 namespace evo::script
 {
 
-SyntaxError::SyntaxError(Runtime& rt, std::istream& input, ASTNode::ErrorList const& errors)
-: Exception(rt, "SyntaxError")
+SyntaxError::SyntaxError()
+: Class("SyntaxError", NativeClass<Exception>::class_object()) {}
+
+std::unique_ptr<ObjectInternalData> SyntaxError::construct_internal_data(Runtime* rt, std::istream& input, ASTNode::ErrorList const& errors) const
 {
     std::ostringstream oss;
     oss << "\e[1;31mSyntax Error\e[m" << std::endl;
     errors.print(oss, input);
-    m_message = oss.str();
+    return std::make_unique<InternalData>(oss.str());
 }
 
-void SyntaxError::repl_print(std::ostream& output, bool) const
+void SyntaxError::print(Object const& object, std::ostream& output, bool, bool) const
 {
-    output << m_message;
+    output << object.internal_data<InternalData>().generated_source_display;
 }
 
 }

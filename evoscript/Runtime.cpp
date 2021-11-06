@@ -1,9 +1,8 @@
-#include <evoscript/CallStack.h>
 #include <evoscript/Runtime.h>
 
+#include <evoscript/CallStack.h>
 #include <evoscript/Parser.h>
 #include <evoscript/objects/Exception.h>
-#include <evoscript/objects/Object.h>
 #include <evoscript/objects/SyntaxError.h>
 
 #include <exception>
@@ -18,7 +17,7 @@ Runtime::Runtime(std::shared_ptr<GlobalObject> const& global_object, std::shared
     if(!m_global_object)
         m_global_object = std::make_shared<GlobalObject>();
     if(!m_global_this)
-        m_global_this = MemoryValue::create_object<Object>();
+        m_global_this = MemoryValue::create_object(Object::create_native<Class>(this));
 
     m_call_stack.push_global_scope(m_global_this->value().get_object(), m_global_object);
 }
@@ -26,11 +25,6 @@ Runtime::Runtime(std::shared_ptr<GlobalObject> const& global_object, std::shared
 Runtime::~Runtime()
 {
     m_call_stack.pop_execution_context();
-}
-
-void Runtime::throw_exception(std::string const& message)
-{
-    m_exception = std::make_shared<Exception>(*this, message);
 }
 
 void Runtime::print_backtrace() const
@@ -76,7 +70,7 @@ Value Runtime::run_code_from_stream(std::istream& input, RunType run_type)
     if(!lexer.lex(tokens))
     {
         if(run_type == RunType::Include)
-            throw_exception("Lexer errors in included script");
+            throw_exception<Exception>("Lexer errors in included script"); // FIXME: This should be SyntaxError
         else
             std::cerr << "Lexer error :(" << std::endl;
         return {};
@@ -86,7 +80,7 @@ Value Runtime::run_code_from_stream(std::istream& input, RunType run_type)
     auto program = parser.parse_program();
     if(program->is_error())
     {
-        if(run_type == RunType::Repl)
+        if(run_type != RunType::Include)
         {
             std::cout << "\e[1;31mSyntax Error:\e[m" << std::endl;
             program->errors().print(*m_output_stream, input);

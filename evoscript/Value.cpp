@@ -1,10 +1,9 @@
 #include <evoscript/Value.h>
 
 #include <evoscript/EscapeSequences.h>
-#include <evoscript/NativeFunction.h>
+#include <evoscript/Object.h>
 #include <evoscript/Runtime.h>
-#include <evoscript/objects/Object.h>
-#include <evoscript/objects/StringObject.h>
+#include <evoscript/objects/Exception.h>
 
 #include <cassert>
 #include <sstream>
@@ -46,8 +45,11 @@ Value::IntType Value::to_int(Runtime& rt) const
     {
         assert(m_object_value);
         auto primitive = m_object_value->to_primitive(rt, Value::Type::Int);
-        if(rt.has_exception())
+        if(primitive.is_invalid())
+        {
+            rt.throw_exception<Exception>("Cannot convert to int");
             return 0;
+        }
         return primitive.to_int(rt);
     }
     case Type::Int:
@@ -93,7 +95,7 @@ std::shared_ptr<Object> Value::to_object(Runtime& rt) const
     case Type::Undefined:
     case Type::Int:
     case Type::Bool:
-        rt.throw_exception("Cannot convert " + type_to_string(m_type) + " to object");
+        rt.throw_exception<Exception>("Cannot convert " + type_to_string(m_type) + " to object");
         return nullptr;
     case Type::Object:
         assert(m_object_value);
@@ -142,7 +144,7 @@ std::shared_ptr<MemoryValue> Value::to_reference(Runtime& rt) const
     case Type::Int:
     case Type::Bool:
     case Type::Object:
-        rt.throw_exception("Cannot bind " + type_to_string(m_type) + " to reference");
+        rt.throw_exception<Exception>("Cannot bind " + type_to_string(m_type) + " to reference");
         return {};
     case Type::Reference:
         assert(m_reference_value);
@@ -160,7 +162,7 @@ std::shared_ptr<MemoryValue> Value::to_writable_reference(Runtime& rt) const
         return value;
     if(value->is_read_only())
     {
-        rt.throw_exception("Cannot create writable reference for read-only object");
+        rt.throw_exception<Exception>("Cannot create writable reference for read-only object");
         return {};
     }
     return value;
@@ -236,7 +238,7 @@ void Value::assign(Runtime& rt, Value const& other)
         auto memory_value = get_reference();
         if(memory_value->is_read_only())
         {
-            rt.throw_exception("Cannot assign to read-only object");
+            rt.throw_exception<Exception>("Cannot assign to read-only object");
             return;
         }
         memory_value->value().assign(rt, other);
@@ -290,7 +292,7 @@ Value Value::call(Runtime& rt, ArgumentList const& arguments)
     Value real_value = dereferenced();
     if(!real_value.is_object())
     {
-        rt.throw_exception("Cannot call non-object");
+        rt.throw_exception<Exception>("Cannot call non-object");
         return {};
     }
 

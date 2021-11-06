@@ -1,8 +1,8 @@
 #include <evoscript/AbstractOperations.h>
 
+#include <evoscript/Object.h>
 #include <evoscript/Runtime.h>
-#include <evoscript/objects/Object.h>
-#include <evoscript/objects/StringObject.h>
+#include <evoscript/objects/Exception.h>
 
 namespace evo::script::abstract
 {
@@ -27,10 +27,13 @@ Value add(Runtime& rt, Value const& lhs, Value const& rhs)
     }
     else
     {
+        /* TODO
         // Unknown case, treat as strings.
         auto lhs_int = real_lhs.to_string();
         auto rhs_int = real_rhs.to_string();
         return new_object_value<StringObject>(lhs_int + rhs_int);
+        */
+        return Value::undefined();
     }
 }
 
@@ -78,7 +81,7 @@ Value divide(Runtime& rt, Value const& lhs, Value const& rhs)
 
     if(rhs_int == 0)
     {
-        rt.throw_exception("Cannot divide by 0");
+        rt.throw_exception<Exception>("Cannot divide by 0");
         return {};
     }
     return Value::new_int(lhs_int / rhs_int);
@@ -98,7 +101,7 @@ Value modulo(Runtime& rt, Value const& lhs, Value const& rhs)
 
     if(rhs_int == 0)
     {
-        rt.throw_exception("Cannot modulo by 0");
+        rt.throw_exception<Exception>("Cannot modulo by 0");
         return {};
     }
     return Value::new_int(lhs_int % rhs_int);
@@ -156,7 +159,7 @@ CompareResult compare(Runtime& rt, Value const& lhs, Value const& rhs)
     auto real_rhs = rhs.dereferenced();
     if(real_lhs.type() != real_rhs.type())
     {
-        rt.throw_exception("Cannot compare values of different type (For now)");
+        rt.throw_exception<Exception>("Cannot compare values of different type (For now)");
         return CompareResult::Unknown;
     }
     if(real_lhs.is_null() || real_rhs.is_null() || real_lhs.is_undefined() || real_rhs.is_undefined())
@@ -171,7 +174,7 @@ CompareResult compare(Runtime& rt, Value const& lhs, Value const& rhs)
     else
     {
         // TODO: Object compare
-        rt.throw_exception("Cannot compare values of type " + real_lhs.type_string());
+        rt.throw_exception<Exception>("Cannot compare values of type " + real_lhs.type_string());
         return CompareResult::Unknown;
     }
 }

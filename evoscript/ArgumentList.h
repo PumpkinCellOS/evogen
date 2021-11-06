@@ -9,6 +9,8 @@ namespace evo::script
 class ArgumentList : std::vector<Value>
 {
 public:
+    ArgumentList() = default;
+
     explicit ArgumentList(std::vector<Value> const& other)
     : std::vector<Value>(other) {}
 

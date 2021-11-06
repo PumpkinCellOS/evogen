@@ -1,12 +1,18 @@
-#include "evoscript/EvalResult.h"
 #include <evoscript/AST.h>
 
 #include <evoscript/AbstractOperations.h>
+#include <evoscript/EvalResult.h>
 #include <evoscript/ExecutionContext.h>
-#include <evoscript/NativeFunction.h>
+#include <evoscript/Object.h>
 #include <evoscript/objects/ASTFunction.h>
-#include <evoscript/objects/Object.h>
+#include <evoscript/objects/Exception.h>
+#include <evoscript/objects/NativeFunction.h>
+#include <evoscript/objects/String.h>
+
+/*
+#include <evoscript/objects/ASTFunction.h>
 #include <evoscript/objects/StringObject.h>
+*/
 
 #include <cassert>
 #include <iostream>
@@ -30,9 +36,9 @@ EvalResult IntegerLiteral::evaluate(Runtime&) const
     return Value::new_int(m_value);
 }
 
-EvalResult StringLiteral::evaluate(Runtime&) const
+EvalResult StringLiteral::evaluate(Runtime& rt) const
 {
-    return new_object_value<StringObject>(m_value);
+    return Value::new_object(Object::create_native<String>(&rt, m_value));
 }
 
 EvalResult Identifier::evaluate(Runtime& rt) const
@@ -40,7 +46,7 @@ EvalResult Identifier::evaluate(Runtime& rt) const
     auto [scope, reference] = rt.resolve_identifier(m_name);
     if(!reference)
     {
-        rt.throw_exception("'" + m_name.string() + "' is not declared");
+        rt.throw_exception<Exception>("'" + m_name.string() + "' is not declared");
         return {};
     }
     
@@ -54,9 +60,9 @@ EvalResult SpecialValue::evaluate(Runtime& rt) const
     switch(m_type)
     {
     case This:
-        return Value::new_reference(MemoryValue::create_existing_object(rt.current_execution_context().this_object()));
+        return Value::new_reference(MemoryValue::create_object(rt.current_execution_context().this_object()));
     case Global:
-        return Value::new_reference(MemoryValue::create_existing_object(rt.global_object()));
+        return Value::new_reference(MemoryValue::create_object(rt.global_object()));
     case Null:
         return Value::null();
     case True:
@@ -66,7 +72,7 @@ EvalResult SpecialValue::evaluate(Runtime& rt) const
     case Undefined:
         return Value::undefined();
     case Local:
-        return Value::new_reference(MemoryValue::create_existing_object(rt.scope_object()));
+        return Value::new_reference(MemoryValue::create_object(rt.scope_object()));
     default:
         assert(false);
         return {};
@@ -84,11 +90,15 @@ EvalResult MemberExpression::evaluate(Runtime& rt) const
         return {}; // LHS of member expression is not an object
 
     auto member = object->get(m_name);
-    if(rt.has_exception())
-        return {}; // get() failed (e.g nonexisting objects are not tolerated)
+    if(!member) // get() failed (e.g nonexisting objects are not tolerated)
+    {
+        rt.throw_exception<Exception>("Member '" + object->to_string() + "." + m_name.string() + "' is not declared");
+        return {};
+    }
 
-    member.set_container(object);
-    return member;
+    auto member_value = Value::new_reference(member);
+    member_value.set_container(object);
+    return member_value;
 }
 
 EvalResult FunctionCall::evaluate(Runtime& rt) const
@@ -136,8 +146,8 @@ EvalResult NewExpression::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {};
 
-    static StringId construct_name = "construct";
-    Value construct_function = name_object->get(construct_name);
+    static StringId construct_sid = "__construct";
+    auto construct_function = name_object->get(construct_sid);
     if(rt.has_exception())
         return {};
 
@@ -149,8 +159,8 @@ EvalResult NewExpression::evaluate(Runtime& rt) const
             return {};
     }
 
-    construct_function.set_container(name_object);
-    return construct_function.call(rt, ArgumentList{args});
+    construct_function->value().set_container(name_object);
+    return construct_function->value().call(rt, ArgumentList{args});
 }
 
 EvalResult UnaryExpression::evaluate(Runtime& rt) const
@@ -323,7 +333,7 @@ EvalResult NormalBinaryExpression::evaluate(Runtime& rt) const
 
 EvalResult FunctionExpression::evaluate(Runtime& rt) const
 {
-    return Value::new_object(std::make_shared<ASTFunction>(m_name, m_body, m_arg_names));
+    return Value::new_object(Object::create_native<ASTFunction>(&rt, m_name, m_body, m_arg_names));
 }
 
 std::string FunctionExpression::to_string() const
@@ -550,7 +560,7 @@ EvalResult Program::evaluate(Runtime& rt) const
             return {};
         if(result.is_return())
         {
-            rt.throw_exception("Cannot 'return' in global scope");
+            rt.throw_exception<Exception>("Cannot 'return' in global scope");
             return {};
         }
         val = std::move(result);
