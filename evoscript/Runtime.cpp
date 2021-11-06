@@ -103,11 +103,8 @@ Value Runtime::run_code_from_stream(std::istream& input, RunType run_type)
     {
         if(has_exception())
         {
-            if(run_type == RunType::Repl)
-            {
-                exception()->repl_print(*m_output_stream, true);
-                clear_exception();
-            }
+            exception()->repl_print(*m_error_stream, true);
+            clear_exception();
             return {};
         }
         else
