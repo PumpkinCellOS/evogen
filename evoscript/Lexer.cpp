@@ -28,6 +28,7 @@ char Lexer::consume()
 
 bool EVOLexer::lex(std::vector<Token>& output)
 {
+    ignore_whitespace();
     while(!eof())
     {
         char next = peek();
