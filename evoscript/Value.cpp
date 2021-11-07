@@ -47,7 +47,9 @@ Value::IntType Value::to_int(Runtime& rt) const
         auto primitive = m_object_value->to_primitive(rt, Value::Type::Int);
         if(primitive.is_invalid())
         {
-            rt.throw_exception<Exception>("Cannot convert to int");
+            std::ostringstream oss;
+            m_object_value->repl_print(oss, false);
+            rt.throw_exception<Exception>("Cannot convert " + oss.str() + " to int");
             return 0;
         }
         return primitive.to_int(rt);
