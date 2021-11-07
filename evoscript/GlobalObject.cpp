@@ -26,6 +26,12 @@ GlobalObject::GlobalObject()
     allocate("sys")->value() = Value::new_object(Object::create_native<System>(nullptr));
 
     allocate("run")->value() = Value::new_object(Object::create_native<NativeFunction<Class>>(nullptr, run_script));
+    allocate("to_int")->value() = Value::new_object(Object::create_native<NativeFunction<Class>>(nullptr, [](Runtime& rt, Object&, ArgumentList const& args) {
+        return Value::new_int(args.get(0).to_int(rt));
+    }));
+    allocate("to_bool")->value() = Value::new_object(Object::create_native<NativeFunction<Class>>(nullptr, [](Runtime& rt, Object&, ArgumentList const& args) {
+        return Value::new_bool(args.get(0).to_bool(rt));
+    }));
 }
 
 Value GlobalObject::run_script(Runtime& rt, Object&, ArgumentList const& args)
