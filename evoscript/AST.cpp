@@ -502,6 +502,20 @@ EvalResult ReturnStatement::evaluate(Runtime& rt) const
     return EvalResult::return_(result);
 }
 
+EvalResult TryCatchStatement::evaluate(Runtime& rt) const
+{
+    auto result = m_try_statement->evaluate(rt);
+    if(rt.has_exception())
+    {
+        Scope scope(rt);
+        auto catch_variable = rt.scope_object()->allocate(m_catch_variable);
+        catch_variable->value() = Value::new_object(rt.exception());
+        rt.clear_exception();
+        return m_catch_statement->evaluate(rt);
+    }
+    return result;
+}
+
 EvalResult SimpleControlStatement::evaluate(Runtime&) const
 {
     switch(m_operation)

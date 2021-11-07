@@ -136,6 +136,7 @@ public:
     std::shared_ptr<ForStatement>           parse_for_statement();
     std::shared_ptr<SwitchStatement>        parse_switch_statement();
     std::shared_ptr<ReturnStatement>        parse_return_statement();
+    std::shared_ptr<TryCatchStatement>      parse_try_catch_statement();
     std::shared_ptr<SimpleControlStatement> parse_simple_control_statement();
     std::shared_ptr<Program>                parse_program();
 

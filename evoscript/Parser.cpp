@@ -774,6 +774,9 @@ std::shared_ptr<IfStatement> EVOParser::parse_if_statement()
     if(!true_statement || true_statement->is_error())
         return std::make_shared<IfStatement>(ASTNode::Error(location(), "Expected statement"));
 
+    // Allow semicolon after non-block statements
+    consume_of_type(Token::Semicolon);
+
     size_t off = offset();
     auto else_keyword = consume_of_type(Token::Name);
     if(!else_keyword || else_keyword->value() != "else")
@@ -922,6 +925,48 @@ std::shared_ptr<ReturnStatement> EVOParser::parse_return_statement()
     return std::make_shared<ReturnStatement>(expression);
 }
 
+std::shared_ptr<TryCatchStatement> EVOParser::parse_try_catch_statement()
+{
+    auto try_keyword = consume_of_type(Token::Name);
+    if(!try_keyword || try_keyword->value() != "try")
+        return {};
+
+    // Unlike other languages, we allow all kinds of statements (not only block statements)
+    auto try_statement = parse_statement();
+    if(!try_statement)
+        return std::make_shared<TryCatchStatement>(ASTNode::Error(location(), "Expected statement"));
+    if(try_statement->is_error())
+        return std::make_shared<TryCatchStatement>(try_statement->errors());
+
+    // Allow semicolon after non-block statements
+    consume_of_type(Token::Semicolon);
+
+    auto catch_keyword = consume_of_type(Token::Name);
+    if(!catch_keyword || catch_keyword->value() != "catch")
+        return std::make_shared<TryCatchStatement>(ASTNode::Error(location(), "Expected 'catch'"));
+
+    auto paren_open = consume_of_type(Token::ParenOpen);
+    if(!paren_open)
+        return std::make_shared<TryCatchStatement>(ASTNode::Error(location(), "Expected '(' after 'catch'"));
+
+    auto variable_name = consume_of_type(Token::Name);
+    if(!variable_name)
+        return std::make_shared<TryCatchStatement>(ASTNode::Error(location(), "Expected variable name in 'catch'"));
+
+    auto paren_close = consume_of_type(Token::ParenClose);
+    if(!paren_close)
+        return std::make_shared<TryCatchStatement>(ASTNode::Error(location(), "Expected ')' after 'catch' variable name"));
+
+    // Unlike other languages, we allow all kinds of statements (not only block statements)
+    auto catch_statement = parse_statement();
+    if(!catch_statement)
+        return std::make_shared<TryCatchStatement>(ASTNode::Error(location(), "Expected statement"));
+    if(catch_statement->is_error())
+        return std::make_shared<TryCatchStatement>(catch_statement->errors());
+
+    return std::make_shared<TryCatchStatement>(try_statement, catch_statement, variable_name->value());
+}
+
 std::shared_ptr<SimpleControlStatement> EVOParser::parse_simple_control_statement()
 {
     auto keyword = consume_of_type(Token::Name);
@@ -967,19 +1012,24 @@ std::shared_ptr<Statement> EVOParser::parse_statement()
                         if(!statement)
                         {
                             set_offset(off);
-                            statement = parse_switch_statement();
+                            statement = parse_try_catch_statement();
                             if(!statement)
                             {
                                 set_offset(off);
-                                statement = parse_declaration();
+                                statement = parse_switch_statement();
                                 if(!statement)
                                 {
                                     set_offset(off);
-                                    statement = parse_expression_statement();
-                                    if(!statement || statement->is_error())
+                                    statement = parse_declaration();
+                                    if(!statement)
                                     {
                                         set_offset(off);
-                                        return statement;
+                                        statement = parse_expression_statement();
+                                        if(!statement || statement->is_error())
+                                        {
+                                            set_offset(off);
+                                            return statement;
+                                        }
                                     }
                                 }
                             }

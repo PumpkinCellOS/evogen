@@ -717,6 +717,24 @@ private:
     std::shared_ptr<Expression> m_expression;
 };
 
+class TryCatchStatement : public Statement
+{
+public:
+    TryCatchStatement(ErrorList const& error)
+    : Statement(error) {}
+
+    TryCatchStatement(std::shared_ptr<Statement> const& try_statement, std::shared_ptr<Statement> const& catch_statement, StringId catch_variable)
+    : m_try_statement(try_statement), m_catch_statement(catch_statement), m_catch_variable(catch_variable) {}
+
+    virtual EvalResult evaluate(Runtime&) const override;
+    virtual bool requires_semicolon() const override { return m_catch_statement->requires_semicolon(); }
+
+private:
+    std::shared_ptr<Statement> m_try_statement;
+    std::shared_ptr<Statement> m_catch_statement;
+    StringId m_catch_variable;
+};
+
 class SimpleControlStatement : public Statement
 {
 public:
