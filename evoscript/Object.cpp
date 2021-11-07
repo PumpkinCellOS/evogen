@@ -21,7 +21,11 @@ std::shared_ptr<MemoryValue> Class::resolve_class_member(StringId member) const
 {
     auto result = m_vtable.find(member);
     if(result != m_vtable.end())
-        return MemoryValue::create_object(result->second);
+    {
+        auto memval = MemoryValue::create_object(result->second);
+        memval->set_name(member);
+        return memval;
+    }
     if(!m_base.expired())
         return m_base.lock()->resolve_class_member(member);
     return nullptr;
