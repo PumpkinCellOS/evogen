@@ -42,6 +42,15 @@ test("variables declared in an outer block are writable in an inner block", func
     expect(i == 2345);
 });
 
+function local_test() {
+    sys.write(b);
+}
+
+test("local variables declared in calling functions are not visible in called functions", function() {
+    let b = 1234;
+    expect(throws(local_test));
+});
+
 test("variables declared in a function scope are not captured by default", function() {
     let i = 2137;
     function a() { i };
