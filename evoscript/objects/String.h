@@ -40,7 +40,7 @@ public:
 
 private:
     static Value concat(Runtime& rt, Object const&, ArgumentList const& args);
-    // TODO: Implement rest of old API
+    static Value substring(Runtime& rt, Object const& object, ArgumentList const& args);
 };
 
 }

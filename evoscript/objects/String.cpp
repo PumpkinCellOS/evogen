@@ -12,7 +12,8 @@ String::String()
     define_native_function<String>("length", [](Runtime&, Object& object, ArgumentList const&) {
         return Value::new_int(object.internal_data<InternalData>().string.size());
     });
-    define_native_function<String>("concat", String::concat);
+    define_native_function<String>("concat", concat);
+    define_native_function<String>("substring", substring);
 }
 
 void String::init_static_class_members(Object& class_wrapper)
@@ -90,6 +91,47 @@ Value String::concat(Runtime& rt, Object const& object, ArgumentList const& args
         string += arg.to_string();
 
     return Value::new_object(Object::create_native<String>(&rt, string));
+}
+
+Value String::substring(Runtime& rt, Object const& object, ArgumentList const& args)
+{
+    if(!args.is_given(0))
+    {
+        rt.throw_exception<Exception>("You need to give at least 1 argument");
+        return {};
+    }
+    auto start = args.get(0).to_int(rt);
+    if(rt.has_exception())
+        return {};
+
+    auto seq_length = args.get_or(1, Value::new_int(-1)).to_int(rt);
+    if(rt.has_exception())
+        return {};
+    
+    if(start < 0)
+    {
+        rt.throw_exception<Exception>("start cannot be negative");
+        return {};
+    }
+    if(seq_length < -1)
+    {
+        rt.throw_exception<Exception>("seq_length cannot be negative");
+        return {};
+    }
+
+    auto const& string = object.internal_data<InternalData>().string;
+    if(static_cast<size_t>(start) > string.size())
+    {
+        rt.throw_exception<Exception>("start exceeds string length");
+        return {};
+    }
+    if(seq_length != -1 && static_cast<size_t>(start + seq_length) > string.size())
+    {
+        rt.throw_exception<Exception>("seq_length exceeds string length");
+        return {};
+    }
+
+    return Value::new_object(Object::create_native<String>(&rt, seq_length == -1 ? string.substr(start) : string.substr(start, seq_length)));
 }
 
 void String::print(Object const& object, std::ostream& output, bool, bool) const
