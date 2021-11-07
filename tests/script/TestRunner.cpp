@@ -1,7 +1,7 @@
-#include "evoscript/objects/Object.h"
+#include <evoscript/Object.h>
 #include <evoscript/Runtime.h>
-#include <evoscript/NativeFunction.h>
 #include <evoscript/objects/Exception.h>
+#include <evoscript/objects/NativeFunction.h>
 #include <fstream>
 
 using namespace evo::script;
@@ -11,27 +11,23 @@ class TestObject : public GlobalObject
 public:
     TestObject()
     {
-        static StringId test_fail_sid = "test_fail";
-        define_native_function<TestObject>(test_fail_sid, &TestObject::test_fail);
-        static StringId throws_sid = "throws";
-        define_native_function<TestObject>(throws_sid, &TestObject::throws);
+        define_native_function<Class>("test_fail", test_fail);
+        define_native_function<Class>("throws", throws);
     }
-
-    EVO_OBJECT("TestObject")
 
 private:
     // TODO: Remove it once a try-catch construction is implemented
-    Value throws(Runtime& rt, ArgumentList const& args)
+    static Value throws(Runtime& rt, Object&, ArgumentList const& args)
     {
-        args.get(0).call(rt, ArgumentList{{}});
+        args.get(0).call(rt, ArgumentList{});
         bool has_exception = rt.has_exception();
         rt.clear_exception();
         return Value::new_bool(has_exception);
     }
-    Value test_fail(Runtime& rt, ArgumentList const& args)
+    static Value test_fail(Runtime& rt, Object&, ArgumentList const& args)
     {
         std::string test_name = args.is_given(0) ? args.get(0).to_string() : "";
-        rt.throw_exception("Test failed: " + test_name);
+        rt.throw_exception<Exception>("Test failed: " + test_name);
         return {};
     }
 };
@@ -54,11 +50,10 @@ int main(int argc, char* argv[])
         return 2;
     }
     std::ifstream test(std::string{test_name});
-    rt.run_code_from_stream(test, Runtime::RunType::Script);
-    if(rt.has_exception())
+    auto result = rt.run_code_from_stream(test, Runtime::RunType::Script);
+    if(result.is_invalid())
     {
         std::cout << "---- \e[31mFAILED\e[0m: " << test_name << std::endl;
-        rt.exception()->repl_print(std::cout, true);
         return 1;
     }
     std::cout << "---- \e[32mPASSED\e[0m: " << test_name << std::endl;
