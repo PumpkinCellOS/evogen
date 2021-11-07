@@ -808,8 +808,10 @@ std::shared_ptr<WhileStatement> EVOParser::parse_while_statement()
         return std::make_shared<WhileStatement>(ASTNode::Error(location(), "Expected ')' after 'while' condition"));
 
     auto statement = parse_statement();
-    if(!statement || statement->is_error())
+    if(!statement)
         return std::make_shared<WhileStatement>(ASTNode::Error(location(), "Expected statement"));
+    if(statement->is_error())
+        return std::make_shared<WhileStatement>(statement->errors());
 
     return std::make_shared<WhileStatement>(condition, statement);
 }
