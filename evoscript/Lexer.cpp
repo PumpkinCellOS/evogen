@@ -137,6 +137,12 @@ bool EVOLexer::lex(std::vector<Token>& output)
             char next2 = peek();
             switch(next2)
             {
+                case '/':
+                    if(next == '/')
+                    {
+                        consume();
+                        consume_while([](char c) { return c != '\n'; });
+                    }
                 case '+':
                     if(next == '+')
                     {
