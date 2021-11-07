@@ -48,7 +48,9 @@ void Class::define_native_function(StringId name, NativeFunctionCallback callbac
 template<class T>
 void Object::define_native_function(StringId name, NativeFunctionCallback callback)
 {
-    m_members.insert({name, MemoryValue::create_object(Object::create_native<NativeFunction<T>>(nullptr, callback))});
+    auto memval = MemoryValue::create_object(Object::create_native<NativeFunction<T>>(nullptr, callback));
+    memval->set_name(name);
+    m_members.insert({name, memval});
 }
 
 }
