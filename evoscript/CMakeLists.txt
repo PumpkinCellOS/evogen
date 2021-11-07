@@ -13,6 +13,7 @@ add_library(evoscript
     "StringId.cpp"
     "Value.cpp"
 
+    "objects/Array.cpp"
     "objects/ASTFunction.cpp"
     "objects/Exception.cpp"
     "objects/String.cpp"

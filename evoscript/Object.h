@@ -34,7 +34,7 @@ public:
     : m_name(name), m_base(base) {}
 
     virtual std::unique_ptr<ObjectInternalData> construct_internal_data(Runtime*, ArgumentList const&) const { return {}; }
-    virtual std::unique_ptr<ObjectInternalData> construct_internal_data(Runtime*) const { return {}; }
+    std::unique_ptr<ObjectInternalData> construct_internal_data(Runtime*) const { return {}; }
     virtual void constructor(Runtime&, Object&, ArgumentList const&) const {};
     virtual void destructor(Object&) const {};
 
