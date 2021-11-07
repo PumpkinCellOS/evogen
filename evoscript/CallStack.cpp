@@ -27,7 +27,7 @@ void CallStack::print(std::ostream& stream, bool detailed) const
 
 ExecutionContext& CallStack::push_execution_context(std::string const& name, std::shared_ptr<Object> const& this_object, std::shared_ptr<GlobalObject> const& global_object)
 {
-    return m_call_stack.emplace_front(name, this_object, global_object, global_object);
+    return m_call_stack.emplace_front(name, this_object, global_object, std::make_shared<ScopeObject>(global_object));
 }
 
 ExecutionContext& CallStack::push_global_scope(std::shared_ptr<Object> const& this_object, std::shared_ptr<GlobalObject> const& global_object)
