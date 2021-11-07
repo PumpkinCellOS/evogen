@@ -1,0 +1,4 @@
+test("basic functionality", function() {
+    try 1/0 catch(e) ;
+});
+test(")
