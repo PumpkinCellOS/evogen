@@ -17,6 +17,7 @@ void CallStack::print(std::ostream& stream, bool detailed) const
             stream << "    at " << name(it.name()) << " ";
             if(detailed)
             {
+                stream << ": ScopeObject[" << it.scope_object().get() << "] parent=" << it.scope_object()->parent().get() << " value=";
                 it.scope_object()->repl_print(stream, true);
             }
             stream << std::endl;
