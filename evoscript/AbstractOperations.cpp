@@ -3,6 +3,7 @@
 #include <evoscript/Object.h>
 #include <evoscript/Runtime.h>
 #include <evoscript/objects/Exception.h>
+#include <evoscript/objects/String.h>
 
 namespace evo::script::abstract
 {
@@ -27,13 +28,10 @@ Value add(Runtime& rt, Value const& lhs, Value const& rhs)
     }
     else
     {
-        /* TODO
         // Unknown case, treat as strings.
         auto lhs_int = real_lhs.to_string();
         auto rhs_int = real_rhs.to_string();
-        return new_object_value<StringObject>(lhs_int + rhs_int);
-        */
-        return Value::undefined();
+        return Value::new_object(Object::create_native<String>(&rt, lhs_int + rhs_int));
     }
 }
 
@@ -49,6 +47,7 @@ Value subtract(Runtime& rt, Value const& lhs, Value const& rhs)
     if(rt.has_exception())
         return {};
 
+    // TODO: operator-
     return Value::new_int(lhs_int - rhs_int);
 }
 
@@ -64,6 +63,7 @@ Value multiply(Runtime& rt, Value const& lhs, Value const& rhs)
     if(rt.has_exception())
         return {};
 
+    // TODO: operator+
     return Value::new_int(lhs_int * rhs_int);
 }
 
@@ -84,6 +84,8 @@ Value divide(Runtime& rt, Value const& lhs, Value const& rhs)
         rt.throw_exception<Exception>("Cannot divide by 0");
         return {};
     }
+
+    // TODO: operator/
     return Value::new_int(lhs_int / rhs_int);
 }
 
@@ -104,6 +106,8 @@ Value modulo(Runtime& rt, Value const& lhs, Value const& rhs)
         rt.throw_exception<Exception>("Cannot modulo by 0");
         return {};
     }
+
+    // TODO: operator%
     return Value::new_int(lhs_int % rhs_int);
 }
 
