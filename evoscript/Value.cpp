@@ -335,8 +335,8 @@ Value Value::call(Runtime& rt, ArgumentList const& arguments)
     }
 
     std::string name = is_reference() ? get_reference()->name() : "<anonymous>";
-    auto container = this->container();
-    ScopedExecutionContext context(rt, (is_reference() && container ? container->type_name() + "::" : "") + name + "()", container);
+    auto container = is_reference() ? this->container() : nullptr;
+    ScopedExecutionContext context(rt, (container ? container->type_name() + "::" : "") + name + "()", container);
     if(rt.has_exception())
         return {}; // 'this' is not an object
     
