@@ -94,8 +94,6 @@ public:
     std::shared_ptr<Object> container() const { assert(is_reference()); return m_value.reference.container; }
     void set_container(std::shared_ptr<Object> const& object) { assert(is_reference()); m_value.reference.container = object; }
 
-    bool operator==(Value const&) const;
-
 private:
     explicit Value(IntType value)
     : m_type(Type::Int) { m_value.integer = value; }
@@ -127,9 +125,6 @@ private:
     {
         std::shared_ptr<MemoryValue> value;
         std::shared_ptr<Object> container;
-
-        // This is needed for Value's operator==
-        bool operator==(Reference const&) const = default;
     };
 
     union InternalValue
