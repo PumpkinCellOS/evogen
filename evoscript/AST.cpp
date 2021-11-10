@@ -266,43 +266,32 @@ EvalResult NormalBinaryExpression::evaluate(Runtime& rt) const
     switch(m_operation)
     {
         case Add:
-            result = abstract::add(rt, lhs, rhs);
-            break;
+            return abstract::add(rt, lhs, rhs);
         case Subtract:
-            result = abstract::subtract(rt, lhs, rhs);
-            break;
+            return abstract::subtract(rt, lhs, rhs);
         case Multiply:
-            result = abstract::multiply(rt, lhs, rhs);
-            break;
+            return abstract::multiply(rt, lhs, rhs);
         case Divide:
-            result = abstract::divide(rt, lhs, rhs);
-            break;
+            return abstract::divide(rt, lhs, rhs);
         case Modulo:
-            result = abstract::modulo(rt, lhs, rhs);
-            break;
+            return abstract::modulo(rt, lhs, rhs);
         case Equal: 
-            result = Value::new_bool(abstract::compare(rt, lhs, rhs) == CompareResult::Equal);
-            break;
+            return Value::new_bool(abstract::compare(rt, lhs, rhs) == CompareResult::Equal);
         case NonEqual: 
-            result = Value::new_bool(abstract::compare(rt, lhs, rhs) != CompareResult::Equal);
-            break;
+            return Value::new_bool(abstract::compare(rt, lhs, rhs) != CompareResult::Equal);
         case Greater: 
-            result = Value::new_bool(abstract::compare(rt, lhs, rhs) == CompareResult::Greater);
-            break;
+            return Value::new_bool(abstract::compare(rt, lhs, rhs) == CompareResult::Greater);
         case GreaterEqual:
         {
             auto compare = abstract::compare(rt, lhs, rhs);
-            result = Value::new_bool(compare != CompareResult::Less && compare != CompareResult::Unknown);
-            break;
+            return Value::new_bool(compare != CompareResult::Less && compare != CompareResult::Unknown);
         }
         case Less:
-            result = Value::new_bool(abstract::compare(rt, lhs, rhs) == CompareResult::Less);
-            break;
+            return Value::new_bool(abstract::compare(rt, lhs, rhs) == CompareResult::Less);
         case LessEqual:
         {
             auto compare = abstract::compare(rt, lhs, rhs);
-            result = Value::new_bool(compare != CompareResult::Greater && compare != CompareResult::Unknown);
-            break;
+            return Value::new_bool(compare != CompareResult::Greater && compare != CompareResult::Unknown);
         }
         case And:
         {
@@ -310,8 +299,7 @@ EvalResult NormalBinaryExpression::evaluate(Runtime& rt) const
             if(rt.has_exception())
                 return {};
             // NOTE: C++ handles short-circuit.
-            result = Value::new_bool(lhs_bool && rhs.to_bool(rt));
-            break;
+            return Value::new_bool(lhs_bool && rhs.to_bool(rt));
         }
         case Or:
         {
@@ -319,14 +307,11 @@ EvalResult NormalBinaryExpression::evaluate(Runtime& rt) const
             if(rt.has_exception())
                 return {};
             // NOTE: C++ handles short-circuit.
-            result = Value::new_bool(lhs_bool || rhs.to_bool(rt));
-            break;
+            return Value::new_bool(lhs_bool || rhs.to_bool(rt));
         }
         default:
-            assert(false);
+            abort();
     }
-
-    return result;
 }
 
 EvalResult FunctionExpression::evaluate(Runtime& rt) const
