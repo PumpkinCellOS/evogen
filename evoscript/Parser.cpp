@@ -925,6 +925,19 @@ std::shared_ptr<ReturnStatement> EVOParser::parse_return_statement()
     return std::make_shared<ReturnStatement>(expression);
 }
 
+std::shared_ptr<ThrowStatement> EVOParser::parse_throw_statement()
+{
+    auto throw_keyword = consume_of_type(Token::Name);
+    if(!throw_keyword || throw_keyword->value() != "throw")
+        return {};
+
+    auto expression = parse_expression();
+    if(expression->is_error())
+        return std::make_shared<ThrowStatement>(ASTNode::Error(location(), "Expected expression"));
+    
+    return std::make_shared<ThrowStatement>(expression);
+}
+
 std::shared_ptr<TryCatchStatement> EVOParser::parse_try_catch_statement()
 {
     auto try_keyword = consume_of_type(Token::Name);
@@ -1000,35 +1013,40 @@ std::shared_ptr<Statement> EVOParser::parse_statement()
             if(!statement)
             {
                 set_offset(off);
-                statement = parse_if_statement();
+                statement = parse_throw_statement();
                 if(!statement)
                 {
                     set_offset(off);
-                    statement = parse_while_statement();
+                    statement = parse_if_statement();
                     if(!statement)
                     {
                         set_offset(off);
-                        statement = parse_for_statement();
+                        statement = parse_while_statement();
                         if(!statement)
                         {
                             set_offset(off);
-                            statement = parse_try_catch_statement();
+                            statement = parse_for_statement();
                             if(!statement)
                             {
                                 set_offset(off);
-                                statement = parse_switch_statement();
+                                statement = parse_try_catch_statement();
                                 if(!statement)
                                 {
                                     set_offset(off);
-                                    statement = parse_declaration();
+                                    statement = parse_switch_statement();
                                     if(!statement)
                                     {
                                         set_offset(off);
-                                        statement = parse_expression_statement();
-                                        if(!statement || statement->is_error())
+                                        statement = parse_declaration();
+                                        if(!statement)
                                         {
                                             set_offset(off);
-                                            return statement;
+                                            statement = parse_expression_statement();
+                                            if(!statement || statement->is_error())
+                                            {
+                                                set_offset(off);
+                                                return statement;
+                                            }
                                         }
                                     }
                                 }

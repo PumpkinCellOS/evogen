@@ -505,6 +505,18 @@ EvalResult ReturnStatement::evaluate(Runtime& rt) const
     return EvalResult::return_(result);
 }
 
+EvalResult ThrowStatement::evaluate(Runtime& rt) const
+{
+    auto result = m_expression->evaluate(rt);
+    if(!result.value().is_object())
+    {
+        rt.throw_exception<Exception>("'throw' argument must be an object");
+        return {};
+    }
+    rt.throw_exception(result.value().get_object());
+    return result;
+}
+
 EvalResult TryCatchStatement::evaluate(Runtime& rt) const
 {
     auto result = m_try_statement->evaluate(rt);

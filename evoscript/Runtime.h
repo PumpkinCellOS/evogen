@@ -28,8 +28,8 @@ public:
         m_exception = Object::create_native<T>(this, std::forward<Args>(args)...);
     }
 
+    void throw_exception(std::shared_ptr<Object> const& object) { m_exception = object; }
     void clear_exception() { m_exception.reset(); }
-
     bool has_exception() const { return !!m_exception; }
     std::shared_ptr<Object> exception() const { return m_exception; }
 

@@ -717,6 +717,21 @@ private:
     std::shared_ptr<Expression> m_expression;
 };
 
+class ThrowStatement : public Statement
+{
+public:
+    ThrowStatement(ErrorList const& error)
+    : Statement(error) {}
+
+    ThrowStatement(std::shared_ptr<Expression> const& expression)
+    : m_expression(expression) {}
+
+    virtual EvalResult evaluate(Runtime&) const override;
+
+private:
+    std::shared_ptr<Expression> m_expression;
+};
+
 class TryCatchStatement : public Statement
 {
 public:

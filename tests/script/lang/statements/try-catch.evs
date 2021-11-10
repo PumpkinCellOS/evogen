@@ -1,4 +1,10 @@
 test("basic functionality", function() {
     try 1/0 catch(e) ;
 });
-test(")
+test("throw", function() {
+    try {throw new Exception("test");} catch(e) { expect(e.message() == "test"); }
+});
+test("throw across functions", function() {
+    function a() { throw new Exception("test"); }
+    try { a(); } catch(e) { expect(e.message() == "test") }
+});
