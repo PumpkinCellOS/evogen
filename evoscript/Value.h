@@ -36,6 +36,13 @@ public:
     Value()
     : m_type(Type::Invalid) {}
 
+    Value(Value const& other) { *this = other; }
+    Value(Value&& other) { *this = other; }
+
+    Value& operator=(Value const&);
+    Value& operator=(Value&&);
+    ~Value();
+
     static std::string type_to_string(Type);
 
     Type type() const { return m_type; }
@@ -67,15 +74,15 @@ public:
     void repl_print(std::ostream& output, bool print_members) const;
 
     // This is type-unsafe and should be used only internally / by Runtime!
-    IntType& get_int() { return m_int_value; }
-    bool& get_bool() { return m_bool_value; }
-    std::shared_ptr<Object>& get_object() { return m_object_value; }
-    std::shared_ptr<MemoryValue>& get_reference() { assert(is_reference()); return m_reference_value.value; }
+    IntType& get_int() { return m_value.integer; }
+    bool& get_bool() { return m_value.boolean; }
+    std::shared_ptr<Object>& get_object() { return m_value.object; }
+    std::shared_ptr<MemoryValue>& get_reference() { assert(is_reference()); return m_value.reference.value; }
 
-    IntType const& get_int() const { return m_int_value; }
-    bool const& get_bool() const { return m_bool_value; }
-    std::shared_ptr<Object> const& get_object() const { return m_object_value; }
-    std::shared_ptr<MemoryValue> const& get_reference() const { return m_reference_value.value; }
+    IntType const& get_int() const { return m_value.integer; }
+    bool const& get_bool() const { return m_value.boolean; }
+    std::shared_ptr<Object> const& get_object() const { return m_value.object; }
+    std::shared_ptr<MemoryValue> const& get_reference() const { assert(is_reference()); return m_value.reference.value; }
 
     void assign(Runtime& rt, Value const& other);
     void assign_direct(Value const& other);
@@ -84,26 +91,25 @@ public:
 
     Value call(Runtime&, ArgumentList const&);
 
-    std::shared_ptr<Object> container() const { assert(is_reference()); return m_reference_value.container; }
-    void set_container(std::shared_ptr<Object> const& object) { assert(is_reference()); m_reference_value.container = object; }
+    std::shared_ptr<Object> container() const { assert(is_reference()); return m_value.reference.container; }
+    void set_container(std::shared_ptr<Object> const& object) { assert(is_reference()); m_value.reference.container = object; }
 
-    // TODO: Default version will probably not be optimal
-    bool operator==(Value const&) const = default;
+    bool operator==(Value const&) const;
 
 private:
     explicit Value(IntType value)
-    : m_type(Type::Int), m_int_value(value) {}
+    : m_type(Type::Int) { m_value.integer = value; }
 
     explicit Value(bool value)
-    : m_type(Type::Bool), m_bool_value(value) {}
+    : m_type(Type::Bool) { m_value.boolean = value; }
 
     explicit Value(std::shared_ptr<Object> const& value)
-    : m_type(Type::Object), m_object_value(value)
-        { assert(m_object_value); }
+    : m_type(Type::Object)
+        { assert(value); new(&m_value.object) std::shared_ptr<Object>(value); }
 
     explicit Value(std::shared_ptr<MemoryValue> const& value, std::shared_ptr<Object> const& container)
-    : m_type(Type::Reference), m_reference_value({value, container})
-        { assert(value); }
+    : m_type(Type::Reference)
+        { assert(value); new(&m_value.reference) Reference({value, container}); }
 
     struct _UndefinedTag {}; static constexpr _UndefinedTag Undefined {};
 
@@ -117,10 +123,6 @@ private:
 
     Type m_type = Type::Null;
 
-    IntType m_int_value = 0;
-    bool m_bool_value = false;
-    std::shared_ptr<Object> m_object_value;
-
     struct Reference
     {
         std::shared_ptr<MemoryValue> value;
@@ -130,7 +132,19 @@ private:
         bool operator==(Reference const&) const = default;
     };
 
-    Reference m_reference_value;
+    union InternalValue
+    {
+        IntType integer;
+        bool boolean;
+        std::shared_ptr<Object> object;
+        Reference reference;
+
+        // This needs to be handled in Value itself
+        InternalValue() {}
+        ~InternalValue() {}
+    } m_value;
+
+    void move_assign_direct(Value&& other);
 };
 
 std::ostream& operator<<(std::ostream&, Value const&);
