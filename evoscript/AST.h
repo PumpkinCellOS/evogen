@@ -622,7 +622,7 @@ public:
         if(m_false_statement)
             return m_false_statement->requires_semicolon();
         assert(m_true_statement);
-        return m_true_statement->requires_semicolon();
+        return false;
     }
 
 private:

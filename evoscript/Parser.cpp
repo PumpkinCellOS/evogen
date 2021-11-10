@@ -774,8 +774,12 @@ std::shared_ptr<IfStatement> EVOParser::parse_if_statement()
     if(!true_statement || true_statement->is_error())
         return std::make_shared<IfStatement>(ASTNode::Error(location(), "Expected statement"));
 
-    // Allow semicolon after non-block statements
-    consume_of_type(Token::Semicolon);
+    if(true_statement->requires_semicolon())
+    {
+        auto semicolon = consume_of_type(Token::Semicolon);
+        if(!semicolon)
+            return std::make_shared<IfStatement>(ASTNode::Error(location(), "Expected ';' after 'if' statement"));
+    }
 
     size_t off = offset();
     auto else_keyword = consume_of_type(Token::Name);
