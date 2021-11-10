@@ -34,7 +34,7 @@ public:
     virtual void print(Object const&, std::ostream&, bool print_members, bool dump) const override;
 
 private:
-    Value print_(Runtime& rt, ArgumentList const&);
+    static Value print_(Runtime& rt, ArgumentList const&);
 };
 
 }

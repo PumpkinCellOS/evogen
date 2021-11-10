@@ -1,4 +1,5 @@
 #include <evoscript/objects/Exception.h>
+#include <evoscript/objects/String.h>
 
 #include <evoscript/EscapeSequences.h>
 #include <evoscript/objects/NativeFunction.h>
@@ -13,10 +14,9 @@ Exception::Exception()
         object.repl_print(std::cerr, false);
         return Value::undefined();
     });
-    /*
     define_native_function<Exception>("message", [](Runtime& rt, Object& object, ArgumentList const&) {
-        return Object::create_native<String>(&rt, object.internal_data<InternalData>().message);
-    });*/
+        return Value::new_object(Object::create_native<String>(&rt, object.internal_data<InternalData>().message));
+    });
 }
 
 void Exception::print(Object const& object, std::ostream& output, bool detailed, bool dump) const
