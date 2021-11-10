@@ -147,7 +147,7 @@ EvalResult NewExpression::evaluate(Runtime& rt) const
         return {};
 
     static StringId construct_sid = "__construct";
-    auto construct_function = name_object->get(construct_sid);
+    auto construct_function = Value::new_reference(name_object->get(construct_sid));
     if(rt.has_exception())
         return {};
 
