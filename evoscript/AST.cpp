@@ -167,38 +167,35 @@ EvalResult UnaryExpression::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {}; // Error evaluating expression
 
-    Value result;
     switch(m_operation)
     {
         case Not:
-            result = abstract::not_(rt, value);
+            return abstract::not_(rt, value);
             break;
         case BitwiseNot:
-            result = abstract::bitwise_not(rt, value);
+            return abstract::bitwise_not(rt, value);
             break;
         case Minus:
-            result = abstract::minus(rt, value);
+            return abstract::minus(rt, value);
             break;
         case Plus:
-            result = abstract::plus(rt, value);
+            return abstract::plus(rt, value);
             break;
         case Increment:
-            result = abstract::prefix_increment(rt, value);
+            return abstract::prefix_increment(rt, value);
             break;
         case Decrement:
-            result = abstract::prefix_decrement(rt, value);
+            return abstract::prefix_decrement(rt, value);
             break;
         case PostfixIncrement:
-            result = abstract::postfix_increment(rt, value);
+            return abstract::postfix_increment(rt, value);
             break;
         case PostfixDecrement:
-            result = abstract::postfix_decrement(rt, value);
+            return abstract::postfix_decrement(rt, value);
             break;
         default:
-            assert(false);
+            abort();
     }
-
-    return result;
 }
 
 EvalResult AssignmentExpression::evaluate(Runtime& rt) const
