@@ -59,8 +59,8 @@ Value::IntType Value::to_int(Runtime& rt) const
     case Type::Bool:
         return m_bool_value ? 1 : 0;
     case Type::Reference:
-        assert(m_reference_value);
-        return m_reference_value->value().to_int(rt);
+        assert(m_reference_value.value);
+        return m_reference_value.value->value().to_int(rt);
     default:
         assert(false);
         return {};
@@ -81,8 +81,8 @@ bool Value::to_bool(Runtime& rt) const
     case Type::Bool:
         return m_bool_value;
     case Type::Reference:
-        assert(m_reference_value);
-        return m_reference_value->value().to_bool(rt);
+        assert(m_reference_value.value);
+        return m_reference_value.value->value().to_bool(rt);
     default:
         assert(false);
         return {};
@@ -103,8 +103,8 @@ std::shared_ptr<Object> Value::to_object(Runtime& rt) const
         assert(m_object_value);
         return m_object_value;
     case Type::Reference:
-        assert(m_reference_value);
-        return m_reference_value->value().to_object(rt);
+        assert(m_reference_value.value);
+        return m_reference_value.value->value().to_object(rt);
     default:
         assert(false);
         return {};
@@ -126,8 +126,8 @@ std::string Value::to_string() const
     case Type::Bool:
         return m_bool_value ? "true" : "false";
     case Type::Reference:
-        assert(m_reference_value);
-        return m_reference_value->value().to_string();
+        assert(m_reference_value.value);
+        return m_reference_value.value->value().to_string();
     case Type::Object:
         assert(m_object_value);
         return m_object_value->to_string();
@@ -149,8 +149,8 @@ std::shared_ptr<MemoryValue> Value::to_reference(Runtime& rt) const
         rt.throw_exception<Exception>("Cannot bind " + type_to_string(m_type) + " to reference");
         return {};
     case Type::Reference:
-        assert(m_reference_value);
-        return m_reference_value;
+        assert(m_reference_value.value);
+        return m_reference_value.value;
     default:
         assert(false);
         return {};
@@ -187,8 +187,8 @@ std::string Value::dump_string() const
         oss << ": " << (m_bool_value ? "true" : "false");
         break;
     case Type::Reference:
-        assert(m_reference_value);
-        oss << ": " << m_reference_value->dump_string();
+        assert(m_reference_value.value);
+        oss << ": " << m_reference_value.value->dump_string();
         break;
     case Type::Object:
         assert(m_object_value);
@@ -221,8 +221,8 @@ void Value::repl_print(std::ostream& output, bool print_members) const
         output << constant(m_bool_value ? "true" : "false") << sgr_reset();
         break;
     case Type::Reference:
-        assert(m_reference_value);
-        m_reference_value->value().repl_print(output, print_members);
+        assert(m_reference_value.value);
+        m_reference_value.value->value().repl_print(output, print_members);
         break;
     case Type::Object:
         assert(m_object_value);
@@ -236,7 +236,7 @@ void Value::assign(Runtime& rt, Value const& other)
 {
     if(is_reference())
     {
-        assert(m_reference_value);
+        assert(m_reference_value.value);
         auto memory_value = get_reference();
         if(memory_value->is_read_only())
         {
@@ -254,7 +254,7 @@ void Value::assign_direct(Value const& other)
 {
     if(is_reference())
     {
-        assert(m_reference_value);
+        assert(m_reference_value.value);
         get_reference()->value().assign_direct(other);
         return;
     }
@@ -277,8 +277,8 @@ void Value::assign_direct(Value const& other)
         m_object_value = other.m_object_value;
         break;
     case Type::Reference:
-        assert(other.m_reference_value);
-        m_reference_value = other.m_reference_value;
+        assert(other.m_reference_value.value);
+        m_reference_value.value = other.m_reference_value.value;
         break;
     default: assert(false);
     }
@@ -299,11 +299,12 @@ Value Value::call(Runtime& rt, ArgumentList const& arguments)
     }
 
     std::string name = is_reference() ? get_reference()->name() : "<anonymous>";
-    ScopedExecutionContext context(rt, (m_container ? m_container->type_name() + "::" : "") + name + "()", container());
+    auto container = this->container();
+    ScopedExecutionContext context(rt, (is_reference() && container ? container->type_name() + "::" : "") + name + "()", container);
     if(rt.has_exception())
         return {}; // 'this' is not an object
     
-    return real_value.get_object()->call(rt, m_container ? *m_container : *real_value.get_object(), arguments);
+    return real_value.get_object()->call(rt, container ? *container : *real_value.get_object(), arguments);
 }
 
 std::ostream& operator<<(std::ostream& stream, Value const& value)
