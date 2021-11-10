@@ -49,10 +49,8 @@ EvalResult Identifier::evaluate(Runtime& rt) const
         rt.throw_exception<Exception>("'" + m_name.string() + "' is not declared");
         return {};
     }
-    
-    auto new_value = Value::new_reference(reference);
-    new_value.set_container(scope);
-    return new_value;
+
+    return Value::new_reference(reference, scope);
 }
 
 EvalResult SpecialValue::evaluate(Runtime& rt) const
