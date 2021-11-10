@@ -1,5 +1,5 @@
 test("basic functionality", function() {
-    try 1/0 catch(e) ;
+    try 1/0 catch(e) return; test_fail();
 });
 test("throw", function() {
     try {throw new Exception("test");} catch(e) { expect(e.message() == "test"); }
