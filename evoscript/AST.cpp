@@ -160,10 +160,7 @@ EvalResult NewExpression::evaluate(Runtime& rt) const
     }
 
     construct_function.set_container(name_object);
-    auto result = construct_function.call(rt, ArgumentList{args});
-    if(rt.has_exception())
-        rt.throw_exception<Exception>("Cannot construct object from object without __construct function");
-    return result;
+    return construct_function.call(rt, ArgumentList{args});
 }
 
 EvalResult UnaryExpression::evaluate(Runtime& rt) const
