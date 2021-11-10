@@ -4,6 +4,7 @@
 #include <evoscript/Runtime.h>
 #include <evoscript/objects/Array.h>
 #include <evoscript/objects/Exception.h>
+#include <evoscript/objects/File.h>
 #include <evoscript/objects/FileSystem.h>
 #include <evoscript/objects/NativeFunction.h>
 #include <evoscript/objects/String.h>
@@ -19,6 +20,7 @@ GlobalObject::GlobalObject()
 {
     allocate("Array")->value() = Value::new_object(ClassWrapper::create<Array>());
     allocate("Exception")->value() = Value::new_object(ClassWrapper::create<Exception>());
+    allocate("File")->value() = Value::new_object(ClassWrapper::create<File>());
     allocate("Object")->value() = Value::new_object(ClassWrapper::create<Class>());
     allocate("String")->value() = Value::new_object(ClassWrapper::create<String>());
     allocate("Time")->value() = Value::new_object(ClassWrapper::create<Time>());

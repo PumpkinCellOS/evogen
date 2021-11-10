@@ -16,6 +16,7 @@ add_library(evoscript
     "objects/Array.cpp"
     "objects/ASTFunction.cpp"
     "objects/Exception.cpp"
+    "objects/File.cpp"
     "objects/FileSystem.cpp"
     "objects/String.cpp"
     "objects/SyntaxError.cpp"
