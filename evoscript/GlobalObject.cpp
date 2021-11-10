@@ -4,6 +4,7 @@
 #include <evoscript/Runtime.h>
 #include <evoscript/objects/Array.h>
 #include <evoscript/objects/Exception.h>
+#include <evoscript/objects/FileSystem.h>
 #include <evoscript/objects/NativeFunction.h>
 #include <evoscript/objects/String.h>
 #include <evoscript/objects/System.h>
@@ -22,7 +23,7 @@ GlobalObject::GlobalObject()
     allocate("String")->value() = Value::new_object(ClassWrapper::create<String>());
     allocate("Time")->value() = Value::new_object(ClassWrapper::create<Time>());
 
-    //allocate("fs")->value() = Value::new_object(Object::create_native<FileSystem>(nullptr, run_script));
+    allocate("fs")->value() = Value::new_object(Object::create_native<FileSystem>(nullptr));
     allocate("sys")->value() = Value::new_object(Object::create_native<System>(nullptr));
 
     allocate("run")->value() = Value::new_object(Object::create_native<NativeFunction<Class>>(nullptr, run_script));
