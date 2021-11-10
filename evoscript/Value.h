@@ -87,7 +87,7 @@ public:
     void assign(Runtime& rt, Value const& other);
     void assign_direct(Value const& other);
 
-    Value dereferenced() const;
+    Value const& dereferenced() const;
 
     Value call(Runtime&, ArgumentList const&);
 

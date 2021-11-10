@@ -320,14 +320,14 @@ void Value::move_assign_direct(Value&& other)
     }
 }
 
-Value Value::dereferenced() const
+Value const& Value::dereferenced() const
 {
     return is_reference() ? get_reference()->value().dereferenced() : *this;
 }
 
 Value Value::call(Runtime& rt, ArgumentList const& arguments)
 {
-    Value real_value = dereferenced();
+    auto& real_value = dereferenced();
     if(!real_value.is_object())
     {
         rt.throw_exception<Exception>("Cannot call non-object");

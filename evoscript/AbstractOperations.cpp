@@ -10,8 +10,8 @@ namespace evo::script::abstract
 
 Value add(Runtime& rt, Value const& lhs, Value const& rhs)
 {
-    auto real_lhs = lhs.dereferenced();
-    auto real_rhs = rhs.dereferenced();
+    auto& real_lhs = lhs.dereferenced();
+    auto& real_rhs = rhs.dereferenced();
     
     auto lhs_int = real_lhs.to_int(rt);
     auto rhs_int = real_rhs.to_int(rt);
@@ -37,8 +37,8 @@ Value add(Runtime& rt, Value const& lhs, Value const& rhs)
 
 Value subtract(Runtime& rt, Value const& lhs, Value const& rhs)
 {
-    auto real_lhs = lhs.dereferenced();
-    auto real_rhs = rhs.dereferenced();
+    auto& real_lhs = lhs.dereferenced();
+    auto& real_rhs = rhs.dereferenced();
     auto lhs_int = real_lhs.to_int(rt);
     if(rt.has_exception())
         return {};
@@ -53,8 +53,8 @@ Value subtract(Runtime& rt, Value const& lhs, Value const& rhs)
 
 Value multiply(Runtime& rt, Value const& lhs, Value const& rhs)
 {
-    auto real_lhs = lhs.dereferenced();
-    auto real_rhs = rhs.dereferenced();
+    auto& real_lhs = lhs.dereferenced();
+    auto& real_rhs = rhs.dereferenced();
     auto lhs_int = real_lhs.to_int(rt);
     if(rt.has_exception())
         return {};
@@ -69,8 +69,8 @@ Value multiply(Runtime& rt, Value const& lhs, Value const& rhs)
 
 Value divide(Runtime& rt, Value const& lhs, Value const& rhs)
 {
-    auto real_lhs = lhs.dereferenced();
-    auto real_rhs = rhs.dereferenced();
+    auto& real_lhs = lhs.dereferenced();
+    auto& real_rhs = rhs.dereferenced();
     auto lhs_int = real_lhs.to_int(rt);
     if(rt.has_exception())
         return {};
@@ -91,8 +91,8 @@ Value divide(Runtime& rt, Value const& lhs, Value const& rhs)
 
 Value modulo(Runtime& rt, Value const& lhs, Value const& rhs)
 {
-    auto real_lhs = lhs.dereferenced();
-    auto real_rhs = rhs.dereferenced();
+    auto& real_lhs = lhs.dereferenced();
+    auto& real_rhs = rhs.dereferenced();
     auto lhs_int = real_lhs.to_int(rt);
     if(rt.has_exception())
         return {};
@@ -113,7 +113,7 @@ Value modulo(Runtime& rt, Value const& lhs, Value const& rhs)
 
 Value not_(Runtime& rt, Value const& value)
 {
-    auto real_value = value.dereferenced();
+    auto& real_value = value.dereferenced();
     auto value_bool = real_value.to_bool(rt);
     if(rt.has_exception())
         return {};
@@ -123,7 +123,7 @@ Value not_(Runtime& rt, Value const& value)
 
 Value bitwise_not(Runtime& rt, Value const& value)
 {
-    auto real_value = value.dereferenced();
+    auto& real_value = value.dereferenced();
     auto value_int = real_value.to_int(rt);
     if(rt.has_exception())
         return {};
@@ -133,7 +133,7 @@ Value bitwise_not(Runtime& rt, Value const& value)
 
 Value minus(Runtime& rt, Value const& value)
 {
-    auto real_value = value.dereferenced();
+    auto& real_value = value.dereferenced();
     auto value_int = real_value.to_int(rt);
     if(rt.has_exception())
         return {};
@@ -143,7 +143,7 @@ Value minus(Runtime& rt, Value const& value)
 
 Value plus(Runtime& rt, Value const& value)
 {
-    auto real_value = value.dereferenced();
+    auto& real_value = value.dereferenced();
     auto value_int = real_value.to_int(rt);
     if(rt.has_exception())
         return {};
@@ -159,8 +159,8 @@ static CompareResult compare_primitive(T const& l, T const& r)
 
 CompareResult compare(Runtime& rt, Value const& lhs, Value const& rhs)
 {
-    auto real_lhs = lhs.dereferenced();
-    auto real_rhs = rhs.dereferenced();
+    auto& real_lhs = lhs.dereferenced();
+    auto& real_rhs = rhs.dereferenced();
     if(real_lhs.type() != real_rhs.type())
     {
         rt.throw_exception<Exception>("Cannot compare values of different type (For now)");
@@ -185,14 +185,14 @@ CompareResult compare(Runtime& rt, Value const& lhs, Value const& rhs)
 
 Value postfix_increment(Runtime& rt, Value const& value)
 {
-    auto old_value = value.dereferenced();
+    auto& old_value = value.dereferenced();
     prefix_increment(rt, value);
     return old_value;
 }
 
 Value postfix_decrement(Runtime& rt, Value const& value)
 {
-    auto old_value = value.dereferenced();
+    auto& old_value = value.dereferenced();
     prefix_decrement(rt, value);
     return old_value;
 }
