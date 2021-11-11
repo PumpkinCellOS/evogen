@@ -1,5 +1,6 @@
 #pragma once
 
+#include <evoscript/EscapeSequences.h>
 #include <evoscript/Object.h>
 #include <evoscript/Runtime.h>
 #include <evoscript/objects/Exception.h>
@@ -35,6 +36,17 @@ public:
             return {};
         }
         return object.internal_data<InternalData>().callback(rt, this_, args);
+    }
+
+private:
+    virtual void print(Object const& object, std::ostream& out, bool detailed, bool dump) const override
+    {
+        if(dump)
+        {
+            Class::print(object, out, detailed, dump);
+            return;
+        }
+        out << escapes::keyword("function") << "() " << (detailed ? "{ <native code> }" : "{...}");
     }
 };
 

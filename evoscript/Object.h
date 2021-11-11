@@ -2,6 +2,7 @@
 
 #include <evoscript/AbstractOperations.h>
 #include <evoscript/ArgumentList.h>
+#include <evoscript/EscapeSequences.h>
 #include <evoscript/StringId.h>
 #include <evoscript/Value.h>
 #include <map>
@@ -88,6 +89,8 @@ public:
     {
         return std::make_unique<InternalData>(class_);
     }
+
+    virtual void print(Object const& object, std::ostream& out, bool detailed, bool dump) const override;
     
     template<class T> requires std::is_base_of_v<NativeClass<T>, T>
     static std::shared_ptr<Object> create();
@@ -152,6 +155,7 @@ protected:
     void print_impl(std::ostream&, bool print_members, bool dump) const;
 
     friend class Class;
+    friend class ClassWrapper;
     void print_members_impl(std::ostream& output, bool dump) const;
 
 private:

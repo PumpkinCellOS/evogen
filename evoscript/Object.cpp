@@ -17,6 +17,21 @@ ClassWrapper::ClassWrapper()
     });
 }
 
+void ClassWrapper::print(Object const& object, std::ostream& out, bool detailed, bool dump) const
+{
+    if(dump)
+    {
+        Class::print(object, out, detailed, dump);
+        return;
+    }
+    auto const& class_ = object.internal_data<InternalData>().underlying_class;
+    out << escapes::keyword("class") << " " << escapes::type(class_->name()) << " ";
+    if(detailed)
+        object.print_members_impl(out, false);
+    else
+        out << "{...}";
+}
+
 std::shared_ptr<MemoryValue> Class::resolve_class_member(StringId member) const
 {
     auto result = m_vtable.find(member);
