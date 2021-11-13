@@ -18,19 +18,12 @@ Runtime::Runtime(std::shared_ptr<GlobalObject> const& global_object, std::shared
         m_global_object = std::make_shared<GlobalObject>();
     if(!m_global_this)
         m_global_this = MemoryValue::create_object(Object::create_native<Class>(this));
-
-    m_call_stack.push_global_scope(m_global_this->value().get_object(), m_global_object);
-}
-
-Runtime::~Runtime()
-{
-    m_call_stack.pop_execution_context();
 }
 
 void Runtime::print_backtrace() const
 {
     *m_error_stream << "Backtrace:" << std::endl;
-    m_call_stack.print(*m_error_stream);
+    m_call_stack.print(*m_error_stream, true);
 }
 
 ExecutionContext& Runtime::push_execution_context(std::string const& name, std::shared_ptr<Object> const& this_object)
@@ -45,7 +38,7 @@ ExecutionContext& Runtime::push_execution_context(std::string const& name, std::
 
 ExecutionContext& Runtime::push_scope()
 {
-    return m_call_stack.push_scope(this_object(), m_global_object);
+    return m_call_stack.push_scope(!m_call_stack.is_empty() ? this_object() : nullptr, m_global_object);
 }
 
 ExecutionContext& Runtime::current_execution_context()
@@ -113,19 +106,19 @@ Value Runtime::run_code_from_stream(std::istream& input, RunType run_type)
     }
     // NOTE: We can omit exception check in include mode since it's 
     // immediately returning script's result without doing anything else.
-    return value;
+    return value.value().dereferenced();
 }
 
-ScopeObject::IdentifierRecord Runtime::resolve_identifier(StringId name) const
+ScopeObject::IdentifierRecord Runtime::resolve_identifier(StringId name)
 {
     // Lookup for already created value in local scope
-    auto container = current_execution_context().scope_object();
-    auto [scope, reference] = container->resolve_identifier(name);
+    auto& container = scope_object();
+    auto [scope, reference] = container.resolve_identifier(name);
 
     // Default to global object if no value is yet created. The
     // access to reference will fail because it's empty.
     if(!reference)
-        return {global_object(), nullptr};
+        return {global_object().get(), nullptr};
     return {scope, reference};
 }
 

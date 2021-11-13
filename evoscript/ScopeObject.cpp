@@ -21,9 +21,9 @@ ScopeObject::IdentifierRecord ScopeObject::resolve_identifier(StringId name)
     {
         if(m_parent)
             return m_parent->resolve_identifier(name);
-        return {shared_from_this(), nullptr};
+        return {this, nullptr};
     }
-    return {shared_from_this(), it->second};
+    return {this, it->second};
 }
 
 std::shared_ptr<MemoryValue> ScopeObject::allocate(StringId name)

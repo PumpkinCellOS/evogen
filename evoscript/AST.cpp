@@ -58,9 +58,14 @@ EvalResult SpecialValue::evaluate(Runtime& rt) const
     switch(m_type)
     {
     case This:
-        return Value::new_reference(MemoryValue::create_object(rt.current_execution_context().this_object()));
+    {
+        auto this_ = rt.this_object();
+        if(!this_)
+            return {};
+        return Value::new_reference(MemoryValue::create_object(this_), nullptr);
+    }
     case Global:
-        return Value::new_reference(MemoryValue::create_object(rt.global_object()));
+        return Value::new_reference(MemoryValue::create_object(rt.global_object()), nullptr);
     case Null:
         return Value::null();
     case True:
@@ -92,8 +97,7 @@ EvalResult MemberExpression::evaluate(Runtime& rt) const
         return {};
     }
 
-    auto member_value = Value::new_reference(member);
-    member_value.set_container(object);
+    auto member_value = Value::new_reference(member, object.get());
     return member_value;
 }
 
@@ -127,9 +131,7 @@ EvalResult Subscript::evaluate(Runtime& rt) const
     auto value_object = value.to_object(rt);
     if(rt.has_exception())
         return {};
-    auto result = value_object->operator_subscript(rt, subscript_value);
-    result.set_container(value_object);
-    return result;
+    return value_object->operator_subscript(rt, subscript_value);
 }
 
 EvalResult NewExpression::evaluate(Runtime& rt) const
@@ -143,7 +145,7 @@ EvalResult NewExpression::evaluate(Runtime& rt) const
         return {};
 
     static StringId construct_sid = "__construct";
-    auto construct_function = Value::new_reference(name_object->get(construct_sid));
+    auto construct_function = Value::new_reference(name_object->get(construct_sid), name_object.get());
     if(rt.has_exception())
         return {};
 
@@ -155,7 +157,6 @@ EvalResult NewExpression::evaluate(Runtime& rt) const
             return {};
     }
 
-    construct_function.set_container(name_object);
     return construct_function.call(rt, ArgumentList{args});
 }
 
@@ -244,7 +245,7 @@ EvalResult AssignmentExpression::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {};
 
-    return Value::new_reference(reference);
+    return Value::new_reference(reference, lhs.container());
 }
 
 EvalResult NormalBinaryExpression::evaluate(Runtime& rt) const
@@ -498,7 +499,7 @@ EvalResult TryCatchStatement::evaluate(Runtime& rt) const
     if(rt.has_exception())
     {
         Scope scope(rt);
-        auto catch_variable = rt.scope_object()->allocate(m_catch_variable);
+        auto catch_variable = rt.scope_object().allocate(m_catch_variable);
         catch_variable->value() = Value::new_object(rt.exception());
         rt.clear_exception();
         return m_catch_statement->evaluate(rt);
@@ -522,8 +523,7 @@ EvalResult SimpleControlStatement::evaluate(Runtime&) const
 
 EvalResult VariableDeclaration::evaluate(Runtime& rt) const
 {
-    auto scope = rt.scope_object();
-    assert(scope);
+    auto& scope = rt.scope_object();
     Value init_value;
     if(m_initializer)
     {
@@ -532,12 +532,12 @@ EvalResult VariableDeclaration::evaluate(Runtime& rt) const
             return {};
     }
     // TODO: Handle redefinition
-    auto memory_value = scope->allocate(m_name);
+    auto memory_value = scope.allocate(m_name);
     if(m_initializer)
         memory_value->value() = init_value;
     if(m_type == Const)
         memory_value->set_read_only(true);
-    return Value::new_reference(memory_value);
+    return Value::new_reference(memory_value, &scope);
 }
 
 EvalResult FunctionDeclaration::evaluate(Runtime& rt) const
@@ -547,10 +547,9 @@ EvalResult FunctionDeclaration::evaluate(Runtime& rt) const
     if(rt.has_exception())
         return {};
 
-    auto scope = rt.scope_object();
-    assert(scope);
+    auto& scope = rt.scope_object();
     // TODO: Handle redefinition
-    scope->allocate(m_expression->name())->value().assign(rt, result);
+    scope.allocate(m_expression->name())->value().assign(rt, result);
     return result;
 }
 

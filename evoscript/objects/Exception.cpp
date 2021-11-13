@@ -7,6 +7,14 @@
 namespace evo::script
 {
 
+Exception::InternalData::InternalData(CallStack const& call_stack_, std::string const& message_)
+: message(message_)
+{
+    call_stack_.walk_stacktrace([this](ExecutionContext const& ctx) {
+        stack_frames.push_back(ctx.name());
+    });
+}
+
 Exception::Exception()
 : Class("Exception")
 {
@@ -29,7 +37,10 @@ void Exception::print(Object const& object, std::ostream& output, bool detailed,
     }
     output << "\e[1m" << escapes::error(name()) << "\e[0m: " << data.message << std::endl;
     if(detailed)
-        data.call_stack.print(output);
+    {
+        for(auto const& frame: data.stack_frames)
+            std::cout << "    at " << escapes::name(frame) << std::endl;
+    }
 }
 
 }

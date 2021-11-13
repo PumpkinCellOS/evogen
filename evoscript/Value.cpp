@@ -267,6 +267,11 @@ void Value::assign(Runtime& rt, Value const& other)
     }
 
     assign_direct(other.dereferenced());
+
+    // Don't leak container to non-directly assigned values as it may not
+    // exist after scopes (direct assign is used only within expressions,
+    // so here sharing is safe)
+    m_value.reference.container = nullptr;
 }
 
 void Value::assign_direct(Value const& other)
@@ -336,7 +341,9 @@ Value Value::call(Runtime& rt, ArgumentList const& arguments)
 
     std::string name = is_reference() ? get_reference()->name() : "<anonymous>";
     auto container = is_reference() ? this->container() : nullptr;
-    ScopedExecutionContext context(rt, (container ? container->type_name() + "::" : "") + name + "()", container);
+    // Don't set 'this' when calling identifiers (which have container allocated )
+    auto container_is_dynamic_object = container && !container->weak_from_this().expired();
+    ScopedExecutionContext context(rt, (container ? container->type_name() + "::" : "") + name + "()", container_is_dynamic_object ? container->shared_from_this() : nullptr);
     if(rt.has_exception())
         return {}; // 'this' is not an object
     

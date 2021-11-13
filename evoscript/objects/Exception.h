@@ -11,11 +11,10 @@ class Exception : public Class, public NativeClass<Exception>
 {
     struct InternalData : public ObjectInternalData
     {
-        CallStack call_stack;
+        std::vector<std::string> stack_frames;
         std::string message;
 
-        InternalData(CallStack const& call_stack_, std::string const& message_)
-        : call_stack(call_stack_), message(message_) {}
+        InternalData(CallStack const& call_stack_, std::string const& message_);
     };
 public:
     Exception();

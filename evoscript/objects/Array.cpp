@@ -68,7 +68,7 @@ Value Array::operator_subscript(Runtime& rt, Object& object, Value const& rhs) c
     if(!value)
         value = MemoryValue::create_undefined();
 
-    return Value::new_reference(value);
+    return Value::new_reference(value, &object);
 }
 
 void Array::print(Object const& object, std::ostream& out, bool print_members, bool dump) const

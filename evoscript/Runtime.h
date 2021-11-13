@@ -20,7 +20,6 @@ class Runtime
 {
 public:
     Runtime(std::shared_ptr<GlobalObject> const& global_object = nullptr, std::shared_ptr<MemoryValue> const& global_this = nullptr);
-    ~Runtime();
 
     template<class T, class... Args>
     void throw_exception(Args&&... args)
@@ -37,15 +36,36 @@ public:
     CallStack& call_stack() { return m_call_stack; }
 
     template<class T = Object>
-    std::shared_ptr<T> this_object() { return call_stack().current_execution_context().this_object<T>(); }
+    std::shared_ptr<T> this_object()
+    {
+        if(call_stack().is_empty())
+        {
+            throw_exception<Exception>("Cannot use 'this' in global scope");
+            return {};
+        }
+        auto this_ = call_stack().current_execution_context().this_object<T>();
+        if(!this_)
+        {
+            throw_exception<Exception>("Cannot use 'this' in functions that are not called on object");
+            return {};
+        }
+        return this_;
+    }
 
     void set_this_object(std::shared_ptr<MemoryValue> const& this_) { m_global_this = this_; }
 
-    std::shared_ptr<ScopeObject> scope_object() const { return call_stack().current_execution_context().scope_object(); }
+    ScopeObject const& scope_object() const
+    {
+        return call_stack().is_empty() ? *global_object() : call_stack().current_execution_context().scope_object();
+    }
+    ScopeObject& scope_object()
+    {
+        return call_stack().is_empty() ? *global_object() : call_stack().current_execution_context().scope_object();
+    }
     std::shared_ptr<GlobalObject> global_object() const { return m_global_object; }
     void print_backtrace() const;
 
-    ScopeObject::IdentifierRecord resolve_identifier(StringId) const;
+    ScopeObject::IdentifierRecord resolve_identifier(StringId);
 
     ExecutionContext& push_execution_context(std::string const& name, std::shared_ptr<Object> const& this_object);
     ExecutionContext& push_global_scope();

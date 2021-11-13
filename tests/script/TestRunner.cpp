@@ -28,6 +28,7 @@ private:
     {
         std::string test_name = args.is_given(0) ? args.get(0).to_string() : "";
         rt.throw_exception<Exception>("Test failed: " + test_name);
+        rt.print_backtrace();
         return {};
     }
 };

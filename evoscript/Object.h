@@ -96,7 +96,7 @@ public:
     static std::shared_ptr<Object> create();
 };
 
-class Object
+class Object : public std::enable_shared_from_this<Object>
 {
 public:
     virtual ~Object();

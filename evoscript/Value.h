@@ -37,7 +37,7 @@ public:
     : m_type(Type::Invalid) {}
 
     Value(Value const& other) { *this = other; }
-    Value(Value&& other) { *this = other; }
+    Value(Value&& other) { *this = std::move(other); }
 
     Value& operator=(Value const&);
     Value& operator=(Value&&);
@@ -53,7 +53,7 @@ public:
     static Value new_int(IntType value) { return Value(value); }
     static Value new_bool(bool value) { return Value(value); }
     static Value new_object(std::shared_ptr<Object> const& value) { return Value(value); }
-    static Value new_reference(std::shared_ptr<MemoryValue> const& value, std::shared_ptr<Object> const& container = {}) { return Value(value, container); }
+    static Value new_reference(std::shared_ptr<MemoryValue> const& value, Object* container) { return Value(value, container); }
 
     bool is_invalid() const { return m_type == Type::Invalid; }
     bool is_null() const { return m_type == Type::Null; }
@@ -91,8 +91,7 @@ public:
 
     Value call(Runtime&, ArgumentList const&);
 
-    std::shared_ptr<Object> container() const { assert(is_reference()); return m_value.reference.container; }
-    void set_container(std::shared_ptr<Object> const& object) { assert(is_reference()); m_value.reference.container = object; }
+    Object* container() const { assert(is_reference()); return m_value.reference.container; }
 
 private:
     explicit Value(IntType value)
@@ -105,7 +104,7 @@ private:
     : m_type(Type::Object)
         { assert(value); new(&m_value.object) std::shared_ptr<Object>(value); }
 
-    explicit Value(std::shared_ptr<MemoryValue> const& value, std::shared_ptr<Object> const& container)
+    explicit Value(std::shared_ptr<MemoryValue> const& value, Object* container)
     : m_type(Type::Reference)
         { assert(value); new(&m_value.reference) Reference({value, container}); }
 
@@ -124,7 +123,7 @@ private:
     struct Reference
     {
         std::shared_ptr<MemoryValue> value;
-        std::shared_ptr<Object> container;
+        Object* container { nullptr };
     };
 
     union InternalValue

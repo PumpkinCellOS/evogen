@@ -17,8 +17,8 @@ void CallStack::print(std::ostream& stream, bool detailed) const
             stream << "    at " << name(it.name()) << " ";
             if(detailed)
             {
-                stream << ": ScopeObject[" << it.scope_object().get() << "] parent=" << it.scope_object()->parent().get() << " value=";
-                it.scope_object()->repl_print(stream, true);
+                stream << ": ScopeObject[" << &it.scope_object() << "] parent=" << it.scope_object().parent() << " value=";
+                it.scope_object().repl_print(stream, true);
             }
             stream << std::endl;
         }
@@ -27,18 +27,12 @@ void CallStack::print(std::ostream& stream, bool detailed) const
 
 ExecutionContext& CallStack::push_execution_context(std::string const& name, std::shared_ptr<Object> const& this_object, std::shared_ptr<GlobalObject> const& global_object)
 {
-    return m_call_stack.emplace_front(name, this_object, global_object, std::make_shared<ScopeObject>(global_object));
-}
-
-ExecutionContext& CallStack::push_global_scope(std::shared_ptr<Object> const& this_object, std::shared_ptr<GlobalObject> const& global_object)
-{
-    return m_call_stack.emplace_front("<global scope>", this_object, global_object, global_object);
+    return m_call_stack.emplace_front(name, this_object, global_object, *global_object.get());
 }
 
 ExecutionContext& CallStack::push_scope(std::shared_ptr<Object> const& this_object, std::shared_ptr<GlobalObject> const& global_object)
 {
-    return m_call_stack.emplace_front("", this_object, global_object,
-        std::make_shared<ScopeObject>(m_call_stack.empty() ? nullptr : current_execution_context().scope_object()));
+    return m_call_stack.emplace_front("", this_object, global_object, !m_call_stack.empty() ? current_execution_context().scope_object() : *global_object);
 }
 
 ExecutionContext const& CallStack::current_execution_context() const
@@ -53,6 +47,7 @@ ExecutionContext& CallStack::current_execution_context()
 
 void CallStack::pop_execution_context()
 {
+    assert(!m_call_stack.empty());
     m_call_stack.pop_front();
 }
 

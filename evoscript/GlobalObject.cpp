@@ -16,7 +16,6 @@ namespace evo::script
 {
 
 GlobalObject::GlobalObject()
-: ScopeObject(nullptr)
 {
     allocate("Array")->value() = Value::new_object(ClassWrapper::create<Array>());
     allocate("Exception")->value() = Value::new_object(ClassWrapper::create<Exception>());
