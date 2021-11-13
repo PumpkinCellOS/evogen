@@ -200,8 +200,7 @@ public:
         Null,
         True,
         False,
-        Undefined,
-        Local
+        Undefined
     };
 
     SpecialValue(ErrorList const& error)
