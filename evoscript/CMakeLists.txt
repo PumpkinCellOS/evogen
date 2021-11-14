@@ -34,6 +34,11 @@ add_executable(evos
 target_include_directories(evos PUBLIC ${CMAKE_SOURCE_DIR})
 target_link_libraries(evos evoscript)
 
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    target_compile_options(evoscript PUBLIC -fsanitize=address,undefined)
+    target_link_options(evoscript PUBLIC -fsanitize=address,undefined)
+endif()
+
 install(TARGETS evoscript DESTINATION lib)
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/evoscript" DESTINATION include FILES_MATCHING PATTERN "*.h" PATTERN "*.inl")
 install(TARGETS evoscript EXPORT evoscript DESTINATION lib)
