@@ -59,7 +59,7 @@ EvalResult SpecialValue::evaluate(Runtime& rt) const
     {
     case This:
     {
-        auto this_ = rt.this_object();
+        auto this_ = rt.resolve_this_object();
         if(!this_)
             return {};
         return Value::new_reference(MemoryValue::create_object(this_), nullptr);

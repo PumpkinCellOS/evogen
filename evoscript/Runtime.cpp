@@ -38,7 +38,7 @@ ExecutionContext& Runtime::push_execution_context(std::string const& name, std::
 
 ExecutionContext& Runtime::push_scope()
 {
-    return m_call_stack.push_scope(!m_call_stack.is_empty() ? this_object() : nullptr, m_global_object);
+    return m_call_stack.push_scope(!m_call_stack.is_empty() ? resolve_this_object() : nullptr, m_global_object);
 }
 
 ExecutionContext& Runtime::current_execution_context()
@@ -120,6 +120,22 @@ ScopeObject::IdentifierRecord Runtime::resolve_identifier(StringId name)
     if(!reference)
         return {global_object().get(), nullptr};
     return {scope, reference};
+}
+
+std::shared_ptr<Object> Runtime::resolve_this_object()
+{
+    if(call_stack().is_empty())
+    {
+        throw_exception<Exception>("Cannot use 'this' in global scope");
+        return {};
+    }
+    auto this_ = call_stack().current_execution_context().this_object();
+    if(!this_)
+    {
+        throw_exception<Exception>("Cannot use 'this' in functions that are not called on object");
+        return {};
+    }
+    return this_;
 }
 
 }

@@ -35,22 +35,7 @@ public:
     CallStack const& call_stack() const { return m_call_stack; }
     CallStack& call_stack() { return m_call_stack; }
 
-    template<class T = Object>
-    std::shared_ptr<T> this_object()
-    {
-        if(call_stack().is_empty())
-        {
-            throw_exception<Exception>("Cannot use 'this' in global scope");
-            return {};
-        }
-        auto this_ = call_stack().current_execution_context().this_object<T>();
-        if(!this_)
-        {
-            throw_exception<Exception>("Cannot use 'this' in functions that are not called on object");
-            return {};
-        }
-        return this_;
-    }
+    std::shared_ptr<Object> resolve_this_object();
 
     void set_this_object(std::shared_ptr<MemoryValue> const& this_) { m_global_this = this_; }
 
