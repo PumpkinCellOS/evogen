@@ -8,6 +8,7 @@ namespace evo::script
 {
 
 Array::Array()
+: Class("Array")
 {
     static StringId size_sid = "size";
     define_native_function<Array>(size_sid, &Array::size);
@@ -84,7 +85,11 @@ void Array::print(Object const& object, std::ostream& out, bool print_members, b
     size_t object_count = std::min((size_t)10, values.size());
     for(size_t s = 0; s < object_count; s++)
     {
-        values[s]->repl_print(out, false);
+        auto& value = values[s];
+        if(!value)
+            out << escapes::constant("undefined");
+        else
+            values[s]->repl_print(out, false);
         if(s < object_count - 1)
             out << ", ";
     }
