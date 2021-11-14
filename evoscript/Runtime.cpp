@@ -38,7 +38,7 @@ ExecutionContext& Runtime::push_execution_context(std::string const& name, std::
 
 ExecutionContext& Runtime::push_scope()
 {
-    return m_call_stack.push_scope(!m_call_stack.is_empty() ? resolve_this_object() : nullptr, m_global_object);
+    return m_call_stack.push_scope(this_object(), m_global_object);
 }
 
 ExecutionContext& Runtime::current_execution_context()
