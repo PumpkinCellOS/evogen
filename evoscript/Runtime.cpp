@@ -122,6 +122,16 @@ ScopeObject::IdentifierRecord Runtime::resolve_identifier(StringId name)
     return {scope, reference};
 }
 
+std::shared_ptr<Object> Runtime::this_object() const
+{
+    if(call_stack().is_empty())
+        return {};
+    auto this_ = call_stack().current_execution_context().this_object();
+    if(!this_)
+        return {};
+    return this_;
+}
+
 std::shared_ptr<Object> Runtime::resolve_this_object()
 {
     if(call_stack().is_empty())

@@ -35,6 +35,7 @@ public:
     CallStack const& call_stack() const { return m_call_stack; }
     CallStack& call_stack() { return m_call_stack; }
 
+    std::shared_ptr<Object> this_object() const;
     std::shared_ptr<Object> resolve_this_object();
 
     void set_this_object(std::shared_ptr<MemoryValue> const& this_) { m_global_this = this_; }
