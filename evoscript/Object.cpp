@@ -148,7 +148,8 @@ bool Object::is_instance_of(Class& class_) const
 
 std::string Object::to_string(Runtime& rt) const
 {
-    return get_without_side_effects(Class::to_string_sid).
+    if(auto func = get_without_side_effects(Class::to_string_sid))
+        return func->
 }
 
 Value Object::to_primitive(Runtime& rt, Value::Type type) const
