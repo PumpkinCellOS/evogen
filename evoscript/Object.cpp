@@ -85,17 +85,25 @@ void Class::print(Object const& object, std::ostream& output, bool detailed, boo
         output << "{...}";
 }
 
-Object::Object(Runtime& rt, std::shared_ptr<Class> const& class_, ArgumentList const& args)
-: m_class(class_)
-{
-    m_internal_data = class_->construct_internal_data(&rt, args);
-    class_->constructor(rt, *this, args);
-}
+StringId Class::to_string_sid =    "@to_string";
+StringId Class::to_primitive_sid = "@to_primitive";
+StringId Class::op_add_sid =       "@+add";
+StringId Class::op_compare_sid =   "@+compare";
+StringId Class::op_subscript_sid = "@+subscript";
+StringId Class::print_sid =        "@print";
+
+Object::Object(std::shared_ptr<Class> const& class_)
+: m_class(class_) {}
 
 Object::~Object()
 {
     if(m_class)
         m_class->destructor(*this);
+}
+
+std::shared_ptr<Object> Object::create(Runtime& rt, std::shared_ptr<Class> const& class_, ArgumentList const& args)
+{
+    return class_->create_object(rt, args);
 }
 
 std::shared_ptr<MemoryValue> Object::get(StringId member)
@@ -138,9 +146,9 @@ bool Object::is_instance_of(Class& class_) const
     return m_class ? m_class->is_same_or_base_of(class_) : (&class_ == NativeClass<Class>::class_object().get());
 }
 
-std::string Object::to_string() const
+std::string Object::to_string(Runtime& rt) const
 {
-    return m_class ? m_class->to_string(*this) : "[object " + type_name() + "]";
+    return get_without_side_effects(Class::to_string_sid).
 }
 
 Value Object::to_primitive(Runtime& rt, Value::Type type) const

@@ -14,17 +14,16 @@ Array::Array()
     define_native_function<Array>(size_sid, &Array::size);
 }
 
-std::unique_ptr<ObjectInternalData> Array::construct_internal_data(Runtime* rt, ArgumentList const& args) const
+void Array::constructor(Runtime& rt, NativeObject<Array>& object, ArgumentList const& args) const
 {
-    auto unique_data = construct_internal_data(rt);
-    if(args.is_given(0) && rt)
+    auto& data = object.internal_data();
+    if(args.is_given(0))
     {
-        auto size = args.get(0).to_int(*rt);
-        if(rt->has_exception())
-            return nullptr;
-        unique_data->values.resize(size);
+        auto size = args.get(0).to_int(rt);
+        if(rt.has_exception())
+            return;
+        data.values.resize(size);
     }
-    return unique_data;
 }
 
 void Array::init_static_class_members(Object& class_wrapper)
@@ -36,8 +35,8 @@ void Array::init_static_class_members(Object& class_wrapper)
 
 std::shared_ptr<Object> Array::from_argument_list(ArgumentList const& vector)
 {
-    std::shared_ptr<Object> array = Object::create_native<Array>(nullptr);
-    auto& values = array->internal_data<InternalData>().values;
+    auto array = Object::create_native<Array>(nullptr);
+    auto& values = array->internal_data().values;
     for(auto& value: vector)
         values.push_back(std::make_shared<MemoryValue>(value));
     return array;
@@ -45,8 +44,8 @@ std::shared_ptr<Object> Array::from_argument_list(ArgumentList const& vector)
 
 std::shared_ptr<Object> Array::from_vector(std::vector<Value> const& vector)
 {
-    std::shared_ptr<Object> array = Object::create_native<Array>(nullptr);
-    auto& values = array->internal_data<InternalData>().values;
+    auto array = Object::create_native<Array>(nullptr);
+    auto& values = array->internal_data().values;
     for(auto& value: vector)
         values.push_back(std::make_shared<MemoryValue>(value));
     return array;

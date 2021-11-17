@@ -22,10 +22,22 @@ class Object;
 using NativeFunctionCallback = std::function<Value(Runtime& rt, Object& t, ArgumentList const& args)>;
 
 template<class T>
-class NativeClass
+class NativeObject;
+
+// TODO: Remove this enable_shared_from_this
+template<class T>
+class NativeClass : public std::enable_shared_from_this<NativeClass<T>>
 {
 public:
     static std::shared_ptr<T> class_object() { static std::shared_ptr<T> class_ = std::make_shared<T>(); return class_; }
+
+    std::shared_ptr<NativeObject<T>> create_object(Runtime& rt, ArgumentList const& constructor_args) const;
+
+    template<class... Args>
+    std::shared_ptr<NativeObject<T>> create_object(Runtime& rt, Args&&... args) const;
+
+private:
+    virtual void constructor(Runtime&, NativeObject<T>&, ArgumentList const&) const {};
 };
 
 class Class : public NativeClass<Class>
@@ -34,26 +46,23 @@ public:
     Class(std::string const& name = "Object", std::shared_ptr<Class> const& base = nullptr)
     : m_name(name), m_base(base) {}
 
-    virtual std::unique_ptr<ObjectInternalData> construct_internal_data(Runtime*, ArgumentList const&) const { return {}; }
-    std::unique_ptr<ObjectInternalData> construct_internal_data(Runtime*) const { return {}; }
-    virtual void constructor(Runtime&, Object&, ArgumentList const&) const {};
     virtual void destructor(Object&) const {};
 
     // FIXME: Throw an exception
     virtual Value call(Runtime&, Object const&, Object& this_, ArgumentList const&) const { return Value::undefined(); };
 
     // function to_string() : string
-    virtual std::string to_string(Object const&) const { return "[object " + name() + "]"; }
+    static StringId to_string_sid;
     // function to_primitive(type: ValueType) : Value
-    virtual Value to_primitive(Runtime&, Object const&, Value::Type) const { return {}; }
+    static StringId to_primitive_sid;
     // function operator+(rhs: Value) : Value
-    virtual Value operator_add(Runtime& rt, Object const&, Value const& rhs) const;
+    static StringId op_add_sid;
     // function operator<>(rhs: Value) : CompareResult
-    virtual CompareResult operator_compare(Runtime& rt, Object const&, Value const& rhs) const;
+    static StringId op_compare_sid;
     // function operator[](rhs: Value) : Value
-    virtual Value operator_subscript(Runtime& rt, Object&, Value const& rhs) const;
+    static StringId op_subscript_sid;
     // function print(stream: OStream, print_members: bool, dump: bool) : undefined
-    virtual void print(Object const&, std::ostream&, bool, bool) const;
+    static StringId print_sid;
 
     std::string name() const { return m_name; }
     std::shared_ptr<MemoryValue> resolve_class_member(StringId member) const;
@@ -101,33 +110,18 @@ class Object : public std::enable_shared_from_this<Object>
 public:
     virtual ~Object();
 
+    Object(Object const& other) = delete;
+
     // TODO: This should be const
     virtual std::shared_ptr<MemoryValue> get(StringId member);
     std::shared_ptr<MemoryValue> get_without_side_effects(StringId member) const;
 
-    static std::shared_ptr<Object> create(Runtime& rt, std::shared_ptr<Class> const& class_, ArgumentList const& args)
-    {
-        return std::shared_ptr<Object>(new Object(rt, class_, args));
-    }
+    static std::shared_ptr<Object> create(Runtime& rt, std::shared_ptr<Class> const& class_, ArgumentList const& args);
 
     template<class T, class... Args> requires std::is_base_of_v<NativeClass<T>, T>
-    static std::shared_ptr<Object> create_native(Runtime* rt, Args&&... args)
-    {
-        auto object = std::shared_ptr<Object>(new Object());
-        auto class_ = NativeClass<T>::class_object();
-        object->m_class = class_;
-        object->m_internal_data = static_cast<T&>(*class_).construct_internal_data(rt, std::forward<Args>(args)...);
-        // FIXME: Should we call constructor?
-        return object;
-    }
+    static std::shared_ptr<NativeObject<T>> create_native(Runtime* rt, Args&&... args);
 
     std::string type_name() const { return m_class ? m_class->name() : "Object"; }
-
-    template<class T>
-    T& internal_data() { assert(m_internal_data); return static_cast<T&>(*m_internal_data.get()); }
-
-    template<class T>
-    T const& internal_data() const { assert(m_internal_data); return static_cast<T const&>(*m_internal_data.get()); }
 
     bool is_instance_of(Class& class_) const;
 
@@ -135,7 +129,7 @@ public:
     void repl_print(std::ostream& output, bool print_members) const;
 
     // These forwards to underlying class
-    std::string to_string() const;
+    std::string to_string(Runtime& rt) const;
     Value to_primitive(Runtime&, Value::Type) const;
     Value operator_add(Runtime& rt, Value const& rhs) const;
     CompareResult operator_compare(Runtime& rt, Value const& rhs) const;
@@ -146,25 +140,63 @@ public:
     void define_native_function(StringId name, NativeFunctionCallback callback);
 
 protected:
-    Object() = default;
+    friend class Class;
+    friend class ClassWrapper;
+
+    Object(std::shared_ptr<Class> const& class_);
 
     std::unordered_map<StringId, std::shared_ptr<MemoryValue>>& members() { return m_members; }
     std::unordered_map<StringId, std::shared_ptr<MemoryValue>> const& members() const { return m_members; }
 
     // This forwards to underlying class
     void print_impl(std::ostream&, bool print_members, bool dump) const;
-
-    friend class Class;
-    friend class ClassWrapper;
     void print_members_impl(std::ostream& output, bool dump) const;
 
 private:
-    Object(Runtime& rt, std::shared_ptr<Class> const& class_, ArgumentList const& args);
-
     std::unordered_map<StringId, std::shared_ptr<MemoryValue>> m_members;
     std::shared_ptr<Class> m_class;
-    std::unique_ptr<ObjectInternalData> m_internal_data;
 };
+
+template<class T>
+class NativeObject : public Object
+{
+public:
+    using InternalData = typename std::conditional<requires { typename T::InternalData; }, typename T::InternalData, ObjectInternalData>::type;
+
+    InternalData& internal_data() { return m_internal_data; }
+    InternalData const& internal_data() const { return m_internal_data; }
+
+private:
+    friend class NativeClass<T>;
+
+    NativeObject(std::shared_ptr<Class> const& class_)
+    : Object(class_) {}
+
+    InternalData m_internal_data;
+};
+
+template<class T>
+std::shared_ptr<NativeObject<T>> NativeClass<T>::create_object(Runtime& rt, ArgumentList const& constructor_args) const
+{
+    auto object = std::make_shared<NativeObject<T>>(shared_from_this());
+    constructor(rt, *object, constructor_args);
+    return object;
+}
+
+template<class T>
+template<class... Args>
+std::shared_ptr<NativeObject<T>> NativeClass<T>::create_object(Runtime& rt, Args&&... args) const
+{
+    auto object = std::make_shared<NativeObject<T>>(shared_from_this());
+    constructor(rt, *object, std::forward<Args>(args)...);
+    return object;
+}
+
+template<class T, class... Args> requires std::is_base_of_v<NativeClass<T>, T>
+std::shared_ptr<NativeObject<T>> Object::create_native(Runtime* rt, Args&&... args)
+{
+    return NativeClass<T>::class_object()->create_object(rt, std::forward<Args>(args)...);
+}
 
 template<class T> requires std::is_base_of_v<NativeClass<T>, T>
 std::shared_ptr<Object> ClassWrapper::create()
