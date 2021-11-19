@@ -38,7 +38,7 @@ EvalResult IntegerLiteral::evaluate(Runtime&) const
 
 EvalResult StringLiteral::evaluate(Runtime& rt) const
 {
-    return Value::new_object(Object::create_native<String>(&rt, m_value));
+    return Value::new_object(Object::create_native<String>(rt, m_value));
 }
 
 EvalResult Identifier::evaluate(Runtime& rt) const
@@ -312,7 +312,7 @@ EvalResult NormalBinaryExpression::evaluate(Runtime& rt) const
 
 EvalResult FunctionExpression::evaluate(Runtime& rt) const
 {
-    return Value::new_object(Object::create_native<ASTFunction>(&rt, m_name, m_body, m_arg_names));
+    return Value::new_object(Object::create_native<ASTFunction>(rt, m_name, m_body, m_arg_names));
 }
 
 std::string FunctionExpression::to_string() const

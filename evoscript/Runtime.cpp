@@ -15,7 +15,7 @@ Runtime::Runtime(std::shared_ptr<GlobalObject> const& global_object, std::shared
 : m_global_object(global_object), m_global_this(global_this)
 {
     if(!m_global_object)
-        m_global_object = std::make_shared<GlobalObject>();
+        m_global_object = std::make_shared<GlobalObject>(*this);
     if(!m_global_this)
         m_global_this = MemoryValue::create_object(Object::create_native<Class>(this));
 }

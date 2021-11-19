@@ -9,6 +9,7 @@ namespace evo::script
 
 class Exception : public Class, public NativeClass<Exception>
 {
+public:
     struct InternalData : public ObjectInternalData
     {
         std::vector<std::string> stack_frames;
@@ -16,21 +17,18 @@ class Exception : public Class, public NativeClass<Exception>
 
         InternalData(CallStack const& call_stack_, std::string const& message_);
     };
-public:
+
     Exception();
 
-    std::unique_ptr<ObjectInternalData> construct_internal_data(Runtime* rt, std::string const& message = "") const
+    void constructor(Runtime& rt, NativeObject<Exception>& object, std::string const& message = "") const
     {
-        assert(rt);
-        return std::make_unique<InternalData>(rt->call_stack(), message);
+        object.internal_data() = InternalData{rt.call_stack(), message};
     }
 
-    virtual std::unique_ptr<ObjectInternalData> construct_internal_data(Runtime* rt, ArgumentList const& args) const override
+    void constructor(Runtime& rt, NativeObject<Exception>& object, ArgumentList const& args) const
     {
-        return construct_internal_data(rt, args.get(0).to_string());
+        constructor(rt, object, args.get(0).to_string());
     }
-
-    virtual void print(Object const&, std::ostream&, bool print_members, bool dump) const override;
 
 private:
     static Value print_(Runtime& rt, ArgumentList const&);

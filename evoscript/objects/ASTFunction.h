@@ -8,6 +8,7 @@ namespace evo::script
 
 class ASTFunction : public Class, public NativeClass<ASTFunction>
 {
+public:
     struct InternalData : public ObjectInternalData
     {
         StringId name;
@@ -18,7 +19,6 @@ class ASTFunction : public Class, public NativeClass<ASTFunction>
         : name(name), body(body), arg_names(arg_names) {}
     };
 
-public:
     ASTFunction()
     : Class("ASTFunction") {}
 

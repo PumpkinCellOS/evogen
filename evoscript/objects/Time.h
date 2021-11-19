@@ -17,10 +17,8 @@ class Time : public Class, public NativeClass<Time>
 public:
     Time();
 
-    std::unique_ptr<ObjectInternalData> construct_internal_data(Runtime*, Value::IntType) const;
-    virtual std::unique_ptr<ObjectInternalData> construct_internal_data(Runtime*, ArgumentList const&) const override;
-
-    virtual Value to_primitive(Runtime&, Object const&, Value::Type) const override;
+    void constructor(Runtime&, NativeObject<Time>&, Value::IntType) const
+    virtual void constructor(Runtime&, NativeObject<Time>&, ArgumentList const&) const override;
 };
 
 }

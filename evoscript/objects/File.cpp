@@ -17,9 +17,15 @@ File::File()
     define_native_function<File>("eof", eof);
 }
 
+void constructor(Runtime& rt, NativeObject<File>& object, ArgumentList const& args) const
+{
+    constructor(rt, object, args.get_or(0, Value::new_object(Object::create_native<String>(rt, ""))).to_string());
+}
+
+void constructor(Runtime&, NativeObject<File>&, std::string const& file_name) const;
+
 std::unique_ptr<ObjectInternalData> File::construct_internal_data(Runtime* rt, ArgumentList const& args) const
 {
-    return construct_internal_data(rt, args.get_or(0, Value::new_object(Object::create_native<String>(rt, ""))).to_string());
 }
 
 std::unique_ptr<ObjectInternalData> File::construct_internal_data(Runtime* rt, std::string const& file_name) const

@@ -16,8 +16,8 @@ class File : public Class, public NativeClass<File>
 public:
     File();
 
-    virtual std::unique_ptr<ObjectInternalData> construct_internal_data(Runtime*, ArgumentList const&) const override;
-    std::unique_ptr<ObjectInternalData> construct_internal_data(Runtime*, std::string const& file_name) const;
+    virtual void constructor(Runtime&, NativeObject<File>&, ArgumentList const&) const override;
+    void constructor(Runtime&, NativeObject<File>&, std::string const& file_name) const;
 
 private:
     static Value read(Runtime& rt, Object&, ArgumentList const& args);

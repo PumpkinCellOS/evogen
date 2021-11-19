@@ -14,16 +14,16 @@ class NativeFunction : public Class, public NativeClass<NativeFunction<T>>
 public:
     struct InternalData : public ObjectInternalData
     {
-        NativeFunctionCallback callback;
+        NativeFunctionCallback<T> callback;
 
-        InternalData(NativeFunctionCallback callback_)
+        InternalData(NativeFunctionCallback<T> callback_)
         : callback(callback_) {}
     };
 
     NativeFunction()
     : Class("NativeFunction") {}
 
-    std::unique_ptr<ObjectInternalData> construct_internal_data(Runtime*, NativeFunctionCallback callback) const
+    std::unique_ptr<ObjectInternalData> construct_internal_data(Runtime*, NativeFunctionCallback<T> callback) const
     {
         return std::make_unique<InternalData>(std::move(callback));
     }
@@ -38,28 +38,17 @@ public:
         }
         return static_cast<NativeObject<T>&>(object).internal_data().callback(rt, this_, args);
     }
-
-private:
-    virtual void print(Object const& object, std::ostream& out, bool detailed, bool dump) const override
-    {
-        if(dump)
-        {
-            Class::print(object, out, detailed, dump);
-            return;
-        }
-        out << escapes::keyword("function") << "() " << (detailed ? "{ <native code> }" : "{...}");
-    }
 };
 
 // NOTE: This must be here because of circular dependency
 template<class T>
-void Class::define_native_function(StringId name, NativeFunctionCallback callback)
+void Class::define_native_function(StringId name, NativeFunctionCallback<T> callback)
 {
     define_virtual_member(name, Object::create_native<NativeFunction<T>>(nullptr, callback));
 }
 
 template<class T>
-void Object::define_native_function(StringId name, NativeFunctionCallback callback)
+void Object::define_native_function(StringId name, NativeFunctionCallback<T> callback)
 {
     auto memval = MemoryValue::create_object(Object::create_native<NativeFunction<T>>(nullptr, callback));
     memval->set_name(name);

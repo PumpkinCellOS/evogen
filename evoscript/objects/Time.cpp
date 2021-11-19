@@ -14,32 +14,23 @@ Time::Time()
     });
 }
 
-std::unique_ptr<ObjectInternalData> Time::construct_internal_data(Runtime*, Value::IntType val) const
+void Time::constructor(Runtime&, NativeObject<Time>& object, Value::IntType value) const
 {
-    return std::make_unique<InternalData>(val);
+    object.internal_data().milliseconds = value;
 }
 
-std::unique_ptr<ObjectInternalData> Time::construct_internal_data(Runtime* rt, ArgumentList const& args) const
+void Time::constructor(Runtime& rt, NativeObject<Time>& object, ArgumentList const& args) const
 {
-    assert(rt);
     if(!args.is_given(0))
     {
         timespec ts;
         clock_gettime(CLOCK_REALTIME, &ts);
-        return construct_internal_data(rt, ts.tv_sec * 1000 + ts.tv_nsec / 1'000'000);
+        constructor(rt, object, ts.tv_sec * 1000 + ts.tv_nsec / 1'000'000);
     }
-    auto arg_int = args.get(0).to_int(*rt);
-    if(rt->has_exception())
-        return nullptr;
-    return construct_internal_data(rt, arg_int);
-}
-
-Value Time::to_primitive(Runtime& rt, Object const& object, Value::Type type) const
-{
-    if(type == Value::Type::Int)
-        return Value::new_int(object.internal_data<InternalData>().milliseconds);
-    rt.throw_exception<Exception>("Cannot convert Time to primitive of type " + Value::type_to_string(type));
-    return {};
+    auto arg_int = args.get(0).to_int(rt);
+    if(rt.has_exception())
+        return;
+    constructor(rt, object, arg_int);
 }
 
 }

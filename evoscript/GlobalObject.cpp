@@ -15,7 +15,7 @@
 namespace evo::script
 {
 
-GlobalObject::GlobalObject()
+GlobalObject::GlobalObject(Runtime& rt)
 {
     allocate("Array")->value() = Value::new_object(ClassWrapper::create<Array>());
     allocate("Exception")->value() = Value::new_object(ClassWrapper::create<Exception>());
@@ -24,14 +24,14 @@ GlobalObject::GlobalObject()
     allocate("String")->value() = Value::new_object(ClassWrapper::create<String>());
     allocate("Time")->value() = Value::new_object(ClassWrapper::create<Time>());
 
-    allocate("fs")->value() = Value::new_object(Object::create_native<FileSystem>(nullptr));
-    allocate("sys")->value() = Value::new_object(Object::create_native<System>(nullptr));
+    allocate("fs")->value() = Value::new_object(Object::create_native<FileSystem>(rt));
+    allocate("sys")->value() = Value::new_object(Object::create_native<System>(rt));
 
-    allocate("run")->value() = Value::new_object(Object::create_native<NativeFunction<Class>>(nullptr, run_script));
-    allocate("to_int")->value() = Value::new_object(Object::create_native<NativeFunction<Class>>(nullptr, [](Runtime& rt, Object&, ArgumentList const& args) {
+    allocate("run")->value() = Value::new_object(Object::create_native<NativeFunction<Class>>(rt, run_script));
+    allocate("to_int")->value() = Value::new_object(Object::create_native<NativeFunction<Class>>(rt, [](Runtime& rt, NativeObject<GlobalObject>&, ArgumentList const& args) {
         return Value::new_int(args.get(0).to_int(rt));
     }));
-    allocate("to_bool")->value() = Value::new_object(Object::create_native<NativeFunction<Class>>(nullptr, [](Runtime& rt, Object&, ArgumentList const& args) {
+    allocate("to_bool")->value() = Value::new_object(Object::create_native<NativeFunction<Class>>(rt, [](Runtime& rt, NativeObject<GlobalObject>&, ArgumentList const& args) {
         return Value::new_bool(args.get(0).to_bool(rt));
     }));
 }

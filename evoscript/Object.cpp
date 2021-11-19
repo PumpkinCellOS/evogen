@@ -12,8 +12,8 @@ namespace evo::script
 ClassWrapper::ClassWrapper()
 : Class("ClassWrapper")
 {
-    define_native_function<ClassWrapper>("__construct", [](Runtime& rt, Object& t, ArgumentList const& args) {
-        return Value::new_object(Object::create(rt, t.internal_data<InternalData>().underlying_class, args));
+    define_native_function<ClassWrapper>("__construct", [](Runtime& rt, NativeObject<ClassWrapper>& t, ArgumentList const& args) {
+        return Value::new_object(Object::create(rt, t.internal_data().underlying_class, args));
     });
 }
 
@@ -146,10 +146,10 @@ bool Object::is_instance_of(Class& class_) const
     return m_class ? m_class->is_same_or_base_of(class_) : (&class_ == NativeClass<Class>::class_object().get());
 }
 
-std::string Object::to_string(Runtime& rt) const
+std::string Object::to_string() const
 {
-    if(auto func = get_without_side_effects(Class::to_string_sid))
-        return func->
+    // TODO
+    return "[object " + type_name() + "]";
 }
 
 Value Object::to_primitive(Runtime& rt, Value::Type type) const
@@ -159,7 +159,9 @@ Value Object::to_primitive(Runtime& rt, Value::Type type) const
         rt.throw_exception<Exception>("Cannot convert " + type_name() + " to primitive");
         return {};
     }
-    return m_class->to_primitive(rt, *this, type);
+    if(auto func = get_without_side_effects(Class::to_primitive_sid))
+        return func->value().call(rt, ArgumentList{{Value::new_int((int)type)}});
+    return Value::undefined();
 }
 
 Value Object::operator_add(Runtime& rt, Value const& rhs) const
@@ -169,7 +171,9 @@ Value Object::operator_add(Runtime& rt, Value const& rhs) const
         rt.throw_exception<Exception>("Cannot call add operator without class");
         return {};
     }
-    return m_class->operator_add(rt, *this, rhs);
+    if(auto func = get_without_side_effects(Class::op_add_sid))
+        return func->value().call(rt, ArgumentList{{rhs}});
+    return Value::undefined();
 }
 
 CompareResult Object::operator_compare(Runtime& rt, Value const& rhs) const
@@ -179,14 +183,18 @@ CompareResult Object::operator_compare(Runtime& rt, Value const& rhs) const
         rt.throw_exception<Exception>("Cannot call compare operator without class");
         return {};
     }
-    return m_class->operator_compare(rt, *this, rhs);
+    if(auto func = get_without_side_effects(Class::op_compare_sid))
+        return func->value().call(rt, ArgumentList{{rhs}});
+    return CompareResult::Unknown;
 }
 
 Value Object::operator_subscript(Runtime& rt, Value const& rhs)
 {
     if(!m_class)
         return get(rhs.to_string())->value();
-    return m_class->operator_subscript(rt, *this, rhs);
+    if(auto func = get_without_side_effects(Class::op_subscript_sid))
+        return func->value().call(rt, ArgumentList{{rhs}});
+    return get(rhs.to_string())->value();
 }
 
 Value Object::call(Runtime& rt, Object& this_, ArgumentList const& args) const
@@ -206,11 +214,7 @@ void Object::repl_print(std::ostream& output, bool print_members) const
 
 void Object::print_impl(std::ostream& output, bool print_members, bool dump) const
 {
-    if(m_class)
-    {
-        m_class->print(*this, output, print_members, dump);
-        return;
-    }
+    // TODO: Class print
     
     using namespace escapes;
     output << type(type_name()) << " ";
