@@ -3,7 +3,7 @@ project(evogen)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_compile_options(-Wall -Werror)
+add_compile_options(-Wall -Werror -Wno-error=return-type)
 
 add_subdirectory(cmd)
 add_subdirectory(evogen)

@@ -28,7 +28,7 @@ public:
         return std::make_unique<InternalData>(std::move(callback));
     }
 
-    virtual Value call(Runtime& rt, Object& object, Object& this_, ArgumentList const& args) const override
+    virtual Value call(Runtime& rt, Object const& object, Object& this_, ArgumentList const& args) const override
     {
         auto required_class_object = NativeClass<T>::class_object();
         if(!this_.is_instance_of(*required_class_object))
@@ -36,21 +36,21 @@ public:
             rt.throw_exception<Exception>("Cannot call function with invalid 'this': '" + this_.type_name() + "', required type: " + required_class_object->name());
             return {};
         }
-        return static_cast<NativeObject<T>&>(object).internal_data().callback(rt, this_, args);
+        return static_cast<NativeObject<T> const&>(object).internal_data().callback(rt, this_, args);
     }
 };
 
 // NOTE: This must be here because of circular dependency
 template<class T>
-void Class::define_native_function(StringId name, NativeFunctionCallback<T> callback)
+void Class::define_native_function(Runtime&, rt, StringId name, NativeFunctionCallback<T> callback)
 {
-    define_virtual_member(name, Object::create_native<NativeFunction<T>>(nullptr, callback));
+    define_virtual_member(name, Object::create_native<NativeFunction<T>>(rt, callback));
 }
 
 template<class T>
-void Object::define_native_function(StringId name, NativeFunctionCallback<T> callback)
+void Object::define_native_function(Runtime&, rt, StringId name, NativeFunctionCallback<T> callback)
 {
-    auto memval = MemoryValue::create_object(Object::create_native<NativeFunction<T>>(nullptr, callback));
+    auto memval = MemoryValue::create_object(Object::create_native<NativeFunction<T>>(rt, callback));
     memval->set_name(name);
     m_members.insert({name, memval});
 }

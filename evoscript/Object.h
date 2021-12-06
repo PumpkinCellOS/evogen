@@ -75,7 +75,7 @@ protected:
     void define_virtual_member(StringId name, std::shared_ptr<Object> const& value);
 
     template<class T>
-    void define_native_function(StringId name, NativeFunctionCallback<T> callback);
+    void define_native_function(Runtime& rt, StringId name, NativeFunctionCallback<T> callback);
 
 private:
     std::unordered_map<StringId, std::shared_ptr<Object>> m_vtable;
@@ -97,7 +97,7 @@ public:
     ClassWrapper();
     
     template<class T> requires std::is_base_of_v<NativeClass<T>, T>
-    static std::shared_ptr<Object> create();
+    static std::shared_ptr<Object> create(Runtime& rt);
 };
 
 class Object : public std::enable_shared_from_this<Object>
@@ -133,7 +133,7 @@ public:
     std::string to_string() const;
 
     template<class T>
-    void define_native_function(StringId name, NativeFunctionCallback<T> callback);
+    void define_native_function(Runtime& rt, StringId name, NativeFunctionCallback<T> callback);
 
 protected:
     friend class Class;
@@ -154,11 +154,27 @@ private:
     std::shared_ptr<Class> m_class;
 };
 
+namespace
+{
+
+template<class T, bool HasInternalData>
+struct _InternalData
+{
+    using Type = typename T::InternalData;
+};
+template<class T>
+struct _InternalData<T, false>
+{
+    using Type = ObjectInternalData;
+};
+
+}
+
 template<class T>
 class NativeObject : public Object
 {
 public:
-    using InternalData = typename std::conditional<requires { typename T::InternalData; }, typename T::InternalData, ObjectInternalData>::type;
+    using InternalData = typename _InternalData<T, requires { typename T::InternalData; }>::Type;
 
     InternalData& internal_data() { return m_internal_data; }
     InternalData const& internal_data() const { return m_internal_data; }
@@ -184,21 +200,21 @@ template<class T>
 template<class... Args>
 std::shared_ptr<NativeObject<T>> NativeClass<T>::create_object(Runtime& rt, Args&&... args) const
 {
-    auto object = std::make_shared<NativeObject<T>>(this->shared_from_this());
-    constructor(rt, *object, std::forward<Args>(args)...);
-    return object;
 }
 
 template<class T, class... Args> requires std::is_base_of_v<NativeClass<T>, T>
 std::shared_ptr<NativeObject<T>> Object::create_native(Runtime& rt, Args&&... args)
 {
-    return NativeClass<T>::class_object()->create_object(rt, std::forward<Args>(args)...);
+    auto class_ = NativeClass<T>::class_object();
+    auto object = std::make_shared<NativeObject<T>>();
+    class_->T::constructor(rt, *object, std::forward<Args>(args)...);
+    return object;
 }
 
 template<class T> requires std::is_base_of_v<NativeClass<T>, T>
-std::shared_ptr<Object> ClassWrapper::create()
+std::shared_ptr<Object> ClassWrapper::create(Runtime& rt)
 {
-    auto class_wrapper = Object::create_native<ClassWrapper>(nullptr, NativeClass<T>::class_object());
+    auto class_wrapper = Object::create_native<ClassWrapper>(rt, NativeClass<T>::class_object());
     if constexpr(requires(Object& w) { T::init_static_class_members(w); })
         T::init_static_class_members(*class_wrapper);
     return class_wrapper;

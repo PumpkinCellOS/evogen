@@ -17,7 +17,7 @@ class Time : public Class, public NativeClass<Time>
 public:
     Time();
 
-    void constructor(Runtime&, NativeObject<Time>&, Value::IntType) const
+    void constructor(Runtime&, NativeObject<Time>&, Value::IntType) const;
     virtual void constructor(Runtime&, NativeObject<Time>&, ArgumentList const&) const override;
 };
 

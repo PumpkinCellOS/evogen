@@ -24,7 +24,7 @@ public:
     template<class T, class... Args>
     void throw_exception(Args&&... args)
     {
-        m_exception = Object::create_native<T>(this, std::forward<Args>(args)...);
+        m_exception = Object::create_native<T>(*this, std::forward<Args>(args)...);
     }
 
     void throw_exception(std::shared_ptr<Object> const& object) { m_exception = object; }

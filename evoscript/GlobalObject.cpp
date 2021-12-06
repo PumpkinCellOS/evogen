@@ -17,12 +17,12 @@ namespace evo::script
 
 GlobalObject::GlobalObject(Runtime& rt)
 {
-    allocate("Array")->value() = Value::new_object(ClassWrapper::create<Array>());
-    allocate("Exception")->value() = Value::new_object(ClassWrapper::create<Exception>());
-    allocate("File")->value() = Value::new_object(ClassWrapper::create<File>());
-    allocate("Object")->value() = Value::new_object(ClassWrapper::create<Class>());
-    allocate("String")->value() = Value::new_object(ClassWrapper::create<String>());
-    allocate("Time")->value() = Value::new_object(ClassWrapper::create<Time>());
+    allocate("Array")->value() = Value::new_object(ClassWrapper::create<Array>(rt));
+    allocate("Exception")->value() = Value::new_object(ClassWrapper::create<Exception>(rt));
+    allocate("File")->value() = Value::new_object(ClassWrapper::create<File>(rt));
+    allocate("Object")->value() = Value::new_object(ClassWrapper::create<Class>(rt));
+    allocate("String")->value() = Value::new_object(ClassWrapper::create<String>(rt));
+    allocate("Time")->value() = Value::new_object(ClassWrapper::create<Time>(rt));
 
     allocate("fs")->value() = Value::new_object(Object::create_native<FileSystem>(rt));
     allocate("sys")->value() = Value::new_object(Object::create_native<System>(rt));

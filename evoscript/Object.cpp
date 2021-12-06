@@ -17,6 +17,8 @@ ClassWrapper::ClassWrapper()
     });
 }
 
+// TODO
+/*
 void ClassWrapper::print(Object const& object, std::ostream& out, bool detailed, bool dump) const
 {
     if(dump)
@@ -31,6 +33,7 @@ void ClassWrapper::print(Object const& object, std::ostream& out, bool detailed,
     else
         out << "{...}";
 }
+*/
 
 std::shared_ptr<MemoryValue> Class::resolve_class_member(StringId member) const
 {
@@ -56,6 +59,8 @@ void Class::define_virtual_member(StringId name, std::shared_ptr<Object> const& 
     m_vtable.insert({name, value});
 }
 
+// TODO
+/*
 Value Class::operator_add(Runtime& rt, Object const&, Value const& rhs) const
 {
     rt.throw_exception<Exception>("Add operator not defined for class");
@@ -84,6 +89,7 @@ void Class::print(Object const& object, std::ostream& output, bool detailed, boo
     else
         output << "{...}";
 }
+*/
 
 StringId Class::to_string_sid =    "@to_string";
 StringId Class::to_primitive_sid = "@to_primitive";
@@ -184,7 +190,7 @@ CompareResult Object::operator_compare(Runtime& rt, Value const& rhs) const
         return {};
     }
     if(auto func = get_without_side_effects(Class::op_compare_sid))
-        return func->value().call(rt, ArgumentList{{rhs}});
+        return static_cast<CompareResult>(func->value().call(rt, ArgumentList{{rhs}}).to_int(rt));
     return CompareResult::Unknown;
 }
 
